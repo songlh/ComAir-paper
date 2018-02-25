@@ -1,0 +1,49 @@
+\section{Understanding Real-World Complexity Bugs}
+\label{sec:study}
+
+
+In this section, we conduct an empirical study on real-world complexity bugs. 
+Specifically, we try to answer the following two questions:
+
+\begin{enumerate}
+
+\item What are common root causes for complexity bugs? 
+Here, we consider code constructs conducting computation in unexpected complexity as root causes. 
+Studying root causes can help us understand whether or not 
+existing algorithmic profiling algorithms work on real-world bugs 
+and can also guide the design of new approximate algorithms. 
+
+\item How real-world complexity bugs are reported, diagnosed, and fixed?
+This can help us understand the state of practice of combating process for complexity bugs. 
+
+\end{enumerate}
+
+
+\subsection{Methodology}
+\label{sec:meth}
+
+We conduct our empirical study based on a public benchmark set for 
+real-world performance bugs~\cite{PerfBug,SongOOPSLA2014}. 
+In the previous work~\cite{PerfBug}, the authors collected 110 real-world 
+performance bugs from 5 representative 
+software suites, including Apache, Chrome, GCC, Mozilla, and MySQL. 
+These software suites cover various types of functionalities and 
+are implemented by different programming languages, 
+like C/C++, Java, C\#, and JavaScript. 
+These software suites are also large and mature, 
+with millions of lines of codes and long development histories. 
+In their following work~\cite{SongOOPSLA2014}, 
+the authors further identified 65 user-perceived performance bugs, 
+which are all observed and reported by users. 
+
+
+Our study focuses on user-perceived performance bugs, 
+since these bugs have large performance impact.
+We carefully read bug reports and buggy codes for these bugs, 
+and clearly identify \ComBugs bugs caused by {\textit{unexpected algorithmic complexity}},
+and will be referred to as {\textit{complexity bugs}} in the reminder of this paper. 
+We believe the collected complexity bugs can serve as a representative sample 
+of complexity bugs in the real world. 
+The detailed distribution for studied complexity bugs is shown in Table~\ref{xx}. 
+
+
