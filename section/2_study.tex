@@ -39,11 +39,24 @@ which are all observed and reported by users.
 
 Our study focuses on user-perceived performance bugs, 
 since these bugs have large performance impact.
-We carefully read bug reports and buggy codes for these bugs, 
-and clearly identify \ComBugs bugs caused by {\textit{unexpected algorithmic complexity}},
-and will be referred to as {\textit{complexity bugs}} in the reminder of this paper. 
-We believe the collected complexity bugs can serve as a representative sample 
+After carefully reading bug reports and buggy code fragments for these bugs,
+we clearly identify \ComBugs bugs caused by {\textit{unexpected algorithmic complexity}}.
+These bugs will be referred to as {\textit{complexity bugs}} in the reminder of this paper.
+The detailed distribution for studied complexity bugs is shown in Table~\ref{tab:study}. 
+
+
+{\bf{\textit{Caveats}}}
+The same as all previous empirical studies, 
+our findings and conclusions need to be considered with our methodology.
+All studied complexity bugs come from representative software. 
+However, there are other types of software not covered in our study, 
+such as distributed systems and HPC software. 
+All studied complexity bugs are reported by users through bug tracking systems.  
+There could be complexity bugs noticed and fixed by developers in other ways. 
+However, there are no conceivable methods to study them.
+We believe the studied complexity bugs can serve as a good representative sample
 of complexity bugs in the real world. 
-The detailed distribution for studied complexity bugs is shown in Table~\ref{xx}. 
 
+\section{Root causes of complexity bugs}
 
+\input{section/tab_study}
