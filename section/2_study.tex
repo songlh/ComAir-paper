@@ -24,13 +24,12 @@ This can help us understand the state of practice of combating process for compl
 
 We conduct our empirical study based on a public benchmark set for 
 real-world performance bugs~\cite{PerfBug,SongOOPSLA2014}. 
-In the previous work~\cite{PerfBug}, the authors collected 110 real-world 
-performance bugs from 5 representative 
-software suites, including Apache, Chrome, GCC, Mozilla, and MySQL. 
-These software suites cover various types of functionalities and 
-are implemented by different programming languages, 
-like C/C++, Java, C\#, and JavaScript. 
-These software suites are also large and mature, 
+In the previous work~\cite{PerfBug}, 
+the authors collected 110 real-world performance bugs from 5 representative 
+software suites, which are Apache, Chrome, GCC, Mozilla, and MySQL. 
+These software suites cover various types of functionalities and are implemented 
+by different programming languages, including C/C++, Java, C\#, and JavaScript. 
+These software suites are all large and mature, 
 with millions of lines of codes and long development histories. 
 In their following work~\cite{SongOOPSLA2014}, 
 the authors further identified 65 user-perceived performance bugs, 
@@ -39,24 +38,27 @@ which are all observed and reported by users.
 
 Our study focuses on user-perceived performance bugs, 
 since these bugs have large performance impact.
-After carefully reading bug reports and buggy code fragments for these bugs,
-we clearly identify \ComBugs bugs caused by {\textit{unexpected algorithmic complexity}}.
-These bugs will be referred to as {\textit{complexity bugs}} in the reminder of this paper.
-The detailed distribution for studied complexity bugs is shown in Table~\ref{tab:study}. 
+After carefully reading bug reports and buggy code fragments of these bugs,
+we clearly identify \ComBugs performance problems 
+caused by {\textit{unexpected algorithmic complexity}}.
+These performance problems will be referred to as 
+{\textit{complexity problems}} in the reminder of this paper.
 
 
-{\bf{\textit{Caveats}}}
+{\bf{\textit{Caveats.}}}
 The same as all previous empirical studies, 
-our findings and conclusions need to be considered with our methodology.
+our findings and conclusions need to be considered together with our methodology.
 All studied complexity bugs come from representative software. 
 However, there are other types of software not covered in our study, 
 such as distributed systems and HPC software. 
-All studied complexity bugs are reported by users through bug tracking systems.  
-There could be complexity bugs noticed and fixed by developers in other ways. 
+All studied complexity problems are reported by users through bug tracking systems.  
+We do believe that there are complexity problems noticed 
+and fixed by developers in other ways. 
 However, there are no conceivable methods to study them.
-We believe the studied complexity bugs can serve as a good representative sample
-of complexity bugs in the real world. 
+We believe that the studied complexity problems can serve as a representative sample
+of complexity problems in the real world. 
 
-\section{Root causes of complexity bugs}
+
+\subsection{Root causes of complexity problems}
 
 \input{section/tab_study}
