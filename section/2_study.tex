@@ -62,3 +62,36 @@ of complexity problems in the real world.
 \subsection{Root causes of complexity problems}
 
 \input{section/tab_study}
+
+
+In this section, we study root causes of complexity problems in different categories. 
+Our study focuses on 1) what code constructs causing the complexity problems, 
+and 2) why the complexity problems can generate user-perceived performance impact. 
+
+{\underline{\textit $O(N)$: linear complexity.}} 
+As shown in Table~\ref{tab:study}, 
+8 out of 30 studied complexity problems are in linear complexity. 
+All of these problems are caused by a buggy loop, 
+whose iterations scale in term of input size $N$.
+
+For 5 of them, their corresponding buggy loops contain serialized IO operations.
+Although loop iteration numbers or input sizes are not large,
+these bugs can still cause user-perceived performance problems.
+The patches for these bugs are to aggregate IO operations 
+or completely eliminate unnecessary IO operations.   
+For example, Mozilla\#490742 is caused by bookmarking tabs by using separated database transactions. 
+Even bookmarking 50 tabs can cause the timeout dialog to pop up.
+To fix this bug, mozilla developers use one aggregated transaction to bookmark all tabs together.
+As another example, Mozilla\#344059 is due to saving unchanged 
+search engine preferences to SQLite, 
+and it is fixed by only saving search engine preferences when they are changed.
+
+For the left 3 bugs, their buggy loops will execute many iterations during buggy runs,
+and they are fixed by adding shortcuts to completely remove the buggy loops.
+Take MySQL\#33948 as an example, 
+originally MySQL developers keep both used and free table entries in the same linked list,
+and the buggy loop is to go through the list and look for a free entry.
+During buggy runs, many table entries are used and the buggy loop 
+needs a lot of iteration to find a free entry. 
+To fix this bug, MySQL developers separate used entries and free entries and keep them in two different linked lists. 
+
