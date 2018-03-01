@@ -38,9 +38,24 @@
 
 \newcommand*{\Scale}[2][4]{\scalebox{#1}{$#2$}}%
 \newcommand{\Tool}{ComAir\xspace}
-\newcommand{\ComBugs}{29\xspace}
+\newcommand{\ComBugs}{30\xspace}
+%\newcommand{\Code}[1]{\lstinline{#1}}
 %\newcommand{\comment}[1]{{}}
 
+
+\lstset{
+  basicstyle=\tiny,
+  columns=fullflexible,
+  numbersep=5pt,
+  numberstyle=\scriptsize,
+  showstringspaces=false,
+  escapeinside={/*@}{@*/},
+  belowcaptionskip=1\baselineskip,
+  language=C,
+  showstringspaces=true,
+  keywordstyle=\bfseries,
+  commentstyle=\itshape,
+}
 
 
 \sloppy
@@ -64,6 +79,8 @@
 
 \input{section/1_intro}
 \input{section/2_study}
+
+\input{section/6_related}
 
 
 
