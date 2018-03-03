@@ -9,7 +9,43 @@ b. Identifying performance bugs caused by API-misuse
 
 The state of the art cannot be applied to production runs. 
 
-Contributions:
-a. Empirical study on real-world complexity bugs
-b. A thorough study on conducting algorithmic profiling during in-house testing
-c. Approximate algorithm to conduct algorithmic profiling in production runs. 
+To better understand real-world complexity problems,
+we conduct an empirical study on complexity bugs 
+in a representative performance bug benchmark suite~\cite{PerfBug,SongOOPSLA2014}.
+To the best of our knowledge, our work is the first study focusing on complexity problems.
+We divide studied complexity problems into different complexity categories.    
+We study root causes, how user-perceived performance impact is generated, 
+and fix strategies for each category.
+We also investigate the reporting and diagnosis process for complexity problems. 
+Our findings and implications can motivate future research on complexity problems. 
+They already guide our design point selection when exploring in-house algorithmic profiling 
+and inspire our approximate algorithms when building production-run techniques. 
+
+
+
+
+Specifically, we make the following contributions:
+
+\begin{itemize}
+
+\item First, we conduct the first empirical study on real-world complexity problems. 
+We have several important findings and implications, including
+1) around three fourths of studied complexity problems are 
+caused by repeated executions of buggy code constructs,
+such as loops or recursive functions;
+2) for most complexity problems, 
+users describe how to change input size to observe the scaling problem during reporting;
+and 3) complexity problems usually take longer time to diagnose and fix, 
+and more effective tool supports are needed.  
+
+
+
+
+ 
+
+\item Second, we systematically study design points for in-house algorithmic profiling.
+
+\item Third, we propose two approximate algorithms to conduct algorithmic profiling in production runs. 
+
+\end{itemize}
+

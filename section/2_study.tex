@@ -60,6 +60,7 @@ of complexity problems in the real world.
 
 
 \subsection{Root causes of complexity problems}
+\label{sec:tax}
 
 \input{section/tab_study}
 
@@ -74,7 +75,7 @@ and 3) how developers fix these complexity problems.
 As shown in Table~\ref{tab:study}, 
 8 out of \ComBugs studied complexity problems are in linear complexity. 
 All of these problems are caused by a buggy loop, 
-whose average loop iteration number scales in term of input size $N$.
+whose average loop iteration number scales in terms of input size $N$.
 
 For 5 of them, their corresponding buggy loops contain serialized I/O operations.
 Although average loop iteration numbers or input sizes are not large,
@@ -83,33 +84,25 @@ The patches for these bugs are to aggregate I/O operations
 or completely eliminate unnecessary I/O operations.   
 For example, Mozilla\#490742 is caused by bookmarking tabs 
 by using separated database transactions. 
-Even bookmarking 50 tabs can cause a timeout dialog to pop up during a buggy run.
-To fix this bug, mozilla developers use only one aggregated transaction to bookmark all tabs together.
+Even bookmarking 50 tabs can cause a timeout dialog window to pop up 
+in a performance failure run.
+To fix this bug, mozilla developers use one single aggregated transaction 
+to bookmark all tabs.
 As another example, Mozilla\#344059 is due to saving unchanged 
 search engine preferences to SQLite, 
-and it is fixed by only saving search engine preferences when some of them are changed.
+and it is fixed by only saving search 
+engine preferences when some of them are changed.
 
-
-For the other 3 bugs, their buggy loops will execute many iterations during buggy runs,
-and they are fixed by adding shortcuts to completely remove the buggy loops.
+For the other 3 bugs, their buggy loops will execute many iterations 
+during performance failure runs,
+and they are fixed by adding shortcuts to completely skip the buggy loops.
 Take MySQL\#33948 as an example, 
 originally MySQL developers keep both used and free table entries in the same linked list,
-and the buggy loop is to go through the list and look for a free entry.
-During buggy runs, many table entries are used and the buggy loop 
-needs to take a lot of iteration to find a free entry. 
-To fix this bug, MySQL developers simply keep used entries 
-and free entries in two different linked lists. 
-
-
-{\underline{\textit{$O(N^k)$: polynomial complexity (k>1).}}}
-As shown in Table~\ref{tab:study}, 
-more than half of the studied complexity bugs are in polynomial complexity. 
-Similar to complexity problems in linear complexity,
-polynomial complexity for each bug in this category is caused by a buggy loop.
-However, {\bf both} loop execution numbers and average loop iteration number
-scale as input size $O(N)$.
-
-
+and the buggy loop is to iterate the linked list and look for a free entry.
+During performance failure runs, many table entries are used and the buggy loop 
+needs to take a lot of iterations to find a free entry. 
+To fix this bug, MySQL developers simply separate used entries 
+and free entries, and keep them in two different linked lists. 
 
 \begin{figure}
 \centering
@@ -117,29 +110,40 @@ scale as input size $O(N)$.
      morekeywords={+},keepspaces=true}
   \mbox{\lstinputlisting[mathescape,boxpos=t]{figure/mysql27287.c}}
 \caption{A MySQL performance problem in polynomial complexity. 
-  (During buggy runs, the total loop iterations scale polynomially in the size of \texttt{items}.)}
+  (During performance failure runs, 
+   the total loop iterations scale polynomially in the size of \texttt{items}.)}
 \vspace{-0.05in}
 \label{fig:mysql27287}
 \vspace{-0.05in}
 \end{figure}
 
+{\underline{\textit{$O(N^k)$: polynomial complexity (k>1).}}}
+As shown in Table~\ref{tab:study}, 
+more than half of the studied complexity bugs are in polynomial complexity. 
+Similar to complexity problems in linear complexity,
+polynomial complexity for each problem is also caused by a buggy loop.
+However, {\bf both} loop execution number and average loop iteration number
+scale as input size $O(N)$.
+
 To fix the majority (13/18) of performance problems in this category, 
 developers directly modify the loops whose total loop iterations scale polynomially.  
 The buggy loop for MySQL\#27287 is shown in Figure~\ref{fig:mysql27287}.
-The loop searches parent \texttt{XML\_NODE} for the function input \texttt{nitems}, 
-which is the index for another \texttt{XML\_NODE}.
-All \texttt{XML\_NODE}s are maintained in the array \texttt{items}. 
+The loop searches parent \texttt{XML\_NODE} for function parameter \texttt{nitems}, 
+which presents array index for another \texttt{XML\_NODE}.
+All \texttt{XML\_NODE}s are maintained in array \texttt{items}. 
 The way the loop to conduct the search is to iterate array \texttt{items} 
-backward from the input node and look for the first \texttt{XML\_NODE} 
+backward from the input and look for the first \texttt{XML\_NODE} 
 whose level is one less than the input.
-During buggy runs, one \texttt{XML\_NODE} contains tens of thousands of children, 
+During performance failure runs, 
+one \texttt{XML\_NODE} contains tens of thousands of children, 
 and \texttt{xml\_parent\_tag} is invoked for each of its children. 
 To fix this bug, MySQL developers add an extra field to each 
 \texttt{XML\_NODE} to save its parent, 
 and this field is initialized when a \texttt{XML\_NODE} is created. 
 After that, the buggy loop is completely removed. 
 
-To fix other performance problems (5/18) in this category, 
+
+To fix other performance problems (5/18), 
 developers reduce data processed by the loops scaling polynomially, 
 instead of optimizing the loops directly. 
 For example, the loop scaling polynomially for GCC\#12322 is part 
@@ -147,7 +151,7 @@ of the functionality to do basic block reordering,
 and it will perform poorly for basic blocks with many successors. 
 The bug-triggering input contains a basic block with thousands of successors. 
 To fix this, developers simply skip basic blocks with many successors, 
-which will lose some optimization opportunities 
+which will lose some optimization opportunities, 
 but can still keep generated codes working correctly. 
 
 
@@ -157,8 +161,8 @@ but can still keep generated codes working correctly.
      morekeywords={+},keepspaces=true}
   \mbox{\lstinputlisting[mathescape,boxpos=t]{figure/gcc27733.c}}
 \caption{A GCC performance problem in exponential complexity. 
- (During buggy runs, how many times \texttt{mult\_alg} is invoked scales exponentially
-  in the number of ones in the binary form of input \texttt{t}.)}
+ (During performance failure runs, how many times \texttt{mult\_alg} is invoked scales exponentially
+  in the number of 1s in the binary form of input \texttt{t}.)}
 \vspace{-0.05in}
 \label{fig:gcc27733}
 \vspace{-0.05in}
@@ -177,47 +181,52 @@ recursive function \texttt{mult\_alg} computes the best algorithm to multiply \t
 In each invocation, \texttt{mult\_alg} will try a set of bitwise 
 operations to change input 
 \texttt{t} into a smaller number \texttt{t'} and recursively call itself. 
-The number of times \texttt{mult\_alg} scales exponentially 
+The number of times when \texttt{mult\_alg} is invoked scales exponentially 
 in terms of 1s in the binary form of input \texttt{t}. 
 To optimize this function, 
 GCC developers use a hash table \texttt{alg\_hash} to record
 which \texttt{t} has been processed before and what is its corresponding result.
-However, there is a type declaration error inside the hash table entry struct,
+However, there is a type declaration error inside the hash table entry,
 and this error causes \texttt{t} larger than the maximum unsigned integer to never hit cache.
 For large \texttt{t}, \texttt{mult\_alg} is still in exponential complexity. 
-To fix this bug, 
-GCC developers simply change the type declaration to enable memoization for large \texttt{t}. 
+After fixing the type declaration error, 
+memoization is enabled for large \texttt{t}. 
 
 GCC\#32540 is in exponential complexity and is caused by an inefficient loop. 
 The loop applies iterative algorithm to implement a compiler optimization. 
 The bug-triggering input contains very complex control and data dependence,  
 so that the buggy loop scales exponentially in terms of \texttt{if} branch in the input. 
-To fix this bug, developers simply disable optimization 
+To fix this bug, developers simply disable the optimization 
 after detecting complex control and data dependence.  
 
 
+
 \subsection{Diagnosis process of complexity problems}
+\label{sec:process}
 
 We also studied how complexity problems are reported by users and get diagnosed by developers. 
 
 {\underline{\textit{How complexity problems are reported?}}
 As shown in Table~\ref{tab:study},
-for most of complexity bugs (25/35), 
-how to change input sizes in order to observe performance scaling problems is specified by users during reporting. 
+for most complexity bugs (25/35), 
+how to change input sizes in order to observe performance scaling problems 
+is specified by users during reporting. 
 As discussed in previous works~\cite{SongOOPSLA2014}, 
-all collected user-perceived performance bug reports in the benchmark set 
-contain bug-triggering inputs from users. 
+all collected user-perceived performance bug reports
+contain bug-triggering inputs provided by users. 
 For most complexity bugs, 
 users will also describe how they change input sizes 
 and how performance changes accordingly. 
 For example, when reporting GCC\#32540, 
 the user provides a C file and several measurement results to 
-show how GCC compilation time scales exponentially with the number of branch in the C file. 
+show that GCC compilation time scales exponentially 
+with the number of \texttt{if} branch in the C file. 
 As another example, when reporting Mozilla\#490742, 
 the user mentions that the length of high, 
 flat CPU usage is related to the number of search engine preferences. 
 
-For the other 5 bugs, users provide one bug-triggering inputs or describe a set of bug-triggering inputs during reporting. 
+For the other 5 bugs, users provide one bug-triggering input 
+or describe a set of bug-triggering inputs when they report the performance problems. 
 For example, when reporting GCC\#27733, 
 the user provides one bad input, which can take GCC 49 minutes to compile. 
 When reporting Mozilla\#231300, the user mentions that clearing disk cache on Mac can trigger the bug, 
@@ -228,25 +237,59 @@ We study how long it takes developers to fix complexity problems.
 On average, it takes developers 162 days to diagnose a complexity problem. 
 Following the same methodology as the previous work~\cite{SongOOPSLA2014},
 we calculate diagnosis time starting from when a problem was reported 
-and ending at when the problem was fixed by developers. 
-It takes developers 101 days to diagnose non-complexity bugs in the same set on average. 
-Diagnosing complexity bugs takes longer time. 
+and ending at when correct patches are submitted on bug tracking systems. 
+On average, it takes developers 101 days to diagnose non-complexity bugs in the same set. 
+Diagnosing complexity problems takes longer time. 
+
 
 As discussed in the previous works~\cite{SongOOPSLA2014}, 
 profiler is the only diagnosis tool mentioned in bug reports 
-when diagnosing the user-perceived performance problems. 
+when diagnosing the collected user-perceived performance problems. 
 Profiler is mentioned in 7 out of 30 complexity bug reports. 
-The percentage of bug reports where profiler is mentioned is similar compared complexity bugs with non-complexity bugs. 
+The percentage of bug reports where profiler is mentioned 
+is similar compared complexity bugs with non-complexity bugs. 
 
 
 \subsection{Implications}
-{\underline{\textit{Implication 1}}
-All studied complexity problems are caused either by loops or by recursive function calls. 
 
+
+{\underline{\textit{Implication 1}}
+For most studied complexity problems (25/30),
+their patches are to directly optimize loops or recursive functions scaling poorly.
+Accurately attributing complexity to loops or to functions can effectively guide developers where to investigate. 
+Our study also shows that developers need to spend longer time to 
+diagnose and fix complexity problems.
+Traditional profiler is the only tool mentioned during diagnosis, 
+and traditional profilers can only tell where computation is spent in each run, 
+while can{\bf not} analyze or predict how computation scales across different runs.
+To sum up, automatic algorithmic profilers are solely needed to effectively combat complexity problems.  
 
 {\underline{\textit{Implication 2}}
-How to change input size is described by users, 
-and this is very important to profile programs’ complexity and diagnose complexity problems.  
+In order to effectively profile algorithmic complexity,
+a set of inputs with similar code coverage while different input sizes is needed. 
+Our study shows that when reporting complexity problems,
+users will describe how to change input sizes, 
+while preserving similar functionalities (or code coverage). 
+It is fairly easy for developers to get necessary inputs in order 
+to conduct diagnosis or algorithmic profiling for user-reported complexity problems. 
 
-{\underline{\textit{Implication 3}} 
-Profiling may not be that useful. 
+ 
+{\underline{\textit{Implication 3}}
+We also refer previous studying results to understand how complexity problems are introduced. 
+20 out of 30 studied complexity bugs are introduced, 
+because developers' workload assumption is wrong or workload has changed. 
+This result motivate to monitor workload and conduct algorithmic profiling in production runs. 
+Workload monitoring tools can warn developers when workload assumption is wrong.
+Online algorithmic profiling tools can tell developers 
+how each piece of codes scales under workload on the user side.  
+
+
+{\underline{\textit{Implication 4}}}
+Our study shows that around three-fourths of studied complexity problems (22/30)
+are caused by repeated execution of buggy code constructs. 
+These bugs are categorized as polynomial complexity and exponential complexity in Section~\ref{sec:tax}.
+Previous works~\cite{SongOOPSLA2014,ldoctor} 
+show that sampling code constructs 
+executing many times can lower the runtime overhead 
+while preserving the same diagnosis or detection capability. 
+It is promising to apply sampling and design production-run algorithmic profiling techniques. 

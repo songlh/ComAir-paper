@@ -2,9 +2,16 @@
 %\documentclass[letterpaper,twocolumn,10pt]{article}
 %\usepackage{usenix,epsfig,endnotes}
 
-\documentclass[sigconf,review, anonymous]{acmart}
-\acmConference[ESEC/FSE 2018]{The 26th ACM Joint European Software Engineering Conference and Symposium on the Foundations of Software Engineering}{4–9 November, 2018}{Lake Buena Vista, Florida, United States}
+\documentclass[sigconf, review, anonymous]{acmart}
 
+
+
+\acmConference[ESEC/FSE 2018]{The 26th ACM Joint European Software Engineering Conference and Symposium on the Foundations of Software Engineering}{4-9 November, 2018}{Lake Buena Vista, Florida, United States}
+
+
+\settopmatter{printacmref=false} % Removes citation information below abstract
+\renewcommand\footnotetextcopyrightpermission[1]{} % removes footnote with conference information in first column
+%\pagestyle{plain} % removes running headers
 % standard LaTeX packages
 %\usepackage{changebar}
 
@@ -62,13 +69,14 @@
 
 \input macros.tex
 
+
 \begin{document}
 
 
 
 
 
-\title{ComAir: Algorithmic Profiling in Production Runs}
+\title{Algorithmic Profiling for Real-World Complexity Problems}
 
 
 \begin{abstract}
@@ -79,7 +87,7 @@
 
 \input{section/1_intro}
 \input{section/2_study}
-
+\input{section/3_inhouse}
 \input{section/6_related}
 
 

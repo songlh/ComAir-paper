@@ -1,1 +1,76 @@
-\section{Algor}
+\section{In-house Algorithmic Profiling}
+\label{sec:inhouse}
+
+In this section, we discuss the design and implementation for in-house algorithmic profiling.
+Under in-house scenario, 
+developers can conduct algorithmic profiling 
+to detect previously unknown complexity problems before releasing their software, 
+or developers could diagnose and fix complexity problems reported by users through bug databases.
+For both of these two cases, 
+run-time overhead is not a major concern. 
+
+\subsection{Design}
+To conduct algorithmic profiling~\cite{Aprof1,Aprof2,AlgoProf},
+we first need to record input \textit{size} and \textit{cost} for different code constructs 
+during multiple executions,
+we then plot records from the same code construct with input size as x-axis and cost as y-axis, 
+and finally, we infer a cost function of the input size by using 
+statistical curve fitting~\cite{curve-fitting} 
+or curving bounding~\cite{curve-bounding}. 
+Therefore, the fundamental design points for algorithmic 
+profiling are to select suitable metrics for input size and cost. 
+
+{{\bf{\underline{\textit{Input designs.}}}}
+Many metrics can be used to measure input for a code construct. 
+We discuss commonly used ones as follows.
+
+
+%\begin{enumerate}
+
+\underline{\textit{Program input.}}
+As discussed in Section~\ref{sec:process}, 
+users tend to specify how to change the whole program 
+input in order to describe the perceived complexity problem during reporting.
+Input size for the whole program is fairly easy to get based on users' report.
+However, the whole program input is related to the input of a code construct in various ways.  
+Changing the whole program input may not change 
+input sizes for all code constructs.
+Using program input as input size for a code 
+construct may lead to incorrect profiling results.
+
+
+\underline{\textit{Read memory size.}}
+~\citet{Aprof1,Aprof2} proposes to use read memory size (RMS) as
+input size for a code construct. 
+RMS is defined as the size of distinct memory cells 
+whose first access is read by the code construct and 
+all the functions called by the code construct directly or indirectly.  
+RMS is a generic metric to measure input size for a code construct. 
+
+RMS is a generic metric to measure input size for a code construct. 
+The RMS value for the loop of MySQL\#27287 shown in Figure~\ref{fig:mysql27287}
+is roughly equal to 2 times the number of \texttt{XML\_NODE} 
+accessed during a loop execution, 
+because \texttt{level} field and \texttt{type} field of 
+different \texttt{XML\_NODE}s will be read in each iteration.
+Although variable \texttt{p} and \texttt{level} are also read in each iteration,
+RMS only considers distinct memory cells and 
+only update its value for the first read of these two variables in the first iteration.  
+There is an outer loop for MySQL\#27287, 
+and the outer loop invokes \texttt{xml\_parent\_tag} 
+for every \texttt{XML\_NODE} contained
+in the same array \texttt{items}. 
+For that outer loop, its RMS value is in linear relationship 
+with the size of array  \texttt{items}, 
+since RMS only considers distinct memory cells 
+and multiple read conducted on the same memory 
+cell will not increase RMS value. 
+
+
+
+
+
+{\bf{\textit{Data Structure Size.}}}
+
+
+%\end{enumerate}
