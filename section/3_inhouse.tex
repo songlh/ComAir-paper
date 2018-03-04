@@ -20,6 +20,8 @@ or curving bounding~\cite{curve-bounding}.
 Therefore, the fundamental design points for algorithmic 
 profiling are to select suitable metrics for input size and cost. 
 
+
+
 {{\bf{\underline{\textit{Input designs.}}}}
 Many metrics can be used to measure input for a code construct. 
 We discuss commonly used ones as follows.
@@ -32,43 +34,207 @@ As discussed in Section~\ref{sec:process},
 users tend to specify how to change the whole program 
 input in order to describe the perceived complexity problem during reporting.
 Input size for the whole program is fairly easy to get based on users' report.
-However, the whole program input is related to the input of a code construct in various ways.  
-Changing the whole program input may not change 
-input sizes for all code constructs.
-Using program input as input size for a code 
-construct may lead to incorrect profiling results.
-
+We could use the size of the whole program input 
+as the size of a code construct inside the program.  
 
 \underline{\textit{Read memory size.}}
 ~\citet{Aprof1,Aprof2} proposes to use read memory size (RMS) as
 input size for a code construct. 
 RMS is defined as the size of distinct memory cells 
-whose first access is read by the code construct and 
-all the functions called by the code construct directly or indirectly.  
-RMS is a generic metric to measure input size for a code construct. 
+whose first access is read by the code construct or by 
+all the functions called from the code construct directly or indirectly.  
+
 
 RMS is a generic metric to measure input size for a code construct. 
-The RMS value for the loop of MySQL\#27287 shown in Figure~\ref{fig:mysql27287}
+For example, 
+RMS value for a loop execution of
+the buggy loop in Figure~\ref{fig:mysql27287}
 is roughly equal to 2 times the number of \texttt{XML\_NODE} 
-accessed during a loop execution, 
+accessed during the execution, 
 because \texttt{level} field and \texttt{type} field of 
-different \texttt{XML\_NODE}s will be read in each iteration.
+different \texttt{XML\_NODE}s are read in each iteration.
 Although variable \texttt{p} and \texttt{level} are also read in each iteration,
 RMS only considers distinct memory cells and 
-only update its value for the first read of these two variables in the first iteration.  
-There is an outer loop for MySQL\#27287, 
+only update its value for the first read of these two variables in the first iteration. 
+There is also an outer loop, 
 and the outer loop invokes \texttt{xml\_parent\_tag} 
 for every \texttt{XML\_NODE} contained
 in the same array \texttt{items}. 
 For that outer loop, its RMS value is in linear relationship 
-with the size of array  \texttt{items}, 
+with the size of array \texttt{items}, 
 since RMS only considers distinct memory cells 
 and multiple read conducted on the same memory 
-cell will not increase RMS value. 
+cell of array \texttt{items} will not increase RMS value. 
+The cost function containing the outer loop is shown in Figure~\ref{fig:mysql27287-line}.
 
-There are two problems to use RMS. 
 
-{\bf a. recursive functions xxxx}
+{\underline{\textit{Data structure size.}}}
+~\citet{AlgoProf} propose to use size of accessed data structures, 
+like linked lists or arrays, as input size of a code construct. 
+Data structure size can possibly provide 
+more semantic information for analyzed codes.
+   
+In the reminder of this paper, we will focus on RMS as input metric. 
+We skip the whole program input, 
+because it is related to the input of a code construct in various ways.
+Changing the whole program input may not change input sizes for all code constructs. 
+Using program input as input size for a code 
+construct may lead to incorrect profiling results. 
+We skip data structure size,
+because it is not a generic measure. 
+We need to design and implement extra static and dynamic techniques 
+to identify data structures and figure out their sizes.
+
+
+
+{{\bf{\underline{\textit{Cost designs.}}}}
+There are also a lot of metrics which can be used to measure execution cost. 
+For example, the number of executed instructions, 
+the time elapsed during execution, 
+and the number of executed basic blocks. 
+We focus on using the number of executed basic blocks. 
+We do not use execution time, 
+because execution time may not provide accurate measurement 
+for code constructs taking very little time.
+We skip to use the number of executed instructions, 
+because it is highly correlated with the number of executed basic blocks. 
+{\bf XXX: Discuss loop iteration numbers and recursive function call number}
+
+\subsection{Implementation and optimizations}
+
+
+Aprof~\cite{Aprof1, Aprof2} is an algorithmic profiling tool built on Valgrind. 
+Aprof uses RMS as input metric and executed basic blocks as cost metric 
+to attribute complexity to functions. 
+We use LLVM framework to build an in-house algorithmic profiling tool.
+Our tool building starts from the instrumentation algorithms used in aprof. 
+We also design a set of optimizations to reduce the runtime overhead.
+In this section, we will first overview algorithms in aprof firstly, 
+and we will then discuss optimizations we designed. 
+
+{{{\bf{\underline{\textit{Aprof overview.}}}}
+Aprof uses the number of executed basic blocks as cost metric.
+To measure this number, aprof keeps a global counter \texttt{cost}, 
+which tracks how many basic blocks are executed since 
+starting the monitored program.
+To figure out whether a memory cell is accessed by the same function invocation before,
+aprof keeps another global counter \texttt{count}, 
+which tracks how many functions have been invoked.  
+Aprof maintains a shallow stack \texttt{S}, 
+which grows as the monitored program makes a function invocation, 
+and shrinks as the monitored program returns. 
+Aprof uses the third global variable \\texttt{top} to track the top of \texttt{S}.
+Aprof also maintains a hashmap \texttt{ts}, 
+which tracks latest access function for each distinct memory cell. 
+
+Aprof instruments 4 types of instructions: \texttt{call}, 
+\texttt{return}, \texttt{read}, and \texttt{write}. 
+When the monitored program makes a function call,
+aprof will increase \texttt{count} and \texttt{top} by 1.
+The new added stack entry will be initialized as follows, 
+\texttt{top.ts=count}, 
+\texttt{top.rms=0} and \texttt{top.cost=cost}.  
+Where the monitored program returns,
+aprof will create a log based on the content inside \texttt{S[top]}
+contribute the rms 
+of the returned function to its caller by doing \texttt{S[top-1].rms+=S[top].rms},
+and shrink the stack. 
+For a memory read on a cell \texttt{w},
+if \texttt{w}'s last access timestamp \texttt{ts[w]} is smaller 
+than the timestamp when the current function is invoked \texttt{S[top].ts},
+aprof will increase the RMS value for the current function.
+Since aprof will contribute an invoked function's rms to its caller, 
+aprof will also check active functions on the shadow stack and 
+decrease their RMS when necessary..   
+Aprof will set memory cell \texttt{w}'s latest access time 
+for all memory \texttt{read} and \texttt{write} on \texttt{w}.
+{\bf xxxx: these two parameters are very bad}
+
+{{{\bf{\underline{\textit{Optimizations}}}}
+We design several optimizations to reduce the 
+runtime overhead for our LLVM implementation. 
+
+Our first optimization is designed to efficiently count the number of executed basic blocks.
+Instead of incrementing a global counter \texttt{cost} inside every basic block, 
+we apply an algorithm to decide where to update \texttt{cost} and how to update \texttt{cost}  
+The algorithm was designed to efficiently count program events through selectively instrumenting counter 
+on edges of control flow graph~\cite{xx}. 
+It has already been effectively applied for path profiling~\cite{xx}.
+
+To apply the algorithm, we first instrument a local counter 
+\texttt{local\_cost} at the beginning of each function
+and initialize its value to be 0. 
+We will add the value of \texttt{local\_cost} to \texttt{cost} before 
+each function return.
+After that, we only need to consider where to update \texttt{local\_cost} 
+within a function.
+We design and implement intra-procedural 
+control flow analysis to achieve this.   
+Since the algorithm is design to count events on edge,
+we split each basic block into two and attribute event number to be 1 
+for the edge connecting the two split basic block.  
+We attribute event number to be 0 for edges originally in the control flow graphs. 
+We calculate spanning tree for the new control flow graphs. 
+Edges not in the spanning tree are called chords.
+Finally, we applied the depth-first search algorithm proposed in~cite{} to decide
+on which chords we should increment 
+\texttt{local\_cost} and how much values we should add to \texttt{local\_cost}.
+ 
+
+The second optimization targets improving the performance of hash-table lookup.
+For each read and write on memory cell w, 
+aprof needs to query a hash-table for the latest access time for w and decide 
+whether RMS should be updated.
+Aprof also needs to update the hash-table entry for w when necessary. 
+
+Instead of using hash-table, we use a page-table to contain timestamp information. 
+We declare timestamp as \texttt{long} integer. 
+To balance runtime overhead and memory overhead, 
+we design a 4-layer page table for 32-bit program 
+and 6-layer page table for 64-bit program.
+We use 4kb consecutive memory space to hold pointers to next layer 
+or timestamps for memory cell. 
+Compared with hash-table, page-page considers data locality and can lead 
+to a better cache performance. 
+To further improve performance, 
+we add an extra variable to hold a pointer pointing 
+to the last referred memory space holding timestamp.
+When new query coming, we first check the saved pointer value can be used, if not,
+we will conduct page-table look up.  
+
+The third optimization tries to reduce the number of instrumentation for read and write. 
+For this optimization, we only focus on stack memory cells holding 
+scalar variables and only used as parameters for read and write.  
+We add these conditions, because we want to avoid complex pointer alias analysis, 
+which is highly possible to introduce inaccurate results. 
+For read conducted on these memory cells, 
+if it is dominated by another read or write on the same memory cell, we skip instrumenting this read.
+For a write conducted on one of these memory cells, 
+if it is dominated by another write on the the same cell, we skip instrumenting this write. 
+{\bf xx: providing more explannation here}
+
+
+
+
+\subsection{Enhancing RMS}
+There are two limitations in applying RMS. 
+In this section, we will discuss how to augment 
+RMS to address these two limitations.
+
+{\bf xxx: there is the problem for recursive functions, using GCC#27733 as example}
+
+
+
+\begin{figure*}
+\centering
+\subfloat[MySQL\#27287]{\includegraphics[width=0.32\linewidth]{figure/apache34464-line}\label{fig:mysql27287-line}} 
+\subfloat[GCC\#27733]{\includegraphics[width=0.32\linewidth]{figure/apache34464-line}\label{fig:jaccard}}
+\subfloat[Apache\#34464]{\includegraphics[width=0.32\linewidth]{figure/apache34464-line}\label{fig:apache34464-line}} \\ 
+\vspace{-0.1in}
+\caption{Cost function using RMS as input size.} 
+\label{fig:heat} 
+\end{figure*} 
+
 
 \begin{figure}
 \centering
@@ -82,15 +248,6 @@ There are two problems to use RMS.
 \vspace{-0.05in}
 \end{figure}
 
-\begin{figure*}
-\centering
-\subfloat[MySQL\#27287]{\includegraphics[width=0.32\linewidth]{figure/apache34464-line}\label{fig:bernoulli}} 
-\subfloat[GCC\#27733]{\includegraphics[width=0.32\linewidth]{figure/apache34464-line}\label{fig:jaccard}}
-\subfloat[Apache\#34464]{\includegraphics[width=0.32\linewidth]{figure/apache34464-line}\label{fig:apache34464-line}} \\ 
-\vspace{-0.1in}
-\caption{Cost function using RMS as input size.} 
-\label{fig:heat} 
-\end{figure*} 
 
 Another problem for RMS is that it does not consider inputs from I/O.
 Buggy code fragment for Apache\#34463 is shown 
@@ -108,24 +265,10 @@ no matter how many characters we get from \texttt{getchar()},
 the RMS value for this piece of code is constant depending 
 on the size of string \texttt{target}, 
 variable \texttt{sourceLen} and variable \texttt{targetLen}, 
-as shown in Figure~\ref{fig:apache34464-line}. 
+as shown in Figure~\ref{fig:apache34464-line}.
 
+\subsection{Discussion}
 
-{\underline{\textit{Data structure size.}}}
-~\citet{AlgoProf} propose to use sizes of accessed data structures, 
-like linked lists or arrays, as input sizes of code constructs. 
-Data structure size can provide more semantic information about analyzed codes.
-However, data structure size is not a generic metric.
-Special static or dynamic techniques are needed in order to identify data structures 
-and figure out their sizes. 
-Data structure size cannot correctly measure input size for 
-a recursive function with integer value as input,
-and it does not consider possible input from I/O, 
-which is the same as RMS.     
+{\bf xxx: top-down view}
 
-
-{{\bf{\underline{\textit{Cost designs.}}}}
-There are also a lot of metrics which can be used to measure execution cost. 
-We discuss them as follows.
-
-%\end{enumerate}
+{\bf xxx: Here we want accurate results while trading runtime overhead}
