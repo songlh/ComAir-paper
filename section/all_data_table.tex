@@ -1,0 +1,18 @@
+\section{Test Table}
+\label{sec:test table}
+
+\begin{table*}
+  \caption{All Data}
+  \label{tab:commands}
+  \begin{tabular}{ccccccccccl}
+    \toprule
+     Case & Valgrind & NO+Optmized & Optimized & Sample & Rms/BB &  Sample/BB & Original Complexity & Languge & LOC & Corr\\
+    \midrule
+    apache53622 & 59 & 73 & 33 & 16.20\% & $0.8*x^{1.90}-4$ & $0.61*x^{1.92}-21$ & N^2 & C & 1095 & > 0.99  \\
+    apache53622-1 & 59 & 73 & 33 & 16.20\% & $0.8*x^{1.90}-4$ & $0.61*x^{1.92}-21$ & N^2 & C & 1095 & > 0.99  \\
+    mozilla347306 & 68 & 5 & 4 & 3.22\% & $0.57*x^{1.75}-76$ & $0.02*x^{1.98}+25$ & N^2 & C & 1095 & > 0.99  \\
+    mozilla416628 & x & 58 & 34 & 6.99\% & $1.38*x^{1.88}+56$ & $1.2*x^{1.92}-64$ & N^2 & C & 1095 & > 0.99  \\
+    \bottomrule
+  \end{tabular}
+\end{table*}
+% end the environment with {table*}, NOTE not {table}!
