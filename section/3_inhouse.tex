@@ -66,11 +66,66 @@ since RMS only considers distinct memory cells
 and multiple read conducted on the same memory 
 cell will not increase RMS value. 
 
+There are two problems to use RMS. 
+
+{\bf a. recursive functions xxxx}
+
+\begin{figure}
+\centering
+\lstset{basicstyle=\ttfamily\fontsize{7}{8}\selectfont,
+     morekeywords={+},keepspaces=true,numbers=left}
+  \mbox{\lstinputlisting[mathescape,boxpos=t]{figure/apache34464.c}}
+\caption{An Apache performance problem in $O(N^2)$ complexity. 
+(Execution time scales polynomially in the number of characters read from  \texttt{getchar()}.) }
+\vspace{-0.05in}
+\label{fig:apache34464}
+\vspace{-0.05in}
+\end{figure}
+
+\begin{figure*}
+\centering
+\subfloat[MySQL\#27287]{\includegraphics[width=0.32\linewidth]{figure/apache34464-line}\label{fig:bernoulli}} 
+\subfloat[GCC\#27733]{\includegraphics[width=0.32\linewidth]{figure/apache34464-line}\label{fig:jaccard}}
+\subfloat[Apache\#34464]{\includegraphics[width=0.32\linewidth]{figure/apache34464-line}\label{fig:apache34464-line}} \\ 
+\vspace{-0.1in}
+\caption{Cost function using RMS as input size.} 
+\label{fig:heat} 
+\end{figure*} 
+
+Another problem for RMS is that it does not consider inputs from I/O.
+Buggy code fragment for Apache\#34463 is shown 
+in Figure~\ref{fig:apache34464}.
+The \texttt{while} loop on line 4 searches a string \texttt{source} for a target sub-string \texttt{target}.
+If the \texttt{while} loop cannot find, 
+a new character from I/O function \texttt{getchar()} 
+on line 6 will be appended to string \texttt{source}, 
+and the loop will search string \texttt{source} again from the beginning. 
+The input size for this piece of codes depend on how many characters got from \texttt{getchar()}.
+Since all memory cells of string \texttt{source} are written 
+firstly with characters from \texttt{getchar()} 
+by this piece of codes, 
+no matter how many characters we get from \texttt{getchar()}, 
+the RMS value for this piece of code is constant depending 
+on the size of string \texttt{target}, 
+variable \texttt{sourceLen} and variable \texttt{targetLen}, 
+as shown in Figure~\ref{fig:apache34464-line}. 
 
 
+{\underline{\textit{Data structure size.}}}
+~\citet{AlgoProf} propose to use sizes of accessed data structures, 
+like linked lists or arrays, as input sizes of code constructs. 
+Data structure size can provide more semantic information about analyzed codes.
+However, data structure size is not a generic metric.
+Special static or dynamic techniques are needed in order to identify data structures 
+and figure out their sizes. 
+Data structure size cannot correctly measure input size for 
+a recursive function with integer value as input,
+and it does not consider possible input from I/O, 
+which is the same as RMS.     
 
 
-{\bf{\textit{Data Structure Size.}}}
-
+{{\bf{\underline{\textit{Cost designs.}}}}
+There are also a lot of metrics which can be used to measure execution cost. 
+We discuss them as follows.
 
 %\end{enumerate}
