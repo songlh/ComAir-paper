@@ -27,7 +27,7 @@ profiling are to select suitable metrics for input size and cost.
 \centering
 \subfloat[MySQL\#27287]{\includegraphics[width=0.24\linewidth]{figure/apache34464-line}\label{fig:mysql27287-line}} 
 \subfloat[GCC\#1687]{\includegraphics[width=0.24\linewidth]{figure/apache34464-line}\label{fig:jaccard}}
-\subfloat[fib]{\includegraphics[width=0.24\linewidth]{figure/fib-line}\label{fig:fib-line}}
+\subfloat[fib]{\includegraphics[width=0.24\linewidth]{figure/apache34464-line}\label{fig:jaccard}}
 \subfloat[Apache\#34464]{\includegraphics[width=0.24\linewidth]{figure/apache34464-line}\label{fig:apache34464-line}} \\ 
 \vspace{-0.1in}
 \caption{Cost function using RMS as input size. XXXXXX} 
@@ -172,6 +172,9 @@ Both \texttt{read} and \texttt{write}
 hook function will update hash table \texttt{ts}
 to maintain the latest access timestamp for each memory cell. 
 
+
+
+
 %{{{\bf{\underline{\textit{Aprof overview.}}}}
 %\subsubsection{Background}
 %Aprof uses the number of executed basic blocks as cost metric.
@@ -218,147 +221,74 @@ runtime overhead for our LLVM implementation from two aspects:
 we try to reduce the number of instrumentation sites, 
 and we try to accelerate hook functions. 
 
-{\underline{\textit{Optimization 1}}
-Our first optimization is designed to efficiently count the number of executed BBs.
-Instead of incrementing a global counter by 1 inside every BB,
-we apply an algorithm to decide where to update the BB counter and how to update the BB counter. 
-The algorithm was originally designed to 
-efficiently count edge events through selectively instrumenting counter 
-on control flow graph~\cite{event-counting}. 
-It has already been proved to be able to conduct path 
-profiling efficiently~\cite{peter-ase,path-profiling}.
+
 
 To apply the algorithm, we first instrument a local counter 
 \texttt{local\_cost} at the beginning of each function
 and initialize its value to be 0. 
-We will add the value of \texttt{local\_cost} to the 
-global counter \texttt{cost} before 
-every function's return.
+We will add the value of \texttt{local\_cost} to \texttt{cost} before 
+each function return.
 After that, we only need to consider where to update \texttt{local\_cost} 
-within a single function.
+within a function.
 We design and implement intra-procedural 
-control flow analysis to achieve this.
-Since the original algorithm is design to count events on edge,
-we split each basic block into two and label event number to be 1 
+control flow analysis to achieve this.   
+Since the algorithm is design to count events on edge,
+we split each basic block into two and attribute event number to be 1 
 for the edge connecting the two split basic block.  
-We label event number to be 0 for all other edges. 
-We calculate spanning tree for the new control flow graph. 
+We attribute event number to be 0 for edges originally in the control flow graphs. 
+We calculate spanning tree for the new control flow graphs. 
 Edges not in the spanning tree are called chords.
-We apply the depth-first search algorithm proposed in~\cite{event-counting} 
-to calculate which chords we should increment 
-\texttt{local\_cost} and how much values 
-we should add to \texttt{local\_cost}.
-{\bf xxx: add some numbers here}
+Finally, we applied the depth-first search algorithm proposed in~cite{} to decide
+on which chords we should increment 
+\texttt{local\_cost} and how much values we should add to \texttt{local\_cost}.
+ 
 
+The second optimization targets improving the performance of hash-table lookup.
+For each read and write on memory cell w, 
+aprof needs to query a hash-table for the latest access time for w and decide 
+whether RMS should be updated.
+Aprof also needs to update the hash-table entry for w when necessary. 
 
-{\underline{\textit{Optimization 2}}
-The second optimization tries to improve the performance of 
-lookuping hash table \texttt{ts}, 
-containing latest access timestamp for each memory cell.
-For memory read, 
-aprof needs to query \texttt{ts} and decide 
-whether or not RMS should be incremented.
-For memory read and write, 
-aprof needs to update \texttt{ts} by using the current timestamp \texttt{count}
-for accessed memory cells. 
-
-Instead of using hash table, 
-we use page table to contain timestamp information. 
+Instead of using hash-table, we use a page-table to contain timestamp information. 
+We declare timestamp as \texttt{long} integer. 
 To balance runtime overhead and memory overhead, 
-we design a 4-layer page table for 32-bit programs.
-We use 4 KB consecutive memory areas to hold pointers pointing to 
-memory areas in the next layer 
-or memory areas holding timestamps for memory cells. 
-For a monitored 32-bit program, 
-we need to calculate 4 addresses using bitwise operations 
-and use the 4 addresses to refer each layer of the page table.  
-For 64-bit programs, we use 6 layers.  
-
-
-Compared with hash table, 
-page page leverage locality of memory access 
-and can lead 
+we design a 4-layer page table for 32-bit program 
+and 6-layer page table for 64-bit program.
+We use 4kb consecutive memory space to hold pointers to next layer 
+or timestamps for memory cell. 
+Compared with hash-table, page-page considers data locality and can lead 
 to a better cache performance. 
 To further improve performance, 
-we add an extra variable to hold the pointer pointing 
-to the last referred memory area holding timestamp.
-For each memory read or write, 
-we first check the saved pointer value can be used. 
-We only conduct page table lookup, when the save value cannot be used. 
+we add an extra variable to hold a pointer pointing 
+to the last referred memory space holding timestamp.
+When new query coming, we first check the saved pointer value can be used, if not,
+we will conduct page-table look up.  
 
-{\underline{\textit{Optimization 3}}
-The third optimization targets reducing the number of instrumentation sites 
-for \texttt{read} and \texttt{write}. 
-We apply dominance analysis on 
-control flow graph to achieve this.
-For this optimization, we focus on stack memory cells holding 
-scalar variables and only having \texttt{read} and \texttt{write} as uses 
-(e.g. not having ``address of'' as uses).
-We only focus on these memory cells,
-because we want to avoid pointer alias analysis, 
-which may potentially introduce inaccurate results. 
-For a \texttt{read} instruction on one of these memory cells, 
-if it is dominated by another \texttt{read} or \texttt{write} instruction 
-on the same memory cell, we will skip to instrument this \texttt{read} instruction.
-For a \texttt{write} instruction on one of these memory cells, 
-if it is dominated by another \texttt{write} on the the same cell, 
-we skip to instrument this \texttt{write}. 
-{\bf xxx: add some numbers here}
+The third optimization tries to reduce the number of instrumentation for read and write. 
+For this optimization, we only focus on stack memory cells holding 
+scalar variables and only used as parameters for read and write.  
+We add these conditions, because we want to avoid complex pointer alias analysis, 
+which is highly possible to introduce inaccurate results. 
+For read conducted on these memory cells, 
+if it is dominated by another read or write on the same memory cell, we skip instrumenting this read.
+For a write conducted on one of these memory cells, 
+if it is dominated by another write on the the same cell, we skip instrumenting this write. 
+{\bf xx: providing more explannation here}
 
- 
-{\underline{\textit{Optimization 4}}
-For the last optimization, we apply inline functionality 
-provide by LLVM to make all instrumented hook functions inline.
+
 
 
 \subsection{Enhancing RMS}
-There are two limitations when applying RMS. 
-In this section, we will discuss how to augment  
-RMS in order to address these two limitations.
+There are two limitations in applying RMS. 
+In this section, we will discuss how to augment 
+RMS to address these two limitations.
 
-\begin{figure}
-\centering
-\lstset{basicstyle=\ttfamily\fontsize{7}{8}\selectfont,
-     morekeywords={+},keepspaces=true,numbers=left}
-  \mbox{\lstinputlisting[mathescape,boxpos=t]{figure/fib.c}}
-\caption{A recursive function to compute fibonacci number. 
-(Execution time scales exponentially in the value of parameter \texttt{n}.) }
-\vspace{-0.05in}
-\label{fig:fib}
-\vspace{-0.05in}
-\end{figure}
-
-\begin{figure}
-\centering
-\subfloat[fib]{\includegraphics[width=0.47\linewidth]{figure/fib-line}\label{fig:fib-line}}
-\subfloat[Apache\#34464]{\includegraphics[width=0.47\linewidth]{figure/apache34464-line}\label{fig:apache34464-line}} \\ 
-\vspace{-0.1in}
-\caption{Cost function using RMS as input size. XXXXXX} 
-\label{fig:heat} 
-\end{figure} 
+{\bf xxx: there is the problem for recursive functions, using GCC#27733 as example}
 
 
-First, RMS cannot accurately measure input size for 
-a recursive function
-whose computation scales with the value of input parameter. 
-Take the recursive function in Figure~\ref{fig:fib} as an example,
-\texttt{fib} is to compute fibonacci number for parameter $n$.
-For an invocation of \texttt{fib}, 
-the first \texttt{read} on the memory cell 
-holding $n$ will increment RMS.
-However, after that, no matter how large $n$ is, RMS will not increment any more. 
-The reason is that whenever \texttt{fib} makes a recursive call itself on line 3, 
-it needs to write parameter $n-1$ (or $n-2$) onto stack firstly, 
-which means that the memory cell is firstly accessed 
-with \texttt{write} operation.
-To address this problem, when a function recursively call itself, 
-we will increment RMS of the current function by the size of function call parameters. 
-For example, when a function call instance $fib$ make recursive function 
-call ($fib(n-1)$ or $fib(n-2)$) on line 3,
-we will increment its RMS by 4.
-The plots for $fib$ before and after algorithm adjustment is shown in Figure~\ref{fig:fib-line}.
-Before adjustment, 
-RMS will always be the same for different $n$. 
+
+
+
 
 \begin{figure}
 \centering
@@ -372,7 +302,8 @@ RMS will always be the same for different $n$.
 \vspace{-0.05in}
 \end{figure}
 
-Second, RMS does not consider inputs from I/O.
+
+Another problem for RMS is that it does not consider inputs from I/O.
 Buggy code fragment for Apache\#34463 is shown 
 in Figure~\ref{fig:apache34464}.
 The \texttt{while} loop on line 4 searches a string \texttt{source} for a target sub-string \texttt{target}.
@@ -380,25 +311,17 @@ If the \texttt{while} loop cannot find,
 a new character from I/O function \texttt{getchar()} 
 on line 6 will be appended to string \texttt{source}, 
 and the loop will search string \texttt{source} again from the beginning. 
-The input size for this piece of codes depend on how many 
-characters got from \texttt{getchar()}.
+The input size for this piece of codes depend on how many characters got from \texttt{getchar()}.
 Since all memory cells of string \texttt{source} are written 
-firstly using characters returned from \texttt{getchar()}, 
+firstly with characters from \texttt{getchar()} 
+by this piece of codes, 
 no matter how many characters we get from \texttt{getchar()}, 
-RMS of this piece of code only depends 
+the RMS value for this piece of code is constant depending 
 on the size of string \texttt{target}, 
-variable \texttt{sourceLen} and variable \texttt{targetLen}.
-To address this problem, 
-we keeps a list of I/O functions. 
-When these functions are called, 
-we will increment RMS for all 
-functions active on the shadow stack. 
-The plots for the function containing the buggy loop 
-before and after algorithm adjustment is shown in Figure~\ref{fig:apache34464-line}.
-Before adjustment, 
-RMS will always be the same no matter how many characters got from \texttt{getchar()}. 
+variable \texttt{sourceLen} and variable \texttt{targetLen}, 
+as shown in Figure~\ref{fig:apache34464-line}.
 
-\subsection{Discussions}
+\subsection{Discussion}
 
 RMS considers memory reads conducted by functions called from a code construct,
 while it does not consider memory accesses 
@@ -409,19 +332,5 @@ In Section~\ref{sec:online},
 we will discuss why it is difficult 
 to apply the top-down view in production runs. 
 
-All optimizations proposed in this section can reduce runtime overhead 
-without changing profiling results.
-Approximate algorithms could be explored to further reduce runtime overhead. 
-For example, in the implementation, we use byte as unit for distinct memory cells.
-We could explore to use larger units, like 4 bytes or 16 bytes. 
-Using a larger unit can reduce memory overhead when applying page table 
-and can reduce runtime overhead by reducing memory read during querying page table. 
-As another example, we could apply alias analysis 
-and extend our dominance analysis to read and 
-write on heap memory to further reduce instrumentation sites. 
-We will leave the exploration of approximate algorithms for future works.   
 
-There are many new hardware with the potential to replace 
-software instrumentation discussed in this section and further reduce runtime overhead. 
-For example, Processor Tracer~\cite{xx} could be used to count executed BBs. 
-We will also leave the exploration of new hardware for future works.  
+{\bf xxx: Here we want accurate results while trading runtime overhead}
