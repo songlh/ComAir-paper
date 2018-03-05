@@ -21,17 +21,19 @@ Our findings and implications can motivate future research on complexity problem
 They already guide our design point selection when exploring in-house algorithmic profiling 
 and inspire our approximate algorithms when building production-run techniques. 
 
-After carefully studying design points for in-house algorithmic profiling,
+After carefully studying the design points for in-house algorithmic profiling,
 we started to build our in-house technique 
 based on an existing algorithm~\cite{Aprof1,Aprof2} leveraging 
 Read Memory Size (RMS) as input metric. 
-We design 4 compiler and runtime optimizations to reduce the runtime overhead.
+We design 4 compiler and runtime optimizations 
+to reduce the runtime overhead during algorithmic profiling.
 Our optimizations can reduce instrumentation sites 
 and can also accelerate instrumented hook functions. 
-There are two scenarios the existing algorithm fails to profile, 
-which are recursive functions scaling as the value of input parameter 
+There are two scenarios where the existing algorithm fails to profile, 
+which are recursive functions scaling as the value of input parameters 
 and code constructs taking inputs from I/O.
 We enhance the existing algorithm to address these two limitations. 
+
 
 
 
@@ -50,10 +52,11 @@ and 3) complexity problems usually take longer time to diagnose and fix,
 and more effective tool supports are needed.  
 
 \item Second, we optimize and enhance an in-house algorithmic profiling algorithm.
-We propose 4 optimizations, 
-which can reduce instrumentation sites and accelerate hook functions.
-We augment the existing algorithm to handle two scenarios, 
-which cannot be correctly profiled. 
+Our proposed optimizations 
+can reduce instrumentation sites and accelerate hook functions.
+We augment the algorithm to handle two scenarios, 
+where the existing version cannot profile correctly. 
+
 
 
 

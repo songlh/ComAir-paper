@@ -1,2 +1,14 @@
 \section{Production-Run Algorithmic Profiling}
 \label{sec:online}
+
+In this section, we discuss our design and 
+implementation for online algorithmic profiling. 
+For production-run usage, 
+it is very important to keep a low runtime overhead, 
+since end users cannot tolerate any perceived slowdown.  
+
+For production-run techniques, 
+sampling is a widely used technique to lower runtime overhead.
+Since less information is collected in one single run,
+sampling usually relies on information collected from 
+multiple runs to achieve the same capability.  
