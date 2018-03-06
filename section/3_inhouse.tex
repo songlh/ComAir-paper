@@ -240,7 +240,7 @@ We design and implement intra-procedural
 control flow analysis to achieve this.
 Since the original algorithm is design to count events on edge,
 we split each basic block into two and label event number to be 1 
-for the edge connecting the two split basic block.  
+for the edge connecting the two split basic blocks.  
 We label event number to be 0 for all other edges. 
 We calculate spanning tree for the new control flow graph. 
 Edges not in the spanning tree are called chords.
@@ -312,9 +312,10 @@ provide by LLVM to make all instrumented hook functions inline.
 
 
 \subsection{Enhancing RMS}
-There are two limitations when applying RMS. 
+There are two limitations in RMS. 
 In this section, we will discuss how to augment  
 RMS in order to address these two limitations.
+
 
 \begin{figure}
 \centering
@@ -330,13 +331,12 @@ RMS in order to address these two limitations.
 
 \begin{figure}
 \centering
-\subfloat[fib]{\includegraphics[width=0.47\linewidth]{figure/fib-line}\label{fig:fib-line}}
-\subfloat[Apache\#34464]{\includegraphics[width=0.47\linewidth]{figure/apache34464-line}\label{fig:apache34464-line}} \\ 
+\subfloat[fib]{\includegraphics[width=0.42\linewidth]{figure/fib-line}\label{fig:fib-line}}
+\subfloat[Apache\#34464]{\includegraphics[width=0.42\linewidth]{figure/apache34464-line}\label{fig:apache34464-line}} \\ 
 \vspace{-0.1in}
 \caption{Cost function using RMS as input size. XXXXXX} 
 \label{fig:heat} 
 \end{figure} 
-
 
 First, RMS cannot accurately measure input size for 
 a recursive function
@@ -344,21 +344,25 @@ whose computation scales with the value of input parameter.
 Take the recursive function in Figure~\ref{fig:fib} as an example,
 \texttt{fib} is to compute fibonacci number for parameter $n$.
 For an invocation of \texttt{fib}, 
-the first \texttt{read} on the memory cell 
-holding $n$ will increment RMS.
+the first \texttt{read} on parameter $n$ will increment RMS.
 However, after that, no matter how large $n$ is, RMS will not increment any more. 
-The reason is that whenever \texttt{fib} makes a recursive call itself on line 3, 
+This is because whenever \texttt{fib} recursively call itself on line 3, 
 it needs to write parameter $n-1$ (or $n-2$) onto stack firstly, 
-which means that the memory cell is firstly accessed 
-with \texttt{write} operation.
+which means that the memory cell is accessed 
+with \texttt{write} operation firstly.
 To address this problem, when a function recursively call itself, 
-we will increment RMS of the current function by the size of function call parameters. 
-For example, when a function call instance $fib$ make recursive function 
-call ($fib(n-1)$ or $fib(n-2)$) on line 3,
+we will increment RMS of the current function 
+by the size of function call parameters. 
+For example, when a call instance of $fib$ recursive calls itself 
+($fib(n-1)$ or $fib(n-2)$) on line 3,
 we will increment its RMS by 4.
-The plots for $fib$ before and after algorithm adjustment is shown in Figure~\ref{fig:fib-line}.
+The plots for $fib$ before and after algorithm 
+adjustment is shown in Figure~\ref{fig:fib-line}.
 Before adjustment, 
-RMS will always be the same for different $n$. 
+RMS will always be the same plotted 
+as the vertical line on the left. 
+
+
 
 \begin{figure}
 \centering
@@ -382,46 +386,48 @@ on line 6 will be appended to string \texttt{source},
 and the loop will search string \texttt{source} again from the beginning. 
 The input size for this piece of codes depend on how many 
 characters got from \texttt{getchar()}.
+The computation scales polynomially as the input size.
 Since all memory cells of string \texttt{source} are written 
-firstly using characters returned from \texttt{getchar()}, 
+firstly using return value of \texttt{getchar()}, 
 no matter how many characters we get from \texttt{getchar()}, 
 RMS of this piece of code only depends 
 on the size of string \texttt{target}, 
 variable \texttt{sourceLen} and variable \texttt{targetLen}.
 To address this problem, 
-we keeps a list of I/O functions. 
+we keep a list of I/O functions. 
 When these functions are called, 
 we will increment RMS for all 
 functions active on the shadow stack. 
 The plots for the function containing the buggy loop 
 before and after algorithm adjustment is shown in Figure~\ref{fig:apache34464-line}.
 Before adjustment, 
-RMS will always be the same no matter how many characters got from \texttt{getchar()}. 
+RMS will always be the same no 
+matter how many characters received from \texttt{getchar()}. 
+
 
 \subsection{Discussions}
 
 RMS considers memory reads conducted by functions called from a code construct,
 while it does not consider memory accesses 
 by the same code construct from different executions.
-Basically, RMS measures input size in a top-down view, 
-not a bottom-up view.
-In Section~\ref{sec:online}, 
-we will discuss why it is difficult 
-to apply the top-down view in production runs. 
+Basically, RMS measures input size in a top-down view.
+In the next section, we will discuss why it is difficult to apply sampling to RMS.
 
-All optimizations proposed in this section can reduce runtime overhead 
+All the optimizations proposed in this section can reduce runtime overhead 
 without changing profiling results.
-Approximate algorithms could be explored to further reduce runtime overhead. 
-For example, in the implementation, we use byte as unit for distinct memory cells.
+Approximate algorithms could be explored to further reduce overhead. 
+For example, in our current implementation, 
+we use byte as unit for distinct memory cells.
 We could explore to use larger units, like 4 bytes or 16 bytes. 
-Using a larger unit can reduce memory overhead when applying page table 
-and can reduce runtime overhead by reducing memory read during querying page table. 
-As another example, we could apply alias analysis 
-and extend our dominance analysis to read and 
-write on heap memory to further reduce instrumentation sites. 
-We will leave the exploration of approximate algorithms for future works.   
-
+Using a larger unit can reduce both memory overhead and runtime overhead for the page table,
+but the timestamp information contained is not precise.  
+As another example, we could leverage alias analysis 
+and extend our dominance analysis other \texttt{read} and 
+\texttt{write} operations.  
+We will leave the exploration of approximate algorithms for future works.  
+ 
 There are many new hardware with the potential to replace 
 software instrumentation discussed in this section and further reduce runtime overhead. 
-For example, Processor Tracer~\cite{xx} could be used to count executed BBs. 
+For example, Intel Processor Tracer (PT) could be used to count executed BBs. 
 We will also leave the exploration of new hardware for future works.  
+
