@@ -173,6 +173,14 @@ Then, another portion is captured.
 The size of the whole animal population is estimated 
 based on the ratio of marked animals in the second captured portion.  
 
+Since mark-and-recapture needs to compare two captured portions, 
+we config our sampling policy to always sample 
+two consecutive loop execution instances. 
+Assume we have a pair of sampled instances with RMS 
+as $N_1$ and $N_2$ respectively.  
+If $M$ memory cells read firstly by both of the two loop instances, 
+we estimate the RMS for all loop instances as $N=N_1*N_2/M$. 
+{\bf xxx I am pretty sure that the current implementation is wrong}
 
 
 
