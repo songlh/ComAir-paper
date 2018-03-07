@@ -90,21 +90,97 @@ to log
 and decrement \texttt{callchain\_length} by 1.
 Generated logs will be processed when the monitored program finish execution, 
 and \textit{input} and \textit{cost} 
-will be calcualted for each recursive instance.   
-  
+will be calculated for each recursive instance.  
+
+Sometimes, when recursive instances are too many, 
+only recording two counter values will still generate a large log, 
+incurring large runtime and memory overhead. 
+We propose to use sampling to decide when to dump counter values to log.
+When we decide to sample an instance, 
+we will record counter values for the instance and all its descendants. 
 
 
-
-
-\subsection{Profiling repeated loops}
+\subsection{Approximately profiling loops}
 
 As we discussed in Section~\ref{sec:study}, 
-all complexity bugs in polynomial complexity are caused by repeated execution of a loop. 
-The problem for RMS is that it does not consider 
-multiple executions for the same code constructs. 
-As shown in Figure~\ref{}, 
-for one single execution of the buggy loop of MySQL\#27287 will always be linear. 
-We need to monitor the outer loop in order to observe the polynomial complexity. 
+all complexity problems in polynomial complexity 
+are caused by repeated executions of a buggy loop.
+Previous works show that sampling code constructs 
+executing multiple 
+times can lower runtime overhead, 
+while can still collect enough runtime information~\cite{SongOOPSLA2014,ldoctor}. 
+Inspired by our study and the previous works, 
+we apply sampling to efficiently profile loops with multiple executions. 
+ 
+
+As we discussed in Section~\ref{sec:inhouse}, 
+to infer the complexity function, 
+we need select metrics for \textit{cost} and input \textit{size}.
+
+{\underline{\textit{Cost Metric.}}
+To efficiently profile a loop, we use the total loop iteration number 
+to estimate the total \textit{cost} of all executions.
+We initialize a local counter to be 0 at the beginning of the program.
+We increase the counter by 1 in the loop header of the monitored loop.
+We dump the counter value to log before the program exits. 
+Compared with using executed BBs discussed in Section~\ref{sec:inhouse}, 
+collecting loop iteration number will incur a smaller overhead.   
+
+
+{\underline{\textit{Input Size Metric.}}
+We still use RMS as input \textit{size} metric for a monitored loop, 
+but we will infer RMS from sampled information, 
+which is different from what we did in Section~\ref{sec:inhouse}.
+The algorithm discussed in Section~\ref{sec:inhouse} 
+focuses on memory reads conducted by a single execution 
+independently from other executions 
+of the same code construct. 
+For example, one single execution of 
+the buggy loop of MySQL\#27287 (Figure~\ref{fig:mysql27287})
+is always linear, as shown in Figure~\ref{fig:mysql27287-in}.
+After merging information of different executions from the outer loop,
+we can observe the polynomial complexity 
+in Figure~\ref{fig:mysql27287-out}.
+
+To estimate RMS for all executions of a monitored loop, 
+we first sample memory read and write information 
+from several loop executions. 
+We then merge sampled information and 
+infer RMS for all executions. 
+
+How to sample memory access information is similar to previous 
+statistical debugging works~\cite{liblit03,liblit05,CCI,SongOOPSLA2014,ldoctor}.
+We make a cloned version of the monitored loop.
+We instrument the cloned version to trace memory accesses.
+We consider memory accesses conducted by the loop directly
+and indirectly. 
+Before each execution of the monitored loop, 
+we randomly decide whether the instrumented version 
+or the original version will execute. 
+How many times the instrumented version is executed 
+depends on a configurable sampling rate. 
+We also add extra marks into the trace to 
+differ information sampled from different loop instances. 
+We use an off-line analysis to figure out which 
+memory addresses are read firstly by a sampled loop instance. 
+
+
+We apply mark-and-recapture method~\citep{mark-recapture} to estimate RMS. 
+Mark-and-recapture is a commonly used statistical method 
+to estimate the size of animal population. 
+By using this method, a portion of animals is captured, marked, and released. 
+Then, another portion is captured.
+The size of the whole animal population is estimated 
+based on the ratio of marked animals in the second captured portion.  
+
+
+
+
+
+
+
+
+
 
 
 

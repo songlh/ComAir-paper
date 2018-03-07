@@ -23,16 +23,16 @@ Code constructs could be loops~\cite{AlgoProf} and functions~\cite{Aprof1,Aprof2
 The fundamental design points for algorithmic 
 profiling are to select suitable metrics for input size and cost. 
 
-\begin{figure*}
-\centering
-\subfloat[MySQL\#27287]{\includegraphics[width=0.24\linewidth]{figure/apache34464-line}\label{fig:mysql27287-line}} 
-\subfloat[GCC\#1687]{\includegraphics[width=0.24\linewidth]{figure/apache34464-line}\label{fig:jaccard}}
-\subfloat[fib]{\includegraphics[width=0.24\linewidth]{figure/fib-line}\label{fig:fib-line}}
-\subfloat[Apache\#34464]{\includegraphics[width=0.24\linewidth]{figure/apache34464-line}\label{fig:apache34464-line}} \\ 
-\vspace{-0.1in}
-\caption{Cost function using RMS as input size. XXXXXX} 
-\label{fig:heat} 
-\end{figure*} 
+%\begin{figure*}
+%\centering
+%\subfloat[MySQL\#27287]{\includegraphics[width=0.24\linewidth]{figure/apache34464-line}\label{fig:mysql27287-line}} 
+%\subfloat[GCC\#1687]{\includegraphics[width=0.24\linewidth]{figure/apache34464-line}\label{fig:jaccard}}
+%\subfloat[fib]{\includegraphics[width=0.24\linewidth]{figure/fib-line}\label{fig:fib-line}}
+%\subfloat[Apache\#34464]{\includegraphics[width=0.24\linewidth]{figure/apache34464-line}\label{fig:apache34464-line}} \\ 
+%\vspace{-0.1in}
+%\caption{Cost function using RMS as input size. XXXXXX} 
+%\label{fig:heat} 
+%\end{figure*} 
 
 
 %{{\bf{\underline{\textit{Input designs.}}}}
@@ -56,7 +56,16 @@ RMS consider both read conducted by a code construct directly
 and read conducted by 
 functions called from the code construct. 
 
-RMS is a generic metric for input size 
+\begin{figure}
+\centering
+\subfloat[Inner loop]{\includegraphics[width=0.42\linewidth]{figure/mysql27287-complexity-n}\label{fig:mysql27287-in}}
+\subfloat[Outer loop]{\includegraphics[width=0.42\linewidth]{figure/mysql27287-complexity-n-square}\label{fig:mysql27287-out}} \\ 
+\vspace{-0.1in}
+\caption{Cost function of MySQL\#27287 using RMS as input size. XXXXXX} 
+\label{fig:mysql27287-2} 
+\end{figure} 
+
+RMS is a generic metric for input \textit{size}, 
 and it can provide important input information for many complexity problems.   
 For example, 
 RMS for one execution of
@@ -64,7 +73,7 @@ the buggy loop in Figure~\ref{fig:mysql27287}
 is roughly equal to 2 times the number of \texttt{XML\_NODE} 
 accessed during the execution, 
 because \texttt{level} field and \texttt{type} field of 
-different \texttt{XML\_NODE}s are read in different loop iteration.
+different \texttt{XML\_NODE}s are read in different loop iterations.
 Although variable \texttt{p} and \texttt{level} are also read in each iteration,
 RMS only considers distinct memory cells and 
 only increments its value for the first read on these two variables in the first iteration. 
@@ -75,10 +84,11 @@ in the same array \texttt{items}.
 For that outer loop, its RMS is in linear relationship 
 with the size of array \texttt{items}, 
 since RMS only considers distinct memory cells 
-and multiple read conducted on the same memory 
+and multiple reads conducted on the same memory 
 cell of array \texttt{items} will not increment RMS value. 
-The cost function containing the outer loop is shown 
-in Figure~\ref{fig:mysql27287-line}.
+The inferred cost functions for the two functions 
+containing the inner and the outer loop are shown 
+in Figure~\ref{fig:mysql27287-2}.
 
 {\underline{\textit{Data structure size.}}}
 The number of accessed elements of a data 
