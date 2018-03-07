@@ -7,11 +7,8 @@ For production-run usage, profiles are collected from user side.
 It is very important to keep a low runtime overhead, since
 end users cannot tolerate any observable performance overhead. 
 
-
-\subsection{Design}
-
-To further lower runtime overhead,
-the design of our production-run technique follows several principles. 
+To achieve the requirement of production-run usage,
+our design follows several principles. 
 
 First, \textit{taxonomy-guided}. 
 Different from the generic metric (or technique) used in in-house profiling,
@@ -22,65 +19,95 @@ caused either by repeated execution of loops ($N^k$)
 or recursive functions ($2^N$).  
 
 Second, \textit{focused checking}.
-Developers could choose a suspicious loop or recursive function 
-and better understand their complexity in production runs.
-Our tool could also be used with performance diagnosis tools or profilers,
+Developers could choose a suspicious loop or recursive function to monitor
+In order to better understand their complexity in production runs.
+Our tool could also be used with performance diagnosis tools~\cite{SongOOPSLA2014} 
+or traditional profilers,
 and focus on loops or recursive functions leading 
 to user-perceived performance problems.
 
 Third, \textit{approximation}. 
 We design lightweight metrics to estimate heavyweight metrics.
-We also apply sampling and infer 
-for the whole execution based on sampled information. 
+We also apply sampling and infer information for the whole 
+execution based on collected samples.
 
-\subsection{Profiling recursive functions}
+
+\subsection{Approximately profiling recursions}
+
 Given a static recursive function \textit{F},
 when \textit{F} is called, 
 a dynamic instance \textit{A} is created.
-When \textit{A} calls \textit{F}, 
-a new instance \textit{B} is created 
-and recursive call chain is increased from 1 to 2. 
-\textit{B} can also create a new instance \textit{C} by itself.
-In this case, we consider \textit{A} creates \textit{C} indirectly.
-Both \textit{B} and \textit{C} are 
-descendants of \textit{A} in the dynamic call tree. 
+\textit{A} can create a new instance, \textit{B}, and increase 
+the length of the recursive call chain from 1 to 2 by calling \textit{F}.
+\textit{B} can also create a new instance, \textit{C}.
+In this case, we consider that \textit{A} creates \textit{C} indirectly.
+Both \textit{B} and \textit{C} are descendants of 
+\textit{A} in the dynamic call tree. 
 
-To efficiently profile a recursive function, 
+To efficiently profile a recursive instance \textit{A}, 
 we make two estimations.
+
+
 First, we use the number of instances created by \textit{A} directly or indirectly 
-to estimate execution \textit{cost} for \textit{A}.
+to estimate execution \textit{cost} of \textit{A}.
 By doing this, we assume that \textit{cost} 
 will be roughly the same for an instance after excluding 
-\textit{cost} spent in descendants.
-Second, we use the maximum recursive call chaining starting from \textit{A} to estimate
+\textit{cost} spent in its descendants.
+
+Second, we use the length of 
+the maximum recursive call chain starting from \textit{A} to estimate
 the input \textit{size} of \textit{A}. 
 The intuition is that 
 when an instance is created by \textit{A} directly or indirectly, 
-a distinct input will be processed.
-The maximum length of the recursive call chain from \textit{A} 
+a distinct input will be processed by \textit{A}.
+The maximum length of the recursive call chain starting from \textit{A} 
 is the number of distinct inputs processed by \textit{A} simultaneously.
-Therefore, we could use the length of 
-the recursive call chain to estimate the input \textit{size}. 
+Therefore, we could use the length of the recursive call chain 
+to estimate the input \textit{size}. 
 For example, 
-the maximum length of the recursive call chain for an instance of \texttt{fib} 
-in Figure~\ref{fig:fib} is $n-1$, by always calling \texttt{fib(n-1)}.
+the maximum length of the recursive call chain from an instance of \texttt{fib} 
+in Figure~\ref{fig:fib} is $n-1$, 
+by always calling \texttt{fib(n-1)} recursively on line 3.
 The maximum length for an instance of \texttt{mult\_alg} 
+in Figure~\ref{fig:gcc27733} 
 is roughly equal to the number of 1s in the binary form of \texttt{t},
-since the bitwise operations basically remove one 1 in the binary 
+since the bitwise operations always remove one 1 in the binary 
 form before making the recursive function call.  
+  
 
 To implement this, 
-we instrument two global counters, \texttt{instances} and \texttt{stack}. 
-At the beginning of the monitored recursive function, 
-we increment the two counters by 1 and dump their values to log.
-Before the return instruction of the monitored function, 
-we dump their values to log and decrement counter \texttt{stack}.
-The generated log will be processed after the monitored 
-exit to calculate input size and cost for each recursive instance. 
+we instrument two global counters, 
+\texttt{instance\_count} and \texttt{callchain\_length} 
+to maintain the number of created instances and 
+the length of recursive call chain, respectively. 
+At the entry point of a monitored recursive function,
+we will increment \texttt{instance\_count} and \texttt{callchain\_length} by 1
+and dump their values to log.
+Before the exit of the monitored recursive function,
+we will dump the values of 
+\texttt{instance\_count} and \texttt{callchain\_length} 
+to log
+and decrement \texttt{callchain\_length} by 1.
+Generated logs will be processed when the monitored program finish execution, 
+and \textit{input} and \textit{cost} 
+will be calcualted for each recursive instance.   
+  
+
 
 
 
 \subsection{Profiling repeated loops}
+
+As we discussed in Section~\ref{sec:study}, 
+all complexity bugs in polynomial complexity are caused by repeated execution of a loop. 
+The problem for RMS is that it does not consider 
+multiple executions for the same code constructs. 
+As shown in Figure~\ref{}, 
+for one single execution of the buggy loop of MySQL\#27287 will always be linear. 
+We need to monitor the outer loop in order to observe the polynomial complexity. 
+
+
+
 
 
 \subsection{Discussions}
