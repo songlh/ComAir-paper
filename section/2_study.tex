@@ -103,18 +103,18 @@ needs to take a lot of iterations to find a free entry.
 To fix this bug, MySQL developers simply separate used entries 
 and free entries, and keep them in two different linked lists. 
 
-\begin{figure}
-\centering
-\lstset{basicstyle=\ttfamily\fontsize{7}{8}\selectfont,
-     morekeywords={+},keepspaces=true,numbers=left}
-  \mbox{\lstinputlisting[mathescape,boxpos=t]{figure/mysql27287.c}}
-\caption{A MySQL performance problem in polynomial complexity. 
-\footnotesize{(During performance failure runs, 
-   the total loop iterations scale polynomially in the size of \texttt{items}.)}}
-\vspace{-0.05in}
-\label{fig:mysql27287}
-\vspace{-0.05in}
-\end{figure}
+%\begin{figure}
+%\centering
+%\lstset{basicstyle=\ttfamily\fontsize{7}{8}\selectfont,
+%     morekeywords={+},keepspaces=true,numbers=left}
+%  \mbox{\lstinputlisting[mathescape,boxpos=t]{figure/mysql27287.c}}
+%\caption{A MySQL performance problem in polynomial complexity. 
+%\footnotesize{(During performance failure runs, 
+%   the total loop iterations scale polynomially in the size of \texttt{items}.)}}
+%\vspace{-0.05in}
+%\label{fig:mysql27287}
+%\vspace{-0.05in}
+%\end{figure}
 
 {\underline{\textit{$O(N^k)$: polynomial complexity (k>1).}}}
 As shown in Table~\ref{tab:study}, 

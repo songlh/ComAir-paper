@@ -20,7 +20,7 @@ Many performance problems are caused by algorithmic inefficiency,
 such as implementing a linear algorithm in a $O(N^2)$ way.
 We refer these performance problems as complexity problems in our paper.
 Our empirical study on a representative performance-bug 
-Benchmark set~\cite{PerfBug,SongOOPSLA2014} shows that 
+benchmark set~\cite{PerfBug,SongOOPSLA2014} shows that 
 nearly half user-perceived performance problems are complexity problems. 
 Complexity problems are usually ranked high in developers' priority list. 
 For example, Mozilla developers will immediately try to fix complexity bugs degrading exponentially~\cite{mozilla35294}. 
@@ -33,26 +33,26 @@ in the form of a \textit{cost} function of \textit{input} size.
 Algorithmic profiling can be used detect previously unknown complexity problems and 
 diagnose performance failures caused by complexity problems. 
 
-Algorithmic profiling is challenging. 
+Conducting algorithmic profiling is challenging. 
 Effective techniques need to satisfy the following three requirements.
 First, \textit{coverage}. Complexity problems are caused by a large variety of root causes. 
 A code construct may take inputs and consume computation resources in various types.
 A good technique must cover a large portion of various root causes, inputs and costs.
-Second, \textit{accuracy}. Algorithmic profiling needs accurately identify 
+Second, \textit{accuracy}. Algorithmic profiling needs to accurately identify 
 how cost scales as input size changes.
 Given an analyzed code construct,
 it is desired to conduct algorithmic profiling under the context of the whole program's execution. 
 Otherwise, missing how the code construct cooperate with other parts will lead to inaccurate results. 
 Third, \textit{performance}. 
+For in-house testing, lowering runtime overhead can save testing time 
+and allow developers to run more tests under a given time budget. 
 Developers' misunderstanding of real-world workloads 
 is the most common reason why performance problems are introduced~\cite{PerfBug}. 
 Production-run algorithmic profiling can help developers 
-understand how their programs scale under these workloads.
+understand how their programs scale under real-world workloads.
 However, production-run techniques require no observable slowdown from end users. 
-For in-house testing, lowering runtime overhead can save testing time 
-and allow developers to run more tests under a given time budget. 
 
-Existing techniques do not satisfy the three conditions and 
+Existing techniques do not satisfy the above three conditions and 
 cannot conduct algorithmic profiling effectively. 
 Traditional profilers are most widely used tools to 
 diagnose performance failure~\cite{gprof,oprofile}. 
@@ -82,6 +82,36 @@ They cannot provide desired performance and are far from being deployed in produ
 \label{fig:mysql27287}
 \vspace{-0.05in}
 \end{figure}
+
+One MySQL complexity problem is shown in Figure~\ref{fig:mysql27287}.
+The loop searches parent \texttt{XML\_NODE} for function parameter \texttt{nitems}, 
+which presents an array index for another \texttt{XML\_NODE}.
+All \texttt{XML\_NODE}s are maintained in array \texttt{items}. 
+The loop searches by iterating array \texttt{items} 
+backward from the input and looking for the first \texttt{XML\_NODE} 
+whose level is one less than the input.
+This piece of codes looks innocent. 
+However, there is an outer loop not shown in the figure.
+The outer loop will keep calling \texttt{xml\_parent\_tag} by using 
+the next sibling of the previous \texttt{XML\_NODE}, 
+which is in $O(N^2)$ complexity in terms of the number of children of a parent \texttt{XML\_NODE}. 
+Developers may think using an implementation in $O(N^2)$ complexity is fine, 
+since a \texttt{XML\_NODE} usually does not have too many children.
+However, during performance failure runs, 
+one \texttt{XML\_NODE} contains tens of thousands of children, 
+and this leads significant showdown perceived by end users. 
+
+To fix this bug, developers add an extra field to each \texttt{XML\_NODE} to save its parent, 
+and this field is initialized when a \texttt{XML\_NODE} is created. 
+After applying this patch, codes shown in Figure~\ref{fig:mysql27287} are completely removed.
+This takes developers around 5 months to figure 
+out~\footnote{We count the time from when developers confirmed this is performance bug 
+to when the patch was submitted}. 
+In-house algorithmic profiling can warn developers the $O(N^2)$ complexity, 
+potentially obscured by the fact that inner and outer loops are not in the same function. 
+Production-run algorithmic profiling can provide information about workload and complexity,
+which are invaluable to diagnose the performance failures caused by this complexity problem. 
+
 
 
 
