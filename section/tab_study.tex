@@ -36,27 +36,29 @@
 {
 \begin{tabular}{|lcccccc|}
 \hline
-                                                               &   Apache  &   Chrome   &  GCC   &    Mozilla   &   MySQL  &  Total\\
+                                                                                  &   Apache  &   Chrome   &  GCC   &    Mozilla   &   MySQL  &  Total\\
 \hline
-Total \#                                              &   4       &    3       &   8    &    10        &   5      &   30 \\
+Total \# of complexity bugs                                                       &   4       &    3       &   8    &    10        &   5      &   30 \\
 \hline
 \multicolumn{7}{|c|}{\bf Taxonomy of complexity problems}\\
-\multicolumn{1}{|l}{{\bf $O(N)$}}                              &   1       &    0       &   0    &    4         &   3      &   8\\
-\multicolumn{1}{|l}{{\bf $O(N^k)$}}                            &   3       &    3       &   5    &    6         &   1      &  18\\
-\multicolumn{1}{|l}{{\bf $O(e^N)$}}               &   0       &    0       &   3    &    0         &   1      &   4\\
+\multicolumn{1}{|l}{{\bf $O(N)$}: linear complexity}                              &   1       &    0       &   0    &    4         &   3      &   8\\
+\multicolumn{1}{|l}{{\bf $O(N^k)$}: polynomial complexity ($k>1$)}                &   3       &    3       &   5    &    6         &   1      &  18\\
+\multicolumn{1}{|l}{{\bf $O(e^N)$}: exponential complexity}                       &   0       &    0       &   3    &    0         &   1      &   4\\
 \hline
-\multicolumn{7}{|c|}{\bf Whether $N$ is specified during report?}\\
-\multicolumn{1}{|l}{\bf Yes}     &  4&2&5&9&5&25\\
-\multicolumn{1}{|l}{\bf No}    &  0&1&3&1&0&5\\
+\multicolumn{7}{|c|}{\bf How complexity problems are fixed?}\\
+\multicolumn{1}{|l}{Optimize {\bf directly}: Buggy codes are revised}              &  4        &    2       &   5    &    9         &   5      &  25\\
+\multicolumn{1}{|l}{Optimize {\bf indirectly}: Workloads are skipped}                                        &  0        &    1       &   3    &    1         &   0      &   5\\
+\hline
+\multicolumn{7}{|c|}{\bf How complexity problems are reported?}\\
+\multicolumn{1}{|l}{Input size {\bf is} specified}                                &  4        &    2       &   5    &    9&5&25\\
+\multicolumn{1}{|l}{Input size is {\bf not} specified}                            &  0        &    1       &   3    &    1    &0&5\\
 \hline
 \end{tabular}
 }
 \end{adjustwidth}
 \caption{Categorization for Section~\ref{sec:study}.
-(This table shows how complexity problems distribute among different complexity categories 
- and whether or not how to change input size is specified during reporing. $O(N)$: linear complexity;
- $O(N^k)$: polynomial complexity ($k>1$); $O(e^N)$: exponential complexity; 
- Yes: how to change input size is specified in the bug report;
- No: how to change input size is not specified in the bug report.)}
+\footnotesize{(This table shows how complexity problems distribute among different complexity categories 
+ and whether or not how to change input size is specified during reporing.)}}
 \label{tab:study}
+\vspace{-0.1in}
 \end{table}

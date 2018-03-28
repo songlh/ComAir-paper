@@ -1,6 +1,94 @@
 \section{Introduction}
 \label{sec:intro}
 
+\subsection{Motivation}
+\label{sec:motiv}
+
+Performance problems~\footnote{We will use performance problems and performance bugs exchangeably, 
+following previous works in this area~\cite{SongOOPSLA2014,ldoctor}} 
+are one type of software implementation mistakes
+and can cause inefficient execution~\cite{PerfBug,perf.fse10,SongOOPSLA2014,ldoctor,Alabama}. 
+Performance problems cannot be optimized away by state-of-the-art compiler optimizations.
+Due to the complexity of modern software and rapidly changing workloads, 
+performance problems widely exist in production-run software, 
+annoying end users and wasting energy in the field~\cite{PerfBug,SongOOPSLA2014,ldoctor}. 
+Many highly-publicized failures have already been caused by performance problems, 
+such as making a website costing millions of dollars useless~\cite{ACA-health}.
+Combating performance problems is urgent. 
+
+Many performance problems are caused by algorithmic inefficiency, 
+such as implementing a linear algorithm in a $O(N^2)$ way.
+We refer these performance problems as complexity problems in our paper.
+Our empirical study on a representative performance-bug 
+Benchmark set~\cite{PerfBug,SongOOPSLA2014} shows that 
+nearly half user-perceived performance problems are complexity problems. 
+Complexity problems are usually ranked high in developers' priority list. 
+For example, Mozilla developers will immediately try to fix complexity bugs degrading exponentially~\cite{mozilla35294}. 
+Addressing complexity problems is an important aspect to fight performance bugs. 
+
+
+Algorithmic profiling~\cite{Aprof1,Aprof2,AlgoProf} collects profiles from multiple 
+runs of the same program and attributes complexity to each code construct, like a loop or a function,
+in the form of a \textit{cost} function of \textit{input} size. 
+Algorithmic profiling can be used detect previously unknown complexity problems and 
+diagnose performance failures caused by complexity problems. 
+
+Algorithmic profiling is challenging. 
+Effective techniques need to satisfy the following three requirements.
+First, \textit{coverage}. Complexity problems are caused by a large variety of root causes. 
+A code construct may take inputs and consume computation resources in various types.
+A good technique must cover a large portion of various root causes, inputs and costs.
+Second, \textit{accuracy}. Algorithmic profiling needs accurately identify 
+how cost scales as input size changes.
+Given an analyzed code construct,
+it is desired to conduct algorithmic profiling under the context of the whole program's execution. 
+Otherwise, missing how the code construct cooperate with other parts will lead to inaccurate results. 
+Third, \textit{performance}. 
+Developers' misunderstanding of real-world workloads 
+is the most common reason why performance problems are introduced~\cite{PerfBug}. 
+Production-run algorithmic profiling can help developers 
+understand how their programs scale under these workloads.
+However, production-run techniques require no observable slowdown from end users. 
+For in-house testing, lowering runtime overhead can save testing time 
+and allow developers to run more tests under a given time budget. 
+
+Existing techniques do not satisfy the three conditions and 
+cannot conduct algorithmic profiling effectively. 
+Traditional profilers are most widely used tools to 
+diagnose performance failure~\cite{gprof,oprofile}. 
+Traditional profilers can only measure how much time spent in each code construct during one single run, 
+while failing to connect information from multiple runs 
+and failing to provide any indication about how execution time scales.
+Therefore, traditional profilers fail in both coverage and accuracy.  
+To understand asymptotic complexity for a code construct,
+experimental algorithmics~\cite{expalg1,expalg2,expalg3} requires developers to 
+extract the code construct and analyze it out of the original program. 
+Although useful,
+experimental algorithmics fail to consider how the code 
+construct interact with the whole program and does not provide desired accuracy. 
+Recent techniques on algorithmic profiling~\cite{Aprof1,Aprof2,AlgoProf} will incur more than 30X runtime overhead.
+They cannot provide desired performance and are far from being deployed in production runs. 
+
+
+\begin{figure}
+\centering
+\lstset{basicstyle=\ttfamily\fontsize{7}{8}\selectfont,
+     morekeywords={+},keepspaces=true,numbers=left}
+  \mbox{\lstinputlisting[mathescape,boxpos=t]{figure/mysql27287.c}}
+\caption{A MySQL performance problem in polynomial complexity. 
+\footnotesize{(During performance failure runs, 
+   the total loop iterations scale polynomially in the size of \texttt{items}.)}}
+\vspace{-0.05in}
+\label{fig:mysql27287}
+\vspace{-0.05in}
+\end{figure}
+
+
+
+\subsection{Contributions}
+\label{sec:con}
+
+
 Why we need algorithmic profiling? 
 
 Why we need to push complexity profiling to production runs? 

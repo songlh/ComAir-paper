@@ -20,8 +20,9 @@ and finally, we infer a cost function of the input size by using
 statistical curve fitting~\cite{curve-fitting} 
 or curving bounding~\cite{curve-bounding}. 
 Code constructs could be loops~\cite{AlgoProf} and functions~\cite{Aprof1,Aprof2}. 
-The fundamental design points for algorithmic 
-profiling are to select suitable metrics for input size and cost. 
+To design algorithmic profiling, we need to select 
+suitable metrics for input size and cost. 
+
 
 %\begin{figure*}
 %\centering
@@ -45,27 +46,31 @@ As discussed in Section~\ref{sec:process},
 users tend to specify how to change the whole program 
 input in order to describe the perceived complexity problem.
 It is fairly easy to measure input size for the whole program based on users' report.
-One way to measure input size for a code construct inside a program
+One way to measure input size for a code construct
 is to simply use the input size of the whole program. 
 
+
 \underline{\textit{Read memory size.}}
-Read memory size (RMS) is proposed as input size metric~\cite{Aprof1,Aprof2} . 
-RMS is defined as the number of distinct memory cells 
+%Read memory size (RMS)is proposed as input size metric~\cite{Aprof1,Aprof2} . 
+Read memory size (RMS) is defined as the number of distinct memory cells 
 whose first access is read. 
-RMS consider both read conducted by a code construct directly 
-and read conducted by 
+RMS consider reads conducted by a code construct directly 
+and reads conducted by 
 functions called from the code construct. 
+
 
 \begin{figure}
 \centering
 \subfloat[Inner loop]{\includegraphics[width=0.42\linewidth]{figure/mysql27287-complexity-n}\label{fig:mysql27287-in}}
 \subfloat[Outer loop]{\includegraphics[width=0.42\linewidth]{figure/mysql27287-complexity-n-square}\label{fig:mysql27287-out}} \\ 
 \vspace{-0.1in}
-\caption{Cost function of MySQL\#27287 using RMS as input size. XXXXXX} 
+\caption{Inferred cost functions for MySQL\#27287 using RMS as input size.
+\footnotesize{(\texttt{xml\_parent\_tag} is the function containing the inner loop, 
+and \texttt{my\_xml\_parse} is the function containing the outer loop.)}} 
 \label{fig:mysql27287-2} 
 \end{figure} 
 
-RMS is a generic metric for input \textit{size}, 
+RMS is a generic metric for input size, 
 and it can provide important input information for many complexity problems.   
 For example, 
 RMS for one execution of
@@ -76,7 +81,7 @@ because \texttt{level} field and \texttt{type} field of
 different \texttt{XML\_NODE}s are read in different loop iterations.
 Although variable \texttt{p} and \texttt{level} are also read in each iteration,
 RMS only considers distinct memory cells and 
-only increments its value for the first read on these two variables in the first iteration. 
+only increases its value for the first read on these two variables in the first iteration. 
 There is also an outer loop, 
 and the outer loop invokes \texttt{xml\_parent\_tag} 
 for every \texttt{XML\_NODE} contained
@@ -85,25 +90,25 @@ For that outer loop, its RMS is in linear relationship
 with the size of array \texttt{items}, 
 since RMS only considers distinct memory cells 
 and multiple reads conducted on the same memory 
-cell of array \texttt{items} will not increment RMS value. 
+cell of array \texttt{items} will not increase RMS. 
 The inferred cost functions for the two functions 
-containing the inner and the outer loop are shown 
+containing the inner and the outer loop using RMS as input metric are shown 
 in Figure~\ref{fig:mysql27287-2}.
 
 {\underline{\textit{Data structure size.}}}
 The number of accessed elements of a data 
 structure could also be used to measure 
 input size for a code construct~\cite{AlgoProf}. 
-Commonly used data structures include linked list and arrays.
+Commonly used data structures include linked lists and arrays.
 Using data structure size can provide more semantic information for 
-analyzed code construct.
+analyzed code constructs.
 For example, if we focus on array \texttt{items}, 
 the input size for both 
 inner loop and outer loop of MySQL\#27287 is 
 the number of accessed elements of array \texttt{items}.
-Developers can clearly see that complexity of each execution 
+Developers can clearly see that cost of each execution 
 of the inner loop is in linear relationship with accessed elements, 
-while the complexity of outer loop is in $O(N^2)$ relationship. 
+while the cost of the outer loop is in $O(N^2)$ relationship. 
 
 In the reminder of this paper, we will focus on RMS as input metric. 
 We skip the whole program input, 
@@ -111,11 +116,12 @@ because it is related to the input of a code construct in various ways.
 Changing the whole program input may not change input sizes for 
 all code constructs. 
 Using the input size of the whole program as input metric for a code construct
-construct may lead to incorrect profiling results. 
+may lead to incorrect profiling results. 
 We also skip data structure size,
-because it is not a generic measure. 
+because it is not a generic metric. 
 We need to design and implement extra static and dynamic techniques 
 to identify data structures and figure out their sizes.
+
 
 \subsubsection{How to design cost metric?}
 There are also a lot of metrics which can be used to measure execution cost, 
@@ -123,19 +129,20 @@ such as the number of executed instructions,
 the time elapsed during execution,
 the number of executed basic blocks (BBs), 
 loop iteration, 
-and the number of recursive function call instances.
+the number of recursive function call instances, and so on.
 
 During our in-house technique design, 
 we focus on the number of executed BBs. 
 We do not use execution time, 
 because when a code construct takes very little time,
-execution time may not provide an accurate measurement. 
+using execution time may not provide an accurate measurement. 
 We do not use the number of executed instructions, 
 because this number is highly correlated with the number of BBs. 
-Loop iteration and the number of recursive call instances are estimates 
+Loop iteration and the number of recursive call instances could be used as estimates 
 for the number of BBs. 
 We do not use these two when designing in-house algorithmic profiling, 
 but we will leverage them when building production-run techniques.  
+ 
 
 \subsection{Implementation optimizations}
 
@@ -150,14 +157,14 @@ In this section, we will first overview instrumentation algorithms in aprof firs
 and we will then discuss our designed optimizations. 
 
 \subsubsection{Background}
-To count executed BBs and RMS for each function call instance,
+To count executed BBs and RMS for each dynamic function call instance,
 aprof runtime needs to maintain 5 global variables:
 \texttt{cost}, 
 tracking how many basic blocks are executed since the monitored program starts running, 
 \texttt{count}, 
-serving as the current timestamp and incremented by 1 after each function invocation, 
+maintaining the current timestamp and increased by 1 after each function invocation, 
 \texttt{ts}, 
-a hash table containing latest access timestamp for each memory cell,
+a hash table containing the latest access timestamp for each memory cell,
 \texttt{S}, 
 a shadow stack tracking all active functions, 
 and \texttt{top}, 
@@ -172,7 +179,7 @@ When a function returns,
 \texttt{return} hook function will 
 generate a log 
 containing the returning function's RMS and executed BBs.
-Since RMS also considers memory read conducted by 
+Since RMS also considers memory reads conducted by 
 invoked callee functions, 
 \texttt{return} hook function will add 
 the RMS of the returning function to its caller on the stack. 
@@ -180,7 +187,8 @@ the RMS of the returning function to its caller on the stack.
 whether to increment RMS for the function on top of the shadow stack \texttt{S}.
 Both \texttt{read} and \texttt{write} 
 hook function will update hash table \texttt{ts}
-to maintain the latest access timestamp for each memory cell. 
+to maintain the latest access timestamp for an accessed memory cell. 
+
 
 %{{{\bf{\underline{\textit{Aprof overview.}}}}
 %\subsubsection{Background}
@@ -255,10 +263,9 @@ We label event number to be 0 for all other edges.
 We calculate spanning tree for the new control flow graph. 
 Edges not in the spanning tree are called chords.
 We apply the depth-first search algorithm proposed in~\cite{event-counting} 
-to calculate which chords we should increment 
+to calculate on which chords we should increase 
 \texttt{local\_cost} and how much values 
 we should add to \texttt{local\_cost}.
-{\bf xxx: add some numbers here}
 
 
 {\underline{\textit{Optimization 2}}

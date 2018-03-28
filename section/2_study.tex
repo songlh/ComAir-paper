@@ -1,23 +1,22 @@
-\section{Understanding Real-World Complexity Bugs}
+\section{Understanding Real-World Complexity Problems}
 \label{sec:study}
 
-
-In this section, we conduct an empirical study on real-world complexity bugs. 
+In this section, we conduct an empirical study on real-world complexity problems. 
 Specifically, we try to answer the following two questions:
 
 \begin{enumerate}
 
 \item What are common root causes for complexity bugs? 
-Here, we consider code constructs conducting computation in unexpected complexity as root causes. 
-Studying root causes can help us understand whether or not 
-existing algorithmic profiling algorithms work on real-world bugs 
-and can also guide the design of new approximate algorithms. 
+Here, we refer root cause as a code construct conducting 
+inefficient computation leading to a complexity problem.
+Studying root causes can help us 
+make suitable design decisions for algorithmic profiling. 
 
-\item How real-world complexity bugs are reported and diagnosed?
-This can help us understand the state of practice of combating process for complexity bugs. 
+\item How real-world complexity problems are reported and diagnosed?
+This knowledge can help us understand the 
+state of practice for combating complexity problems.
 
 \end{enumerate}
-
 
 \subsection{Methodology}
 \label{sec:meth}
@@ -26,35 +25,35 @@ We conduct our empirical study based on a public benchmark set for
 real-world performance bugs~\cite{PerfBug,SongOOPSLA2014}. 
 In the previous work~\cite{PerfBug}, 
 the authors collected 110 real-world performance bugs from 5 representative 
-software suites, which are Apache, Chrome, GCC, Mozilla, and MySQL. 
+software suites: Apache, Chrome, GCC, Mozilla, and MySQL. 
 These software suites cover various types of functionalities and are implemented 
-by different programming languages, including C/C++, Java, C\#, and JavaScript. 
-These software suites are all large and mature, 
+by a variety of programming languages, including C/C++, Java, C\#, and JavaScript. 
+All five studied software suites are large and mature, 
 with millions of lines of codes and long development histories. 
 In their following work~\cite{SongOOPSLA2014}, 
 the authors further identified 65 user-perceived performance bugs, 
 which are all observed and reported by users. 
 
-
 Our study focuses on user-perceived performance bugs, 
-since these bugs have large performance impact.
-After carefully reading bug reports and buggy code fragments of these bugs,
+since these bugs have a large performance impact.
+After carefully reading bug reports and buggy code fragments 
+associated with these bugs,
 we clearly identify \ComBugs performance problems 
 caused by {\textit{unexpected algorithmic complexity}}.
 These performance problems will be referred to as 
 {\textit{complexity problems}} in the reminder of this paper.
 
-
 {\bf{\textit{Caveats.}}}
-The same as all previous empirical studies, 
+In keeping with all previous empirical studies, 
 our findings and conclusions need to be considered together with our methodology.
-All studied complexity bugs come from representative software. 
+All studied complexity bugs come from software representative of a variety of uses and development processes. 
 However, there are other types of software not covered in our study, 
-such as distributed systems and HPC software. 
+such as distributed systems and high performance computation software. 
 All studied complexity problems are reported by users through bug tracking systems.  
 We do believe that there are complexity problems noticed 
-and fixed by developers in other ways. 
-However, there are no conceivable methods to study them.
+and fixed by developers through other processes. 
+%However, there are no conceivable methods to study them.
+However, the field has not found methods to study them.
 We believe that the studied complexity problems can serve as a representative sample
 of complexity problems in the real world. 
 
@@ -110,8 +109,8 @@ and free entries, and keep them in two different linked lists.
      morekeywords={+},keepspaces=true,numbers=left}
   \mbox{\lstinputlisting[mathescape,boxpos=t]{figure/mysql27287.c}}
 \caption{A MySQL performance problem in polynomial complexity. 
-  (During performance failure runs, 
-   the total loop iterations scale polynomially in the size of \texttt{items}.)}
+\footnotesize{(During performance failure runs, 
+   the total loop iterations scale polynomially in the size of \texttt{items}.)}}
 \vspace{-0.05in}
 \label{fig:mysql27287}
 \vspace{-0.05in}
@@ -161,9 +160,8 @@ but can still keep generated codes working correctly.
      morekeywords={+},keepspaces=true,numbers=left}
   \mbox{\lstinputlisting[mathescape,boxpos=t]{figure/gcc27733.c}}
 \caption{A GCC performance problem in exponential complexity. 
- (During performance failure runs, how many times \texttt{mult\_alg} is invoked scales exponentially
-  in the number of 1s in the binary form of input \texttt{t}.
-  xxxx: change to gcc\#1687)}
+ \footnotesize{(During performance failure runs, how many times \texttt{mult\_alg} is invoked scales exponentially
+  in the number of 1s in the binary form of input \texttt{t}.)}}
 \vspace{-0.05in}
 \label{fig:gcc27733}
 \vspace{-0.05in}
