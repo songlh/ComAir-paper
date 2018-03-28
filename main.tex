@@ -2,16 +2,15 @@
 %\documentclass[letterpaper,twocolumn,10pt]{article}
 %\usepackage{usenix,epsfig,endnotes}
 
-\documentclass[sigconf, review, anonymous]{acmart}
+\documentclass[acmsmall,review,anonymous]{acmart}\settopmatter{printfolios=true,printccs=false,printacmref=false}
 
 
 
-\acmConference[ESEC/FSE 2018]{The 26th ACM Joint European Software Engineering Conference and Symposium on the Foundations of Software Engineering}{4-9 November, 2018}{Lake Buena Vista, Florida, United States}
 
 
 \settopmatter{printacmref=false} % Removes citation information below abstract
 \renewcommand\footnotetextcopyrightpermission[1]{} % removes footnote with conference information in first column
-\pagestyle{plain} % removes running headers
+\pagestyle{fancy} % removes running headers
 % standard LaTeX packages
 %\usepackage{changebar}
 
@@ -87,8 +86,9 @@
 
 \input{section/1_intro}
 \input{section/2_study}
-\input{section/3_inhouse}
-\input{section/4_online}
+%\input{section/3_inhouse}
+%\input{section/4_online}
+\input{section/3_input_design}
 \input{section/5_exp}
 \input{section/6_related}
 
