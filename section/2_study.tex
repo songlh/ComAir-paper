@@ -288,62 +288,66 @@ or by skipping computation with exponential complexity for large workloads.
 \end{figure}
 
 
-3 of the performance problems are caused by recursive function calls. 
-Take GCC\#27733 in Figure~\ref{fig:gcc27733} as an example, 
-recursive function \texttt{mult\_alg} computes the best algorithm to multiply \texttt{t}.
+Three of the studied performance problems are caused by recursive function calls. 
+Taking GCC\#27733 in Figure~\ref{fig:gcc27733} as an example, 
+the recursive function \texttt{mult\_alg} computes the best algorithm to multiply \texttt{t}.
 In each invocation, \texttt{mult\_alg} will try a set of bitwise 
 operations to change input 
-\texttt{t} into a smaller number \texttt{t'} and recursively call itself. 
+\texttt{t} into a smaller number, \texttt{t'}, 
+and recursively call itself.
 The number of times when \texttt{mult\_alg} is invoked scales exponentially 
-in terms of 1s in the binary form of input \texttt{t}. 
+in terms of the number of 1s in the binary form of input \texttt{t}.
 To optimize this function, 
-GCC developers use a hash table \texttt{alg\_hash} to record
-which \texttt{t} has been processed before and what is its corresponding result.
+GCC developers use a hash table, \texttt{alg\_hash}, to record
+which \texttt{t} has been processed before and its corresponding result.
 However, there is a type declaration error inside the hash table entry,
 and this error causes \texttt{t} larger than the maximum unsigned integer to never hit cache.
 For large \texttt{t}, \texttt{mult\_alg} is still in exponential complexity. 
 After fixing the type declaration error, 
 memoization is enabled for large \texttt{t}. 
 
-GCC\#32540 is in exponential complexity and is caused by an inefficient loop. 
-The loop applies iterative algorithm to implement a compiler optimization. 
+GCC\#32540 is in the exponential complexity category and is caused by an inefficient loop. 
+The loop applies an iterative algorithm to implement a compiler optimization. 
 The bug-triggering input contains very complex control and data dependence,  
-so that the buggy loop scales exponentially in terms of \texttt{if} branch in the input. 
+so that the buggy loop scales exponentially in terms of the number 
+of \texttt{if} branches in the input. 
 To fix this bug, developers simply disable the optimization 
-after detecting complex control and data dependence.  
-
+once they detect the complex control and data dependence.  
 
 
 \subsection{Diagnosis process of complexity problems}
 \label{sec:process}
 
-We also studied how complexity problems are reported by users and get diagnosed by developers. 
+We also study how complexity problems are reported by users and diagnosed by developers 
+to better understand state-of-the-art combating process of complexity problems. 
 
-{\underline{\textit{How complexity problems are reported?}}
+
+{\underline{\textit{How are complexity problems reported?}}
 As shown in Table~\ref{tab:study},
-for most complexity bugs (25/35), 
-how to change input sizes in order to observe performance scaling problems 
-is specified by users during reporting. 
+for most complexity bugs (25/30), 
+users' reports specified how to change input sizes 
+in order to observe performance scaling problems. 
 As discussed in previous works~\cite{SongOOPSLA2014}, 
 all collected user-perceived performance bug reports
-contain bug-triggering inputs provided by users. 
+contain bug-triggering inputs from end users. 
 For most complexity bugs, 
 users will also describe how they change input sizes 
 and how performance changes accordingly. 
 For example, when reporting GCC\#32540, 
 the user provides a C file and several measurement results to 
 show that GCC compilation time scales exponentially 
-with the number of \texttt{if} branch in the C file. 
+with the number of \texttt{if} branches in the C file. 
 As another example, when reporting Mozilla\#490742, 
 the user mentions that the length of high, 
 flat CPU usage is related to the number of search engine preferences. 
 
-For the other 5 bugs, users provide one bug-triggering input 
+For the other five bugs, users provide one bug-triggering input 
 or describe a set of bug-triggering inputs when they report the performance problems. 
 For example, when reporting GCC\#27733, 
 the user provides one bad input, which can take GCC 49 minutes to compile. 
-When reporting Mozilla\#231300, the user mentions that clearing disk cache on Mac can trigger the bug, 
-no matter what is the content of the cached files. 
+When reporting Mozilla\#231300, the user mentions that clearing the disk cache on a Macintosh system can trigger the bug, 
+regardless of the content of the cached files. 
+
 
 {\underline{\textit{How complexity problems are diagnosed?}}
 We study how long it takes developers to fix complexity problems. 
