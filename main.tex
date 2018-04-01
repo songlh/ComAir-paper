@@ -25,7 +25,7 @@
 \usepackage{hyperref}
 \usepackage{nicefrac}
 \usepackage{subfig}
-%\usepackage{xcolor}
+
 \usepackage{setspace}
 \usepackage{xspace}
 \usepackage{multirow}
@@ -35,7 +35,9 @@
 \usepackage{chngpage}
 \usepackage{listings}
 \usepackage{color}
-
+\usepackage{natbib}
+\bibliographystyle{abbrvnat}
+\setcitestyle{authoryear,open={(},close={)}}
 
 
 
@@ -86,17 +88,19 @@
 
 \input{section/1_intro}
 \input{section/2_study}
-%\input{section/3_inhouse}
-%\input{section/4_online}
-\input{section/3_input_design}
-\input{section/5_exp}
+\input{section/3_inhouse}
+\input{section/4_online}
+%\input{section/3_input_design}
+%\input{section/5_exp}
 \input{section/6_related}
 
 
 
 \balance
 {
-\bibliographystyle{abbrvnat}
+
+%\bibliographystyle{plainnat}
+%\setcitestyle{authoryear,open={((},close={))}}
 \bibliography{perf} 
 }
 

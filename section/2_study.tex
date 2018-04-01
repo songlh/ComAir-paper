@@ -1,74 +1,96 @@
+\newpage
 \section{Understanding Real-World Complexity Problems}
 \label{sec:study}
 
-In this section, we conduct an empirical study on real-world complexity problems. 
-Specifically, we try to answer the following two questions:
+In this section, we report an empirical study on real-world 
+complexity problems. Our empirical study is conducted in two steps.
 
 \begin{enumerate}
 
-\item What are common root causes for complexity bugs? 
-Here, we refer root cause as a code construct conducting 
-inefficient computation leading to a complexity problem.
-Studying root causes can help us 
+\item First, we build a taxonomy for studied complexity bugs. 
+For bugs in each category, 
+we study what code constructs conduct efficient computation,
+how user-perceived slowdown is generated, and how to fix these bugs. 
+Our studying results can help us 
 make suitable design decisions for algorithmic profiling. 
 
-\item How real-world complexity problems are reported and diagnosed?
-This knowledge can help us understand the 
-state of practice for combating complexity problems.
+\item Second, we investigate how these complexity problems are reported by end users
+and how they are diagnosed by developers. 
+This knowledge can help us understand what information is available from users' side
+and help us understand the 
+state of practice for combating complexity bugs.
+
 
 \end{enumerate}
 
 \subsection{Methodology}
 \label{sec:meth}
 
-We conduct our empirical study based on a public benchmark set for 
+\input{section/tab_app}
+
+We conduct our empirical study based on a public benchmark set of 
 real-world performance bugs~\cite{PerfBug,SongOOPSLA2014}. 
-In the previous work~\cite{PerfBug}, 
+In their first work~\cite{PerfBug}, 
 the authors collected 110 real-world performance bugs from 5 representative 
 software suites: Apache, Chrome, GCC, Mozilla, and MySQL. 
-These software suites cover various types of functionalities and are implemented 
-by a variety of programming languages, including C/C++, Java, C\#, and JavaScript. 
-All five studied software suites are large and mature, 
+As shown in Figure~\ref{tab:app_bug}, 
+these software suites cover various types of functionalities and are implemented 
+in a variety of programming languages, including C/C++, Java, C\#, and JavaScript. 
+All the five studied software suites are large and mature, 
 with millions of lines of codes and long development histories. 
 In their following work~\cite{SongOOPSLA2014}, 
 the authors further identified 65 user-perceived performance bugs, 
-which are all observed and reported by users. 
+whose bugs reports contain detailed information 
+about how these bugs are perceived by end users and fixed by developers.  
 
-Our study focuses on user-perceived performance bugs, 
-since these bugs have a large performance impact.
+Our study focuses on user-perceived complexity bugs, 
+because these bugs have large performance impact.
 After carefully reading bug reports and buggy code fragments 
 associated with these bugs,
 we clearly identify \ComBugs performance problems 
-caused by {\textit{unexpected algorithmic complexity}}.
-These performance problems will be referred to as 
+caused by {\textit{algorithmic complexity}}.
+Developers usually fix these bugs by applying optimized algorithms to lower complexity
+or to reduce workloads processed by buggy code fragments. 
+We refer these performance problems as 
 {\textit{complexity problems}} in the reminder of this paper.
+The number of studied complexity problems are shown in Figure~\ref{tab:app_bug}.
+Bugs not belonging to complexity problems are caused by various reasons.
+For example, there are several Mozilla bugs related to GUI, 
+like drawing transparent figures or refreshing web pages too frequently. 
+There are also bugs caused by misusing synchronizations, 
+such as using busy wait or conducting I/O in a critical section. 
 
 {\bf{\textit{Caveats.}}}
 In keeping with all previous empirical studies, 
 our findings and conclusions need to be considered together with our methodology.
 All studied complexity bugs come from software representative of a variety of uses and development processes. 
 However, there are other types of software not covered in our study, 
-such as distributed systems and high performance computation software. 
-All studied complexity problems are reported by users through bug tracking systems.  
-We do believe that there are complexity problems noticed 
-and fixed by developers through other processes. 
-%However, there are no conceivable methods to study them.
-However, the field has not found methods to study them.
-We believe that the studied complexity problems can serve as a representative sample
+such as distributed systems and software for high performance computation. 
+All studied complexity problems are collected from bug databases.  
+We believe that end users could report perceived complexity problems through other ways.
+We also believe that there could be some complexity problems noticed 
+and fixed by developers through manual inspection or in-house testing, 
+before releasing the software to end users.  
+However, the field has not found methods to study bugs not tracked by bug databases.
+We believe that the studied bugs can serve as a representative sample
 of complexity problems in the real world. 
 
 
-\subsection{Root causes of complexity problems}
+
+\subsection{A Taxonomy for Complexity Problems}
 \label{sec:tax}
 
 \input{section/tab_study}
 
-In this section, we study root causes of complexity problems in different categories. 
+After categorizing studied bugs according to their different complexity, 
+we study complexity problems in each category.
 Our study focuses on 
-1) what code constructs causing the complexity problems, 
-2) why the complexity problems can generate user-perceived performance impact, 
-and 3) how developers fix these complexity problems. 
-
+1) what are root causes\footnote{We refer root causes as code constructs 
+conducting the inefficient computation, 
+following previous works in this area~\cite{SongOOPSLA2014,ldoctor}.} 
+for the complexity problems;
+2) how the complexity problems generate user-perceived performance impact;
+3) how developers fix these complexity problems. 
 
 {\underline{\textit{$O(N)$: linear complexity.}}} 
 As shown in Table~\ref{tab:study}, 
@@ -76,32 +98,38 @@ As shown in Table~\ref{tab:study},
 All of these problems are caused by a buggy loop, 
 whose average loop iteration number scales in terms of input size $N$.
 
-For 5 of them, their corresponding buggy loops contain serialized I/O operations.
-Although average loop iteration numbers or input sizes are not large,
-these bugs are still perceived by users.
-The patches for these bugs are to aggregate I/O operations 
-or completely eliminate unnecessary I/O operations.   
-For example, Mozilla\#490742 is caused by bookmarking tabs 
-by using separated database transactions. 
-Even bookmarking 50 tabs can cause a timeout dialog window to pop up 
-in a performance failure run.
-To fix this bug, mozilla developers use one single aggregated transaction 
+Five of them are characterized by buggy loops that contain serialized I/O operations.
+Users could perceive these bugs, 
+even though the average loop iteration numbers of input sizes are not large.
+Patching these 5 bugs involves aggregating I/O operations 
+or completely eliminating unnecessary I/O operations. 
+For example, Mozilla\#490742 is caused by bookmarking 
+tabs by using individual database transactions. 
+Even bookmarking 50 tabs can cause a timeout dialog 
+window to pop up in a performance failure run. 
+To fix this bug, Mozilla developers use one single aggregated transaction 
 to bookmark all tabs.
 As another example, Mozilla\#344059 is due to saving unchanged 
 search engine preferences to SQLite, 
-and it is fixed by only saving search 
-engine preferences when some of them are changed.
+and it is fixed by saving search 
+engine preferences only when some of them are changed.
 
-For the other 3 bugs, their buggy loops will execute many iterations 
-during performance failure runs,
-and they are fixed by adding shortcuts to completely skip the buggy loops.
-Take MySQL\#33948 as an example, 
-originally MySQL developers keep both used and free table entries in the same linked list,
-and the buggy loop is to iterate the linked list and look for a free entry.
-During performance failure runs, many table entries are used and the buggy loop 
-needs to take a lot of iterations to find a free entry. 
-To fix this bug, MySQL developers simply separate used entries 
-and free entries, and keep them in two different linked lists. 
+
+For the other three bugs,
+their buggy loops execute many iterations during performance failure runs.
+They are fixed by adding shortcuts to completely skip the buggy loops. 
+Taking MySQL\#33948 as an example,
+MySQL developers followed a common practice to keep all table entries in the same linked list, 
+including both used ones and free ones. 
+The buggy loop iterates the linked list and looks for a free entry.
+During performance failure runs, 
+many table entries are used and the buggy loop must iterate excessively to find a free entry.
+To fix this bug, MySQL developers simply separate used entries and free entries,
+and keep them in two separated linked lists. 
+
+To sum up, all $O(N)$ complexity problems are caused by buggy loops. 
+To fix them, developers directly optimize these loops or completely skip these loops. 
+
 
 %\begin{figure}
 %\centering
@@ -116,6 +144,8 @@ and free entries, and keep them in two different linked lists.
 %\vspace{-0.05in}
 %\end{figure}
 
+
+
 {\underline{\textit{$O(N^k)$: polynomial complexity (k>1).}}}
 As shown in Table~\ref{tab:study}, 
 more than half of the studied complexity bugs are in polynomial complexity. 
@@ -124,34 +154,124 @@ polynomial complexity for each problem is also caused by a buggy loop.
 However, {\bf both} loop execution number and average loop iteration number
 scale as input size $O(N)$.
 
-To fix the majority (13/18) of performance problems in this category, 
-developers directly modify the loops whose total loop iterations scale polynomially.  
-The buggy loop for MySQL\#27287 is shown in Figure~\ref{fig:mysql27287}.
-The loop searches parent \texttt{XML\_NODE} for function parameter \texttt{nitems}, 
-which presents array index for another \texttt{XML\_NODE}.
-All \texttt{XML\_NODE}s are maintained in array \texttt{items}. 
-The way the loop to conduct the search is to iterate array \texttt{items} 
-backward from the input and look for the first \texttt{XML\_NODE} 
-whose level is one less than the input.
-During performance failure runs, 
-one \texttt{XML\_NODE} contains tens of thousands of children, 
-and \texttt{xml\_parent\_tag} is invoked for each of its children. 
-To fix this bug, MySQL developers add an extra field to each 
-\texttt{XML\_NODE} to save its parent, 
-and this field is initialized when a \texttt{XML\_NODE} is created. 
-After that, the buggy loop is completely removed. 
+\begin{figure}
+\centering
+\lstset{basicstyle=\ttfamily\fontsize{7}{8}\selectfont,
+     morekeywords={+},keepspaces=true,numbers=left}
+  \mbox{\lstinputlisting[mathescape,boxpos=t]{figure/Mozilla477564.js}}
+\caption{A Mozilla complexity problem in $O(N^2)$ complexity.
+\footnotesize{(This figure shows the buggy code fragment for Mozilla\#477564. 
+Execution time scales polynomially in the number of nodes in a linked list.)}}
+\vspace{-0.05in}
+\label{fig:Mozilla477564}\vspace{-0.05in}
+\end{figure}
+
+\begin{figure*}
+\centering
+\subfloat[MySQL\#27287]{\includegraphics[width=0.22\linewidth]{figure/gcc27733-time-cost-line}\label{fig:mysql27287-time}} 
+\subfloat[Mozilla\#477564]{\includegraphics[width=0.22\linewidth]{figure/gcc27733-time-cost-line}\label{fig:mozilla477564-time}}
+\subfloat[Apache\#34464]{\includegraphics[width=0.22\linewidth]{figure/gcc27733-time-cost-line}\label{fig:apache34464-time}} 
+\subfloat[GCC\#27733]{\includegraphics[width=0.22\linewidth]{figure/gcc27733-time-cost-line}\label{fig:gcc27733-time}} \\ 
+\vspace{-0.1in}
+\caption{How execution time scales with input size for four complexity problems. 
+\footnotesize{(These figures show how execution time change with the change of input size for MySQL\#27287, 
+ Apache\#34464, Mozilla\#477564, and GCC\#27733. For each complexity problem, we use 10 distinct inputs.)}} 
+\label{fig:time} 
+\end{figure*} 
+
+To fix the majority (11/18) of performance problems in this category,
+developers modify directly the buggy loops, 
+whose total loop iteration numbers scale polynomially.
+Take MySQL\#27287 as an illustration.
+As we discussed earlier, to fix this bug,
+developers add an extra field to save parent \texttt{XML\_NODE}
+and completely remove the buggy loop shown in Figure~\ref{fig:mysql27287}.
+As another example, the buggy loop for Mozilla\#477564 is shown in Figure~\ref{fig:Mozilla477564}.
+The loop counts how many previous nodes of input \texttt{aNode} 
+having the same \texttt{localName} and \texttt{URI}.
+An outer loop, not shown in the figure, 
+will invoke \texttt{sss\_xph\_generate} for every node in a linked list, 
+so that the complexity is $O(N^2)$ in terms of the number of nodes in the linked list.
+To fix this complexity bug, developers add an extra field to each node to 
+save the counting result. 
+Given a node, 
+its \texttt{count} value is calculated by adding one 
+to the \texttt{count} value of 
+its nearest previous node with the same \texttt{localName} and \texttt{URI}.  
+How complexity changes after fix for MySQL\#27287 and Mozilla\#477564 are 
+shown in Figure~\ref{fig:mysql27287-time} and Figure~\ref{fig:mozilla477564-time}, respectively. 
 
 
-To fix other performance problems (5/18), 
+
+
+
+
+\begin{figure}
+\centering
+\lstset{basicstyle=\ttfamily\fontsize{7}{8}\selectfont,
+     morekeywords={+},keepspaces=true,numbers=left}
+  \mbox{\lstinputlisting[mathescape,boxpos=t]{figure/apache34464.c}}
+\caption{An Apache performance problem in $O(N^2)$ complexity and its patch. 
+\footnotesize{(This figure shows the buggy code fragment for Apache\#34464. 
+ Execution time scales polynomially in the number of characters read from \texttt{getchar()}.)}}
+\vspace{-0.05in}
+\label{fig:apache34464}
+\vspace{-0.05in}
+\end{figure}
+
+
+
+
+
+%To fix the majority (13/18) of performance problems in this category, 
+%developers directly modify the loops whose total loop iterations scale polynomially.  
+%The buggy loop for MySQL\#27287 is shown in Figure~\ref{fig:mysql27287}.
+%The loop searches parent \texttt{XML\_NODE} for function parameter \texttt{nitems}, 
+%which presents array index for another \texttt{XML\_NODE}.
+%All \texttt{XML\_NODE}s are maintained in array \texttt{items}. 
+%The way the loop to conduct the search is to iterate array \texttt{items} 
+%backward from the input and look for the first \texttt{XML\_NODE} 
+%whose level is one less than the input.
+%During performance failure runs, 
+%one \texttt{XML\_NODE} contains tens of thousands of children, 
+%and \texttt{xml\_parent\_tag} is invoked for each of its children. 
+%To fix this bug, MySQL developers add an extra field to each 
+%\texttt{XML\_NODE} to save its parent, 
+%and this field is initialized when a \texttt{XML\_NODE} is created. 
+%After that, the buggy loop is completely removed. 
+
+
+To fix other complexity problems (5/18) in this category,
 developers reduce data processed by the loops scaling polynomially, 
-instead of optimizing the loops directly. 
-For example, the loop scaling polynomially for GCC\#12322 is part 
-of the functionality to do basic block reordering, 
-and it will perform poorly for basic blocks with many successors. 
+instead of changing the loops directly.
+In the buggy code fragment for Apache\#34464 shown in Figure~\ref{fig:apache34464},
+the \texttt{while} loop on line 5 searches a string \texttt{source}
+for a target sub-string \texttt{target}.
+If the \texttt{while} loop's search is unsuccessful, 
+a new character returned from \texttt{getchar()} on line 8 will be appended to string \texttt{source}, 
+and the loop will search string \texttt{source} again from the beginning. 
+There is an inner loop inside \texttt{indexOf()}, whose total iterations 
+scale polynomially in terms of the number of characters from \texttt{getchar()}. 
+After fixing this bug, the inner loop will only check the most recent \texttt{targetLen} characters.
+The developers not change the inner loop, 
+while reduce the workload it processes.   
+How execution time scales before and after fix for 
+Apache\#34464 is shown in Figure~\ref{fig:apache34464-time}.
+Take GCC\#12322 as another example.
+The loop scaling polynomially is part of the functionality that does basic block reordering,
+and it will perform poorly for basic blocks with too many successors. 
 The bug-triggering input contains a basic block with thousands of successors. 
-To fix this, developers simply skip basic blocks with many successors, 
-which will lose some optimization opportunities, 
-but can still keep generated codes working correctly. 
+To fix this, developers simply skip basic blocks with many successors.
+By does this, some optimization opportunities may be lost, 
+but the generated codes will still work correctly. 
+
+
+{\underline{\textit{$O(e^N)$: exponential complexity.}}}
+Four of the studied complexity problems are in exponential complexity. 
+These complexity problems are fixed 
+either by leveraging memoization to reuse previous results 
+or by skipping computation with exponential complexity for large workloads. 
+
 
 
 \begin{figure}
@@ -167,12 +287,6 @@ but can still keep generated codes working correctly.
 \vspace{-0.05in}
 \end{figure}
 
-
-{\underline{\textit{$O(e^N)$: exponential complexity.}}}
-4 studied complexity problems are in exponential complexity. 
-These complexity problems are fixed by 
-either leveraging memoization to reuse previous results 
-or skipping computation with exponential complexity for large workload. 
 
 3 of the performance problems are caused by recursive function calls. 
 Take GCC\#27733 in Figure~\ref{fig:gcc27733} as an example, 

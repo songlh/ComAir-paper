@@ -4,7 +4,7 @@
 \subsection{Motivation}
 \label{sec:motiv}
 
-Performance problems~\footnote{We will use performance problems and performance bugs exchangeably, 
+Performance problems\footnote{We will use performance problems and performance bugs exchangeably, 
 following previous works in this area~\cite{SongOOPSLA2014,ldoctor}} 
 are one type of software implementation mistakes
 and can cause inefficient execution~\cite{PerfBug,perf.fse10,SongOOPSLA2014,ldoctor,Alabama}. 
@@ -28,34 +28,46 @@ Addressing complexity problems is an important aspect to fight performance bugs.
 
 
 Algorithmic profiling~\cite{Aprof1,Aprof2,AlgoProf} collects profiles from multiple 
-runs of the same program and attributes complexity to each code construct, like a loop or a function,
+runs of the same program and attributes complexity to each code construct, such as a loop or a function,
 in the form of a \textit{cost} function of \textit{input} size. 
 Algorithmic profiling can be used detect previously unknown complexity problems and 
 diagnose performance failures caused by complexity problems. 
-
 Conducting algorithmic profiling is challenging. 
 Effective techniques need to satisfy the following three requirements.
-First, \textit{coverage}. Complexity problems are caused by a large variety of root causes. 
-A code construct may take inputs and consume computation resources in various types.
-A good technique must cover a large portion of various root causes, inputs and costs.
-Second, \textit{accuracy}. Algorithmic profiling needs to accurately identify 
-how cost scales as input size changes.
-Given an analyzed code construct,
-it is desired to conduct algorithmic profiling under the context of the whole program's execution. 
-Otherwise, missing how the code construct cooperate with other parts will lead to inaccurate results. 
-Third, \textit{performance}. 
-For in-house testing, lowering runtime overhead can save testing time 
-and allow developers to run more tests under a given time budget. 
-Developers' misunderstanding of real-world workloads 
-is the most common reason why performance problems are introduced~\cite{PerfBug}. 
-Production-run algorithmic profiling can help developers 
-understand how their programs scale under real-world workloads.
-However, production-run techniques require no observable slowdown from end users. 
 
-Existing techniques do not satisfy the above three conditions and 
+\begin{itemize}
+
+\item First, \textit{coverage}. Complexity problems are in different types of complexity, 
+and they are also caused by a large variety of root causes. 
+Given a code construct, it may take inputs and 
+consume computation resources in various types.
+A good algorithmic profiling technique must cover a 
+large portion of various complexity types, root causes, inputs and costs.
+
+
+\item Second, \textit{accuracy}. 
+Given an analyzed code construct,
+algorithmic profiling needs accurately identify 
+how cost scales as input size changes.
+It is desired to conduct algorithmic profiling under the context of the whole program's execution. 
+Otherwise, missing how the code construct cooperates with other parts will lead to inaccurate results. 
+
+\item Third, \textit{performance}. 
+Lower runtime overhead can allow developers to run more tests 
+under a given time budget during in-house testing.
+Production-run algorithmic profiling can help developers 
+understand how their programs scale
+under real-world workloads.
+To be deployed in production runs, 
+techniques must not incur any observable slowdown.
+
+
+\end{itemize}
+
+Existing techniques do not satisfy the above three requirements and 
 cannot conduct algorithmic profiling effectively. 
 Traditional profilers are most widely used tools to 
-diagnose performance failure~\cite{gprof,oprofile}. 
+diagnose performance failures~\cite{gprof,oprofile}. 
 Traditional profilers can only measure how much time spent in each code construct during one single run, 
 while failing to connect information from multiple runs 
 and failing to provide any indication about how execution time scales.
@@ -76,12 +88,14 @@ They cannot provide desired performance and are far from being deployed in produ
      morekeywords={+},keepspaces=true,numbers=left}
   \mbox{\lstinputlisting[mathescape,boxpos=t]{figure/mysql27287.c}}
 \caption{A MySQL performance problem in polynomial complexity. 
-\footnotesize{(During performance failure runs, 
-   the total loop iterations scale polynomially in the size of \texttt{items}.)}}
+\footnotesize{(This figure shows the buggy code fragment for MySQL\#27287. 
+   During performance failure runs, 
+   execution time scales polynomially in the size of \texttt{items}.)}}
 \vspace{-0.05in}
 \label{fig:mysql27287}
 \vspace{-0.05in}
 \end{figure}
+
 
 One MySQL complexity problem is shown in Figure~\ref{fig:mysql27287}.
 The loop searches parent \texttt{XML\_NODE} for function parameter \texttt{nitems}, 
@@ -105,7 +119,7 @@ To fix this bug, developers add an extra field to each \texttt{XML\_NODE} to sav
 and this field is initialized when a \texttt{XML\_NODE} is created. 
 After applying this patch, codes shown in Figure~\ref{fig:mysql27287} are completely removed.
 This takes developers around 5 months to figure 
-out~\footnote{We count the time from when developers confirmed this is performance bug 
+out\footnote{We count the time from when developers confirmed this is performance bug 
 to when the patch was submitted}. 
 In-house algorithmic profiling can warn developers the $O(N^2)$ complexity, 
 potentially obscured by the fact that inner and outer loops are not in the same function. 
@@ -115,42 +129,72 @@ which are invaluable to diagnose the performance failures caused by this complex
 
 
 
-\subsection{Contributions}
+\subsection{Our Contributions}
 \label{sec:con}
 
 
-Why we need algorithmic profiling? 
+In this paper, 
+we present a tool chain, \Tool, to effectively conduct algorithmic profiling with 
+good coverage, accuracy, and performance. 
+\Tool has in-house and production-run two settings. 
+Under in-house setting, 
+\Tool is launched by using existing tests, 
+or tests generated by test input generation techniques~\cite{KLEE,s2e,dart,EventBreak}. 
+\Tool will automatically merge profiles from multiple runs and 
+identify code constructs with super-linear complexity. 
+Under production-run setting, 
+instrumented programs will be distributed to end users 
+and complexity information be collected in negligible runtime overhead. 
+Developers can leverage this information to better understand real-world workloads
+and diagnose performance failure caused by complexity problems. 
 
-Why we need to push complexity profiling to production runs? 
-a. Understanding real-world workload
-b. Identifying performance bugs caused by API-misuse
-
-The state of the art cannot be applied to production runs. 
+We build \Tool through the following three steps.
 
 To better understand real-world complexity problems,
-we conduct an empirical study on complexity bugs 
-in a representative performance bug benchmark suite~\cite{PerfBug,SongOOPSLA2014}.
+we first conduct an empirical study on real-world complexity bugs.
+All studied complexity bugs come from a representative 
+performance-bug benchmark suite~\cite{PerfBug,SongOOPSLA2014}.
 To the best of our knowledge, our work is the first study focusing on complexity problems.
-We divide studied complexity problems into different complexity categories.    
-We study root causes, how user-perceived performance impact is generated, 
-and fix strategies for each category.
-We also investigate the reporting and diagnosis process for complexity problems. 
+We categorize complexity problems into different complexity categories.
+We study root causes, 
+how user-perceived performance impact is generated 
+and fix strategies for bugs in each category. 
+We also investigate the reporting and diagnosis process for complexity problems.
 Our findings and implications can motivate future research on complexity problems. 
-They already guide our design point selection when exploring in-house algorithmic profiling 
+They already guide our design point selection when designing in-house algorithmic profiling 
 and inspire our approximate algorithms when building production-run techniques. 
 
-After carefully studying the design points for in-house algorithmic profiling,
-we started to build our in-house technique 
-based on an existing algorithm~\cite{Aprof1,Aprof2} leveraging 
-Read Memory Size (RMS) as input metric. 
-We design 4 compiler and runtime optimizations 
-to reduce the runtime overhead during algorithmic profiling.
-Our optimizations can reduce instrumentation sites 
-and can also accelerate instrumented hook functions. 
-There are two scenarios where the existing algorithm fails to profile, 
-which are recursive functions scaling as the value of input parameters 
-and code constructs taking inputs from I/O.
-We enhance the existing algorithm to address these two limitations. 
+To build the in-house version of \Tool, 
+we then study different design points for algorithmic profiling,
+including four types of input metrics, three types of cost metrics, 
+and two methods to fit cost curve. 
+Our experience shows that naive implementation 
+to collect runtime information
+will lead to extremely large overhead. 
+We also design several optimizations to avoid collecting redundant information
+and to reduce the overhead of information collection in one time.
+We evaluate our design by using real-world complexity problems from three sources.
+We also manually inspect all studied complexity problems. 
+Our evaluation and study results show that after choosing the correct design points, 
+\Tool can accurately attribute complexity to code constructs 
+leading to perceive performance problems. 
+
+
+
+
+
+%After carefully studying the design points for in-house algorithmic profiling,
+%we started to build our in-house technique 
+%based on an existing algorithm~\cite{Aprof1,Aprof2} leveraging 
+%Read Memory Size (RMS) as input metric. 
+%We design 4 compiler and runtime optimizations 
+%to reduce the runtime overhead during algorithmic profiling.
+%Our optimizations can reduce instrumentation sites 
+%and can also accelerate instrumented hook functions. 
+%There are two scenarios where the existing algorithm fails to profile, 
+%which are recursive functions scaling as the value of input parameters 
+%and code constructs taking inputs from I/O.
+%We enhance the existing algorithm to address these two limitations. 
 
 
 
