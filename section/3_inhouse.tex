@@ -61,16 +61,16 @@ and reads conducted by
 functions called from the code construct. 
 
 
-\begin{figure}
-\centering
-\subfloat[Inner loop]{\includegraphics[width=0.42\linewidth]{figure/mysql27287-complexity-n}\label{fig:mysql27287-in}}
-\subfloat[Outer loop]{\includegraphics[width=0.42\linewidth]{figure/mysql27287-complexity-n-square}\label{fig:mysql27287-out}} \\ 
-\vspace{-0.1in}
-\caption{Inferred cost functions for MySQL\#27287 using RMS as input size.
-\footnotesize{(\texttt{xml\_parent\_tag} is the function containing the inner loop, 
-and \texttt{my\_xml\_parse} is the function containing the outer loop.)}} 
-\label{fig:mysql27287-2} 
-\end{figure} 
+%\begin{figure}
+%\centering
+%\subfloat[Inner loop]{\includegraphics[width=0.42\linewidth]{figure/mysql27287-complexity-n}\label{fig:mysql27287-in}}
+%\subfloat[Outer loop]{\includegraphics[width=0.42\linewidth]{figure/mysql27287-complexity-n-square}\label{fig:mysql27287-out}} \\ 
+%\vspace{-0.1in}
+%\caption{Inferred cost functions for MySQL\#27287 using RMS as input size.
+%\footnotesize{(\texttt{xml\_parent\_tag} is the function containing the inner loop, 
+%and \texttt{my\_xml\_parse} is the function containing the outer loop.)}} 
+%\label{fig:mysql27287-2} 
+%\end{figure} 
 
 RMS is a generic metric for input size, 
 and it can provide important input information for many complexity problems.   
