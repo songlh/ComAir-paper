@@ -139,7 +139,88 @@ For simplicity, we use function as granularity for code constructs under in-hous
 Otherwise, we need to check whether a monitored code construct enclose related call sites, 
 when we check functions active on the call stack.  
 
+\citet{Aprof1,Aprof2} designed an algorithm to collect 
+RMS for all executed functions based on 
+Valgrind. We briefly discuss this algorithm firstly, 
+and then we will discuss our designed optimizations. 
+To count RMS for each function call instance, 
+several global variables are maintained: 
+\texttt{count}, serving as the current timestamp and incremented 
+by 1 after each function invocation,  
+\texttt{ts}, a hash table containing the latest access timestamp for each memory cell, 
+and \texttt{S}, a shadow stack tracking all active functions on the stack. 
+Four hook functions are instrumented for four types of instructions:
+\texttt{call}, \texttt{return}, \texttt{read}, and \texttt{write}.
+The \texttt{call} hook function will increment the timestamp variable \texttt{count} 
+and grow the shadow stack \texttt{S}.
+The \texttt{return} hook function will generate a log containing the returning function's RMS.
+The \texttt{read} hook function will query the hash table \texttt{ts} to decide whether 
+to increment RMS for all the functions active on the shadow stack \texttt{S}.
+Both the \texttt{read} and \texttt{write} hook functions will update the hash table \texttt{ts}
+by using the value of \texttt{count} to maintain 
+the latest access timestamp for each memory cell. 
 
+We design three optimizations to reduce the runtime overhead when collecting RMS
+from two aspects:
+we try to reduce the number of instrumentation sites, 
+and we try to accelerate hook functions. 
+
+{\underline{\textit{Optimization 1}}
+The first optimization is an attempt to improve the performance of 
+lookups in the hash table \texttt{ts}, 
+containing the latest access timestamp for each memory cell.
+For a memory read, 
+we need to query \texttt{ts} and decide 
+whether RMS should be incremented.
+For both memory read and write, 
+we need to update \texttt{ts} by using the current timestamp \texttt{count}
+for accessed memory cells. 
+
+Instead of using a hash table, 
+we use a page table to contain the timestamp information. 
+To balance runtime overhead and memory overhead, 
+we design a four-layer page table for 32-bit programs.
+We use 4-KB consecutive memory areas to hold pointers pointing to 
+memory areas in the next layer 
+or memory areas holding timestamps for memory cells. 
+For a monitored 32-bit program, 
+we need to calculate four addresses using bitwise operations 
+and use the four addresses to refer to each layer of the page table.  
+For 64-bit programs, we use six layers.  
+Compared with the hash table, 
+the page table leverages the locality of memory accesses 
+and can lead 
+to a better cache performance. 
+To further improve performance, 
+we add an extra variable to hold the pointer pointing 
+to the last referenced memory area holding timestamp.
+For each memory read or write, 
+we first check whether the saved pointer value can be used. 
+We only conduct a page table lookup when the saved value cannot be used. 
+
+{\underline{\textit{Optimization 2}}
+The second optimization targets reducing the number of instrumentation sites 
+for \texttt{read} and \texttt{write} instructions. 
+The \texttt{read} hook function needs to query hashmap \texttt{ts} 
+to get the timestamp for the latest access and update RMS value when necessary. 
+Both \texttt{read} and \texttt{write} hook functions 
+need to use the value of \texttt{count} to update hashmap \texttt{ts}.
+As we discussed earlier, the value of texttt{count} will be incremented after each function invocation. 
+Therefore, given two consecutive memory accesses on the same memory cell,
+if there is no function calls between these two accesses, 
+we do not need to instrument the second memory access. 
+
+We rely on dominance analysis to implement this optimization. 
+We focus on stack memory cells that hold 
+scalar variables and only have \texttt{read} and \texttt{write} as uses 
+(i.e., not having ``address of'' as uses).
+We only focus on these memory cells,
+because we want to avoid pointer alias analysis, 
+which may potentially introduce inaccurate results. 
+For a \texttt{read} or \texttt{write} instruction on one of these memory cells,
+if it is dominated by another \texttt{read} or \texttt{write} instruction, 
+and there is not function call on any path between these two instructions,
+we will skip to instrument the second instruction.  
 
 
 
