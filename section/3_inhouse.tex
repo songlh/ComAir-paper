@@ -10,34 +10,34 @@ previously unknown complexity problems before releasing their software,
 or help developers diagnose and fix complexity problems reported by end users. 
 
 To conduct algorithmic profiling,
-we first need to record \textit{input} size and \textit{cost} for different code constructs 
+we first need to record \textit{input} sizes and \textit{costs} for different code constructs 
 during multiple executions;
 we then plot records from the same code construct with input size as x-axis and cost as y-axis; 
-and finally, we infer a cost function of the input size.
-The code constructs could be loops and functions. 
-In order to design \Tool, 
-there are three fundamental questions we need to answer:
-1) how to design input metric; 2) how to design cost metric; 
-and 3) how to infer and compare cost functions.
+and finally, we infer a cost function of input size.
+To design the in-house version of \Tool, 
+we need to answer three fundamental questions:
+1) how to design input metric; 
+2) how to design cost metric;
+and 3) how to infer and compare cost functions. 
 
 
 \subsection{Input Metric Design}
 \label{sec:input}
 
-The goal of input metric design is to figure out general metrics, 
+The goal of input metric design is to figure out generic metrics, 
 which can represent input sizes for different code constructs. 
 We cannot rely on developers to manually label or specify input information 
 for different code constructs, 
 because it is time-consuming and also difficult for complex code constructs.  
-There are several metrics, which can be used to measure input for a code construct.
+There are several metrics, which can be used to measure input size for a code construct.
 We discuss commonly used ones as follows. 
 
 \subsubsection{Program input}
 As discussed in Section~\ref{sec:process}, 
 users tend to specify how to change the whole program 
 input to describe the perceived complexity problem.
-It is fairly easy to measure the input size for the whole program based on users' reports.
-One way to measure the input size for a code construct inside a program
+It is fairly easy to measure input size for the whole program based on users' reports.
+One way to measure input size for a code construct
 is to simply use the input size of the whole program. 
 However, the whole program input 
 is related to the input of a code construct in various ways.
@@ -46,35 +46,40 @@ all code constructs.
 Using the input size of the whole program as an input metric for a code 
 construct may lead to incorrect profiling results. 
 
+
 \subsubsection{Read memory size (RMS)}
-RMS is proposed as an input size metric for one 
+RMS is proposed as an input metric for one 
 execution of a code construct~\cite{Aprof1,Aprof2}. 
 RMS is defined as the number of distinct memory cells 
 whose first access is read. 
 RMS considers both read accesses conducted by a code construct directly 
 and read accesses conducted by 
 functions called from the code construct. 
-RMS is a generic metric for input size, 
+RMS is a generic metric for input, 
 and it can provide important input information for many complexity problems.   
-Given a code construct \texttt{c}, which is inside a loop \texttt{l} and executed
-$n$ times in one single run, 
-we would have $n$ RMS records for \texttt{c}. 
+
+Given a code construct \texttt{c} inside a program, 
+we assume \texttt{c} is inside a loop \texttt{l} and is executed
+$n$ times in one run of the program. 
+We would have $n$ RMS records for \texttt{c}. 
 There are two methods to analyze these $n$ RMS records.
 
 \begin{itemize}
 
-\item First, \textit{top-down} method. 
+\item The first method aggregates the $n$ records in a \textit{top-down} way~\cite{Aprof1,Aprof2}.
 When analyzing complexity for \texttt{c}, 
-we consider the $n$ records independently from each other~\cite{Aprof1,Aprof2}. 
+we consider the $n$ records independently from each other. 
 The effect of multiple executions of \texttt{c} 
 will be aggregated when analyzing complexity for \texttt{l}.
 
-\item Second, \textit{bottom-up} method. 
+\item The second method aggregates the $n$ records in a \texttt{bottom-up} way.
 When analyzing complexity for \texttt{c}, 
-we merge the $n$ records and calculate the number of distinct memory cells 
-contributing RMS as the input size of \texttt{c} in the program run.
+We will merge the $n$ records and calculate the number of distinct memory cells 
+contributing RMS as the input size of \texttt{c} during the whole program execution.
 
 \end{itemize}
+
+
 
 
 
@@ -102,10 +107,10 @@ Although variable \texttt{p} and \texttt{level} are also read in each iteration,
 RMS only considers distinct memory cells and 
 only increments its value for the first read on these two variables in the first iteration. 
 The outer loop, not shown in Figure~\ref{fig:mysql27287}, 
-invokes function \texttt{xml\_parent\_tag} for every \texttt{XML\_NODE} contained
+invokes \texttt{xml\_parent\_tag} for every \texttt{XML\_NODE} contained
 in the same array \texttt{items}.
 If we use the top-down method to analyze the buggy loop
-(or function \texttt{xml\_parent\_tag}), 
+(or the buggy function), 
 execution cost is in linear relationship with RMS, 
 as shown in Figure~\ref{fig:mysql27287-indep}.
 The $O(N^2)$ complexity can be inferred from the side of the outer loop, 
@@ -113,8 +118,9 @@ as shown in Figure~\ref{fig:mysql27287-outer}.
 If we use the bottom-up method, 
 we can observe aggregated cost scales 
 polynomially in terms of RMS for the buggy loop 
-(or function \texttt{xml\_parent\_tag}), 
+(or the buggy function), 
 which is shown in Figure~\ref{fig:mysql27287-merge}. 
+
 
 
 Both of the two methods can infer the same complexity, such as for MySQL\#27287,
