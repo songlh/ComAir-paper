@@ -5,25 +5,25 @@
   \newcommand{\No}[0]{-}
   \begin{tabular}{lccccccccccc}
     \toprule     
-    {\bf BugID}                   & KLOC  &  P.L.    & \multicolumn{6}{c}{\# of Static Features}                                          &   Complexity  & Buggy C.C.        & \# of Inputs \\
+    {\bf BugID}                   & KLOC  &  P.L.    & \multicolumn{6}{c}{\# of Static Features}    &   Complexity  & Buggy C.C.        & \# of Inputs \\
                            
     \cmidrule(lr){4-9}
-                                 &        &          &  BB      &  Loop     & A-L    &  LL-L    &  F.  & R.F.                             &               &                             & \\
+                                 &        &          &  BB      &  Loop     & A-L    &  LL-L    &  F.  & R.F.    &           &        &  \\
     \midrule 
 
-    Mozilla\#347306              &  88    & C        &          &           &       &           &       &                                 &               &&         \\
-    Mozilla\#416628              &  105   & C        &          &           &       &           &       &                                 &               &&                \\
-    Mozilla\#490742                  &  -  & JS  &  &              &    &                                 &                   &                           &       &&                         \\
-    Mozilla\#35294    &  -  & C++  &  &              &    &                                 &                   &                           &                     &&          \\
-    Mozilla\#477564   &  -  & JS  &  &              &    &                                 &                   &                           &                      &&          \\
+    Mozilla\#347306              &  88    & C        &   46735  &   1177     &  483    &  136    &  1988  & 35   &  $O(N^{2})$ &  Array  & 10000   \\
+    Mozilla\#416628              &  105   & C        &   46097  &   1116     &  484    &  136    &  1919  &  35  &  $O(N^{2})$  &  LinkedList & 380  \\
+    Mozilla\#490742              &  0.157\textsuperscript{*}  & JS  &  41 & 4 &  3  &   0   &  8   &  0   & $O(N)$   &  Array  &  10000              \\
+    Mozilla\#35294    &  0.195\textsuperscript{*}  & C++  &  &              &    &                                 &                   &                           &                     &&          \\
+    Mozilla\#477564   &  0.116\textsuperscript{*}  & JS  &  &              &    &                                 &                   &                           &                      &&          \\
     \midrule
     MySQL\#27287      &  995  & C++  &  &              &    &                                 &                   &                           &                   &&             \\
     MySQL\#15811      &  1127 & C++  &  &              &    &                                 &                   &                           &                   &&             \\
     \midrule
-    Apache\#37184     &  -  & Java  &  &              &    &                                 &                   &                           &                    &&           \\ 
-    Apache\#29743     &  -  & Java  &  &              &    &                                 &                   &                           &                    &&          \\
-    Apache\#34464     &  -  & Java  &  &              &    &                                 &                   &                           &                    &&           \\
-    Apache\#47223     &  -  & Java  &  &              &    &                                 &                   &                           &                    &&           \\
+    Apache\#37184     &  0.092\textsuperscript{*} & Java  &  &              &    &                                 &                   &                           &                    &&           \\ 
+    Apache\#29743     &  0.257\textsuperscript{*}  & Java  &  &              &    &                                 &                   &                           &                    &&          \\
+    Apache\#34464     &  0.16\textsuperscript{*}  & Java  &  &              &    &                                 &                   &                           &                    &&           \\
+    Apache\#47223     &  0.162\textsuperscript{*} & Java  &  &              &    &                                 &                   &                           &                    &&           \\
     \midrule
     GCC\#46401        &  5521  & C  &  &              &    &                                 &                   &                           &                    &&            \\
     GCC\#1687         &  2099  & C  &  &              &    &                                 &                   &                           &                    &&           \\
