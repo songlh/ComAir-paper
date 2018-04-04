@@ -11,61 +11,61 @@
                                  &        &          &  BB      &  Loop     & A-L    &  LL-L    &  F.  & R.F.    &           &        &  \\
     \midrule 
 
-    Mozilla\#347306              &  88    & C        &   46735  &   1177     &  483    &  136    &  1988  & 35   &  $O(N^{2})$ &  Array  & 10000   \\
-    Mozilla\#416628              &  105   & C        &   46097  &   1116     &  484    &  136    &  1919  &  35  &  $O(N^{2})$  &  LinkedList & 380  \\
+    Mozilla\#347306              &  88    & C        &   46735  &   1177     &  483    &  136    &  1988  & 35   &  $O(N^{2})$ &  A-L  & 10000   \\
+    Mozilla\#416628              &  105   & C        &   46097  &   1116     &  484    &  136    &  1919  &  35  &  $O(N^{2})$  &  LL-L & 380  \\
     Mozilla\#490742              &  0.157\textsuperscript{*}  & JS  &  41 & 4 &  3  &   0   &  8   &  0   & $O(N)$   &  Array  &  10000              \\
-    Mozilla\#35294    &  0.195\textsuperscript{*}  & C++  &  &              &    &                                 &                   &                           &                     &&          \\
-    Mozilla\#477564   &  0.116\textsuperscript{*}  & JS  &  &              &    &                                 &                   &                           &                      &&          \\
+    Mozilla\#35294    &  0.195\textsuperscript{*}  & C++  & 85 &  9  &  5  & 0  & 12   & 0  &  $O(N^{2})$  &  & 50000  \\
+    Mozilla\#477564   &  0.116\textsuperscript{*}  & JS  & 40 & 6 & 1 & 3 & 5   & 0  & $O(N^{2})$  & LL-L & 4000       \\
     \midrule
-    MySQL\#27287      &  995  & C++  &  &              &    &                                 &                   &                           &                   &&             \\
-    MySQL\#15811      &  1127 & C++  &  &              &    &                                 &                   &                           &                   &&             \\
+    MySQL\#27287      &  995  & C++  & 88971  & 2535 & 905 & 287 & 11969 & 80 & $O(N^{2})$ & A-L & 65536            \\
+    MySQL\#15811      &  1127 & C++  & 17656 & 844 & 237 & 29 & 490 & 5 &  $O(N^{2})$ & A-L & 16384 \\
     \midrule
-    Apache\#37184     &  0.092\textsuperscript{*} & Java  &  &              &    &                                 &                   &                           &                    &&           \\ 
-    Apache\#29743     &  0.257\textsuperscript{*}  & Java  &  &              &    &                                 &                   &                           &                    &&          \\
-    Apache\#34464     &  0.16\textsuperscript{*}  & Java  &  &              &    &                                 &                   &                           &                    &&           \\
-    Apache\#47223     &  0.162\textsuperscript{*} & Java  &  &              &    &                                 &                   &                           &                    &&           \\
+    Apache\#37184     &  0.092\textsuperscript{*} & Java  & 31 & 5  & 0 & 0 & 7 & 0  & $O(N)$  & & 10000     \\ 
+    Apache\#29743     &  0.257\textsuperscript{*}  & Java  & 408 & 8 & 0 & 0 & 123 & 0 & $O(N^{2})$ & & 10000 \\
+    Apache\#34464     &  0.16\textsuperscript{*}  & Java  & 70 & 6 & 5 & 0  & 13 & 0 & $O(N^{2})$ & A-L & 50000 \\
+    Apache\#47223     &  0.162\textsuperscript{*} & Java  & 67 & 5 & 4 & 0  & 13 & 0 & $O(N^{2})$ & A-L & 50000 \\
     \midrule
-    GCC\#46401        &  5521  & C  &  &              &    &                                 &                   &                           &                    &&            \\
-    GCC\#1687         &  2099  & C  &  &              &    &                                 &                   &                           &                    &&           \\
-    GCC\#27733        &  3217  & C  &  &              &    &                                 &                   &                           &                    &&           \\
-    GCC\#8805         &  2538  & C  &  &              &    &                                 &                   &                           &                    &&            \\
-    GCC\#21430        &  3844  & C  &  &              &    &                                 &                   &                           &                    &&            \\
-    GCC\#12322        &  2341  & C  &  &              &    &                                 &                   &                           &                    &&           \\
-    \midrule
-    \midrule
-    Apache\#53622     &  -  & Java  &  &              &    &                                 &                   &                           &                    &&           \\
-    Apache\#53637     &  -  & Java  &  &              &    &                                 &                   &                           &                    &&          \\
-    Apache\#53803     &  -  & Java  &  &              &    &                                 &                   &                           &                    &&            \\
-    Apache\#53821     &  -  & Java  &  &              &    &                                 &                   &                           &                    &&           \\
-    Apache\#53822     &  -  & Java  &  &              &    &                                 &                   &                           &                    &&            \\
-    \midrule
-    Collections406    &  -  & Java  &  &              &    &                                 &                   &                           &                    &&           \\
-    Collections407    &  -  & Java  &  &              &    &                                 &                   &                           &                    &&          \\
-    Collections408    &  -  & Java  &  &              &    &                                 &                   &                           &                    &&            \\
-    Collections409    &  -  & Java  &  &              &    &                                 &                   &                           &                    &&            \\
-    Collections410    &  - & Java  &  &              &    &                                 &                   &                           &                     &&           \\
-    Collections412    &  -  & Java  &  &              &    &                                 &                   &                           &                    &&            \\
-    Collections413    &  -  & Java  &  &              &    &                                 &                   &                           &                    &&            \\
-    Collections425    &  -  & Java  &  &              &    &                                 &                   &                           &                    &&            \\
-    Collections426    &  -  & Java  &  &              &    &                                 &                   &                           &                    &&            \\
-    Collections427    &   - & Java  &  &              &    &                                 &                   &                           &                    &&            \\
-    Collections429-0    &  -  & Java  &  &              &    &                                 &                   &                           &                  &&              \\
-    Collections429-1    &  -  & Java  &  &              &    &                                 &                   &                           &                  &&              \\
-    Collections429-2    &  -  & Java  &  &              &    &                                 &                   &                           &                  &&              \\
-    Collections434    & -   & Java  &  &              &    &                                 &                   &                           &                    &&            \\
-    \midrule
-    Groovy5739-0      & -  & Java  &  &              &    &                                 &                   &                           &                     &&           \\
-    Groovy5739-1      & -  & Java  &  &              &    &                                 &                   &                           &                     &&          \\
+    GCC\#46401        &  5521  & C  & 301913 & 11266 & 1340 & 1637 & 27733 & 964 & $O(N^{2})$ & LL-L & 1462 \\
+    GCC\#1687         &  2099  & C  & 125408 & 5315  & 724 & 1086  & 7573  & 558 & $O(2^{N})$ & Recursive & 16  \\
+    GCC\#27733        &  3217  & C  & 217239 & 7412 & 1004 & 1196  & 12722 & 686 & $O(2^{N})$ & Recursive & 65  \\
+    GCC\#8805         &  2538  & C  & 148099 & 5857 & 841 & 1222 & 6753 & 517 & $O(N^{2})$ & LL-L & 1000 \\
+    GCC\#21430        &  3844  & C  & 283675 & 7727 & 883  & 1178 & 13745 & 700 & $O(N^{2})$ & LL-L & 10000 \\
+    GCC\#12322        &  2341  & C  & 124310 & 5397 & 831 & 1190 & 7078 & 540 & $O(N^{2})$ & LL-L & 1175 \\
     \midrule
     \midrule
-    knapsack      &  -  & C++  &  &              &    &                                 &                   &                           &                         &&     \\
-    fib      &  - & C++  &  &              &    &                                 &                   &                           &                               && \\
-    parentheses      & -   & C++  &  &              &    &                                 &                   &                           &                      &&          \\
-    nqueens      &  -  & C++  &  &              &    &                                 &                   &                           &                          &&      \\
-    graphcol      &  -  & C++  &  &              &    &                                 &                   &                           &                         &&     \\
-    uts      &  -  & C++  &  &              &    &                                 &                   &                           &                              && \\
-    binomial      &  -  & C++  &  &              &    &                                 &                   &                           &                         &&       \\
-    minmax      &  -  & C++  &  &              &    &                                 &                   &                           &                           &&    \\
+    Apache\#53622     & 1.094\textsuperscript{*}  & Java  & 345 & 38 & 22 & 12 & 72 & 0 & $O(N^{2})$ & A-L & 50000    \\
+    Apache\#53637     & 0.937\textsuperscript{*}  & Java  & 308 & 34 & 21 & 9  & 60 & 0 & $O(N^{2})$ & A-L & 50000 \\
+    Apache\#53803     & 0.421\textsuperscript{*}  & Java  & 128 & 11 & 9  & 0  & 34 & 0  & $O(N^{2})$ & A-L & 50000     \\
+    Apache\#53821     & 0.417\textsuperscript{*}  & Java  & 131 & 12 & 10 & 0  & 34 & 0  & $O(N^{2})$ & A-L & 50000      \\
+    Apache\#53822     & 0.417\textsuperscript{*}  & Java  & 132 & 12 & 11 & 0  & 34 & 0  & $O(N^{2})$ & A-L & 50000      \\
+    \midrule
+    Collections406    & 0.253\textsuperscript{*}  & Java  & 81 & 9 & 7 & 0 & 19 & 0 & $O(N^{2})$ & A-L & 50000      \\
+    Collections407    & 0.766\textsuperscript{*}  & Java  & 234 & 26 & 15 & 9 & 53 & 0 & $O(N^{2})$ & A-L & 50000   \\
+    Collections408    & 0.742\textsuperscript{*}  & Java  & 225 & 25 & 14 & 9 & 51 & 0 & $O(N^{2})$ & A-L & 50000    \\
+    Collections409    & 0.781\textsuperscript{*}  & Java  & 236 & 26 & 15 & 9 & 53 & 0 & $O(N^{2})$ & A-L & 50000     \\
+    Collections410    & 0.769\textsuperscript{*} & Java   & 234 & 26 & 15 & 9 & 51 & 0 & $O(N^{2})$ & A-L & 50000    \\
+    Collections412    & 0.284\textsuperscript{*}  & Java  & 84 & 9  & 6  & 0  & 20 & 0 & $O(N^{2})$ & A-L & 50000     \\
+    Collections413    & 0.923\textsuperscript{*}  & Java  & 274 & 32 & 16 & 14 & 62 & 0 & $O(N^{2})$ & LL-L & 50000   \\
+    Collections425    & 0.758\textsuperscript{*}  & Java  & 233 & 26 & 15 & 9  & 52 & 0 & $O(N^{2})$ & A-L & 50000    \\
+    Collections426    & 0.783\textsuperscript{*}  & Java  & 242 & 26 & 15 & 9  & 53 & 0 & $O(N^{2})$ & A-L & 50000   \\
+    Collections427    & 0.756\textsuperscript{*} & Java  & 227 & 25 & 14 & 9  & 53 & 0 & $O(N^{2})$ & A-L & 50000   \\
+    Collections429-0    & 0.668\textsuperscript{*}  & Java  & 203 & 21 & 11 & 7 & 45 & 0 & $O(N^{2})$ & & 30000       \\
+    Collections429-1    & 0.536\textsuperscript{*}  & Java  & 157 & 20 & 13 & 4 & 36 & 0 & $O(N^{2})$ & & 30000     \\
+    Collections429-2    & 0.416\textsuperscript{*}  & Java  & 129 & 15 & 9 & 3  & 26 & 0 & $O(N^{2})$ & & 30000 \\
+    Collections434    & 0.336\textsuperscript{*}   & Java  & 86  & 10 & 0 & 8 & 33 & 0 & $O(N^{2})$ & LL-L & 50000     \\
+    \midrule
+    Groovy5739-0      & 0.745\textsuperscript{*}  & Java  & 227 & 10 & 0 & 8 & 51 & 0 & $O(N^{2})$ & LL-L& 50000 \\
+    Groovy5739-1      & 0.756\textsuperscript{*}  & Java  &227  & 25 &  14 & 9 & 51 & 0 & $O(N^{2})$ & A-L & 50000 \\
+    \midrule
+    \midrule
+    knapsack      &  0.282  & C++  & 42 & 1 & 0 & 0 & 5 & 1 & $O(2^{N})$ & Recursive & 30  \\
+    fib      &  0.048 & C++  & 10 & 0 & 0 & 0 & 3 & 1 & $O(2^{N})$ & Recursive & 45 \\
+    parentheses      & 0.056   & C++  & 10 & 0 & 0 & 0 & 3 & 1 & $O(2^{N})$ & Recursive & 19 \\
+    nqueens      & 0.091  & C++  & 33 & 3 & 2 & 0 & 4 & 1 & $O(2^{N})$ & Recursive & 13 \\
+    graphcol      &  0.171  & C++  & 58 & 8 & 3 & 0 & 8 & 1 & $O(2^{N})$ & Recursive & 50 \\
+    uts      &  0.667  & C++  & 40  & 2 & 0 & 0 & 8 & 1 & $O(2^{N})$ & Recursive & 20 \\
+    binomial      &  0.058  & C++  & 14 & 0 & 0 & 0 & 3 & 1 & $O(2^{N})$ & Recursive & 36 \\
+    minmax      &  0.262  & C++  & 203 & 8 & 3 & 0 & 8 & 1 & $O(2^{N})$  & Recursive & 13 \\
 
 
     \bottomrule
