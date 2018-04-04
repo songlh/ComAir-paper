@@ -63,25 +63,15 @@ we assume \texttt{c} is inside a loop \texttt{l} and is executed
 $n$ times in one run of the program. 
 We would have $n$ RMS records for \texttt{c}. 
 There are two methods to analyze these $n$ RMS records.
-
-\begin{itemize}
-
-\item The first method aggregates the $n$ records in a \textit{top-down} way~\cite{Aprof1,Aprof2}.
+The first method aggregates the $n$ records in a \textit{top-down} way~\cite{Aprof1,Aprof2}.
 When analyzing complexity for \texttt{c}, 
 we consider the $n$ records independently from each other. 
 The effect of multiple executions of \texttt{c} 
 will be aggregated when analyzing complexity for \texttt{l}.
-
-\item The second method aggregates the $n$ records in a \texttt{bottom-up} way.
+The second method aggregates the $n$ records in a \textit{bottom-up} way.
 When analyzing complexity for \texttt{c}, 
 We will merge the $n$ records and calculate the number of distinct memory cells 
 contributing RMS as the input size of \texttt{c} during the whole program execution.
-
-\end{itemize}
-
-
-
-
 
 \begin{figure*}
 \centering
@@ -107,10 +97,10 @@ Although variable \texttt{p} and \texttt{level} are also read in each iteration,
 RMS only considers distinct memory cells and 
 only increments its value for the first read on these two variables in the first iteration. 
 The outer loop, not shown in Figure~\ref{fig:mysql27287}, 
-invokes \texttt{xml\_parent\_tag} for every \texttt{XML\_NODE} contained
+invokes \texttt{xml\_parent\_tag()} for every \texttt{XML\_NODE} contained
 in the same array \texttt{items}.
 If we use the top-down method to analyze the buggy loop
-(or the buggy function), 
+or the buggy function, 
 execution cost is in linear relationship with RMS, 
 as shown in Figure~\ref{fig:mysql27287-indep}.
 The $O(N^2)$ complexity can be inferred from the side of the outer loop, 
@@ -118,11 +108,82 @@ as shown in Figure~\ref{fig:mysql27287-outer}.
 If we use the bottom-up method, 
 we can observe aggregated cost scales 
 polynomially in terms of RMS for the buggy loop 
-(or the buggy function), 
+or the buggy function, 
 which is shown in Figure~\ref{fig:mysql27287-merge}. 
 
+\subsubsection{Data structure size (DSS)}
+The number of distinct accessed elements of a data 
+structure could also be used to measure 
+input size for a code construct~\cite{AlgoProf}. 
+As we discussed in Section~\ref{sec:study_impli},
+array and linked list are the two most common 
+data structures involved in complexity problems. 
+Using DSS can provide more semantic information for an 
+analyzed code construct.
 
 
+Similar to RMS, there are also, top-down and bottom-up, 
+two methods to analyze 
+multiple DSS records collected for the same code 
+construct in one program run.
+Take MySQL\#27287 in Figure~\ref{fig:mysql27287} as an example.
+If we focus on array \texttt{items},
+DSS for one execution of the inner loop is the number of 
+accessed array elements during the execution.
+If we use the top-down method, the execution cost 
+of the inner loop is in linear relationship with its DSS.
+For the outer loop, its execution cost is in $O(N^2)$ relationship with its DSS,
+becasue DSS only considers distinct accessed elements,
+If we apply the bottom-up method, 
+we count distinct accessed array elements across all executions of the inner loop,
+the aggregate execution cost of the inner loop is in $O(N^2)$ relationship with its DSS, 
+as shown in Figure~\ref{fig:mysql27287-inner-array}.   
+
+
+\subsubsection{Library input size (LIS)}
+There are code constructs taking inputs from library calls. 
+As we discussed in Section~\ref{sec:tax}, 
+the loop shown in Figure~\ref{fig:apache34464} 
+is in $O(N^2)$ complexity of the number 
+of characters returned from \texttt{getchar()}. 
+Besides \texttt{getchar()}, there are many other library calls, 
+which can allow code constructs to take inputs
+from disk, terminal, network, and other places. 
+
+LIS can complement RMS for cases like Apache\#34464 in Figure~\ref{fig:apache34464}.
+RMS only consider memory cells accessed with read firstly. 
+All of the memory cells of string \texttt{source} are written first, 
+using the return value of \texttt{getchar()}.
+Therefore, all the following accesses of string 
+\texttt{source} will not increase RMS value.  
+If we use RMS to measure input size of the loop shown in Figure~\ref{fig:apache34464},
+RMS depends only on the size of string \texttt{target}, 
+variable \texttt{sourceLen}, and variable \texttt{targetLen}, 
+regardless of the number of characters from \texttt{getchar()}.
+DSS can correctly measure input size for Apache\#34464,
+since all characters from \texttt{getchar()} will be saved in string (or array) \texttt{source},
+and each element of string \texttt{source} 
+will be accessed by the inner loop inside \texttt{indexOf()}. 
+
+
+
+
+
+\subsection{Cost Design}
+
+\subsubsection{Executed basic blocks (BBs)}
+The number of executed BBs for a dynamic instance of a code construct
+can be used to measure the execution cost for the dynamic instance. 
+A naive method to collect this metric is to add a global counter 
+to the monitored program and increase the counter value by 1 inside each BB.  
+When entering and leaving a monitored code construct, 
+the value of the counter will be dumped to log.
+
+
+\subsection{Cost Function Inference and Comparison}
+
+
+\subsection{Implementation and Optimization}
 Both of the two methods can infer the same complexity, such as for MySQL\#27287,
 but they require different implementations.
 If we want to apply the bottom-up method to analyze a code construct,
@@ -230,15 +291,7 @@ we will skip to instrument the second instruction.
 
 
 
-\subsection{Cost Design}
 
-\subsubsection{Executed basic blocks (BBs)}
-The number of executed BBs for a dynamic instance of a code construct
-can be used to measure the execution cost for the dynamic instance. 
-A naive method to collect this metric is to add a global counter 
-to the monitored program and increase the counter value by 1 inside each BB.  
-When entering and leaving a monitored code construct, 
-the value of the counter will be dumped to log.
 
 To efficiently count executed BBs, 
 we apply an algorithm, which was originally designed to 
