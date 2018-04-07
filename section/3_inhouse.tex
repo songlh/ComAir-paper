@@ -10,29 +10,27 @@ previously unknown complexity problems before releasing their software,
 or help developers diagnose and fix complexity problems reported by end users. 
 
 To conduct algorithmic profiling,
-we first need to record \textit{input} sizes and \textit{costs} for different code constructs 
-during multiple executions;
+we first need to record \textit{input} size and \textit{cost} for different code constructs 
+in multiple program runs;
 we then plot records from the same code construct with input size as x-axis and cost as y-axis; 
 and finally, we infer a cost function of input size.
 To design the in-house version of \Tool, 
 we need to answer three fundamental questions:
-1) how to design input metric; 
-2) how to design cost metric;
+1) how to design input metrics; 
+2) how to design cost metrics;
 and 3) how to infer and compare cost functions. 
-
 
 \subsection{Input Metric Design}
 \label{sec:input}
 
-The goal of input metric design is to figure out generic metrics, 
-which can represent input sizes for different code constructs. 
-We cannot rely on developers to manually label or specify input information 
-for different code constructs, 
+The goal of input metric design is to figure out metrics
+holding input size information for different types of code constructs. 
+We cannot rely on developers to manually label or specify input size information, 
 because it is time-consuming and also difficult for complex code constructs.  
-There are several metrics, which can be used to measure input size for a code construct.
-We discuss commonly used ones as follows. 
+There are several metrics, which can be used to measure input size.
+We discuss them as follows. 
 
-\subsubsection{Program input}
+\textit{\textbf{Program input.}}
 As discussed in Section~\ref{sec:process}, 
 users tend to specify how to change the whole program 
 input to describe the perceived complexity problem.
@@ -43,25 +41,23 @@ However, the whole program input
 is related to the input of a code construct in various ways.
 Changing the whole program input may not change input sizes for 
 all code constructs. 
-Using the input size of the whole program as an input metric for a code 
+Using the input size of the whole program as input size for a code 
 construct may lead to incorrect profiling results. 
 
-
-\subsubsection{Read memory size (RMS)}
-RMS is proposed as an input metric for one 
-execution of a code construct~\cite{Aprof1,Aprof2}. 
+\textit{\textbf{Read memory size (RMS).}}
+RMS is proposed as an input metric for a dynamic instance
+of a code construct~\cite{Aprof1,Aprof2}. 
 RMS is defined as the number of distinct memory cells 
 whose first access is read. 
-RMS considers both read accesses conducted by a code construct directly 
-and read accesses conducted by 
+RMS considers both reads conducted by a code construct directly 
+and reads conducted by 
 functions called from the code construct. 
-RMS is a generic metric for input, 
-and it can provide important input information for many complexity problems.   
-
-Given a code construct \texttt{c} inside a program, 
+RMS can provide important input information for many complexity problems.   
+ 
+Given a code construct \texttt{c} of a program, 
 we assume \texttt{c} is inside a loop \texttt{l} and is executed
 $n$ times in one run of the program. 
-We would have $n$ RMS records for \texttt{c}. 
+We would have $n$ RMS records collected for \texttt{c}. 
 There are two methods to analyze these $n$ RMS records.
 The first method aggregates the $n$ records in a \textit{top-down} way~\cite{Aprof1,Aprof2}.
 When analyzing complexity for \texttt{c}, 
@@ -70,8 +66,9 @@ The effect of multiple executions of \texttt{c}
 will be aggregated when analyzing complexity for \texttt{l}.
 The second method aggregates the $n$ records in a \textit{bottom-up} way.
 When analyzing complexity for \texttt{c}, 
-We will merge the $n$ records and calculate the number of distinct memory cells 
-contributing RMS as the input size of \texttt{c} during the whole program execution.
+we merge the $n$ records and calculate the number of distinct memory cells 
+contributing RMS as the input size of \texttt{c} during the whole program run.
+
 
 \begin{figure*}
 \centering
@@ -89,7 +86,7 @@ contributing RMS as the input size of \texttt{c} during the whole program execut
 Take MySQL\#27287 as an example.
 RMS for one single execution of
 the buggy loop in Figure~\ref{fig:mysql27287}
-is roughly equal to 2 times the number of \texttt{XML\_NODE} 
+is roughly equal to 2 times the number of \texttt{XML\_NODE}s 
 accessed during the execution, 
 because the \texttt{level} field and the \texttt{type} field of 
 different \texttt{XML\_NODE}s are read in different loop iterations.
@@ -106,21 +103,18 @@ as shown in Figure~\ref{fig:mysql27287-indep}.
 The $O(N^2)$ complexity can be inferred from the side of the outer loop, 
 as shown in Figure~\ref{fig:mysql27287-outer}. 
 If we use the bottom-up method, 
-we can observe aggregated cost scales 
+we can observe the aggregated cost scales 
 polynomially in terms of RMS for the buggy loop 
 or the buggy function, 
 which is shown in Figure~\ref{fig:mysql27287-merge}. 
 
-\subsubsection{Data structure size (DSS)}
+\textit{\textbf{Data structure size (DSS).}}
 The number of distinct accessed elements of a data 
 structure could also be used to measure 
-input size for a code construct~\cite{AlgoProf}. 
+input size for a dynamic instance of the code construct~\cite{AlgoProf}. 
 As we discussed in Section~\ref{sec:study_impli},
-array and linked list are the two most common 
-data structures involved in complexity problems. 
-Using DSS can provide more semantic information for an 
-analyzed code construct.
-
+array and linked list are the two types of data structures
+most commonly involved in complexity problems. 
 
 Similar to RMS, there are also, top-down and bottom-up, 
 two methods to analyze 
@@ -133,31 +127,30 @@ accessed array elements during the execution.
 If we use the top-down method, the execution cost 
 of the inner loop is in linear relationship with its DSS.
 For the outer loop, its execution cost is in $O(N^2)$ relationship with its DSS,
-becasue DSS only considers distinct accessed elements,
+since DSS only considers distinct accessed elements.
 If we apply the bottom-up method, 
-we count distinct accessed array elements across all executions of the inner loop,
+we count distinct accessed array elements across all dynamic instances of the inner loop,
 the aggregate execution cost of the inner loop is in $O(N^2)$ relationship with its DSS, 
 as shown in Figure~\ref{fig:mysql27287-inner-array}.   
 
-
-\subsubsection{Library input size (LIS)}
+\textit{\textbf{Library input size (LIS).}}
 There are code constructs taking inputs from library calls. 
 As we discussed in Section~\ref{sec:tax}, 
 the loop shown in Figure~\ref{fig:apache34464} 
-is in $O(N^2)$ complexity of the number 
+is in $O(N^2)$ complexity in terms of the number 
 of characters returned from \texttt{getchar()}. 
 Besides \texttt{getchar()}, there are many other library calls, 
-which can allow code constructs to take inputs
-from disk, terminal, network, and other places. 
+which allow code constructs to take inputs
+from disk, terminal, network, and many other places. 
 
 LIS can complement RMS for cases like Apache\#34464 in Figure~\ref{fig:apache34464}.
-RMS only consider memory cells accessed with read firstly. 
-All of the memory cells of string \texttt{source} are written first, 
-using the return value of \texttt{getchar()}.
-Therefore, all the following accesses of string 
+RMS only considers memory cells whose first access is read. 
+The first accesses for all memory cells of string \texttt{source} are write on line $8$.
+Therefore, all accesses on string 
 \texttt{source} will not increase RMS value.  
-If we use RMS to measure input size of the loop shown in Figure~\ref{fig:apache34464},
-RMS depends only on the size of string \texttt{target}, 
+%If we use RMS to measure input size for the loop in Figure~\ref{fig:apache34464},
+RMS for the loop in Figure~\ref{fig:apache34464} only depends 
+on the size of string \texttt{target}, 
 variable \texttt{sourceLen}, and variable \texttt{targetLen}, 
 regardless of the number of characters from \texttt{getchar()}.
 DSS can correctly measure input size for Apache\#34464,
@@ -166,42 +159,197 @@ and each element of string \texttt{source}
 will be accessed by the inner loop inside \texttt{indexOf()}. 
 
 
+\begin{figure}
+\centering
+\lstset{basicstyle=\ttfamily\fontsize{7}{8}\selectfont,
+     morekeywords={+},keepspaces=true,numbers=left}
+  \mbox{\lstinputlisting[mathescape,boxpos=t]{figure/fib.c}}
+\caption{A recursive function exponential complexity.
+\footnotesize{(This figure shows a recursive implement to compute fibonacci numbers. 
+Execution time scales polynomially in the value of input parameter $n$.)}}
+\vspace{-0.05in}
+\label{fig:fib}\vspace{-0.05in}
+\end{figure}
 
 
+\textit{\textbf{Important integer variable (IIV).}}
+Sometimes, a code construct contains some important integer variables,
+whose values determine how many times a loop iterates 
+or how many times a recursive function is invoked. 
+Values of these important integer variables contain important information about input sizes. 
+For example, a recursive implementation to calculate fibonacci numbers shown in Figure~\ref{fig:fib}, 
+and it scales exponentially in the value of variable $n$.
 
-\subsection{Cost Design}
+IIV can complement RMS, DSS and LIS for cases like 
+computing fibonacci numbers in Figure~\ref{fig:fib}. 
+If we use RMS to measure input size,
+no matter how large \texttt{n} is, the input size will always be constant. 
+For an invocation of \texttt{fib},
+the first \texttt{read} on parameter \texttt{n} will increase RMS.
+After that, RMS will not increase any more.
+This is because whenever \texttt{fib} recursively call itself on line 3,
+it must write parameter $n-1$ (or $n-2$) onto the stack, 
+which means the first access for the stack cell is \texttt{write}. 
+The recursive function does not
+involve any data structure or library call, 
+so that it cannot be measure by DSS and LIS.  
 
-\subsubsection{Executed basic blocks (BBs)}
-The number of executed BBs for a dynamic instance of a code construct
-can be used to measure the execution cost for the dynamic instance. 
-A naive method to collect this metric is to add a global counter 
-to the monitored program and increase the counter value by 1 inside each BB.  
-When entering and leaving a monitored code construct, 
-the value of the counter will be dumped to log.
+\paragraph{\textit{\underline{Input metric selection for \Tool}}}
+We choose input metrics to explore two directions. 
+The first one is to cover as many cases as possible. 
+RMS is the most general metric.
+RMS can largely cover cases DSS can handle.
+We use LIS and IIV to enhance RMS.
+We name the enhanced version as RMS+.
+The second direction is to find a simple and semantic metric, 
+which can cover  a good percentage of common cases. 
+We will apply DSS along this direction. 
+In the remainder of this paper, 
+we will focus on RMS+ and DSS. 
 
+\subsection{Cost Metric Design}
+When a code construct is executed, 
+it could consume many different types of resources, 
+such as computation, network bandwidth, storage, and so on.
+In this paper, we focus on how to measure computation cost and 
+leave the measurement for other types of consumed resources for future works. 
+When a code construct is executed, 
+there are many metrics can be used to measure computation 
+cost for a dynamic instance of the code construct. 
+We discuss commonly used ones as follows.
+
+\textit{\textbf{Execution time.}}
+We can use time elapsed during executing a dynamic instance to present computation cost 
+for the instance.
+One potential problem to use execution time is that, 
+when a dynamic instance takes very little time, 
+execution time may fail to provide an accurate measurement.  
+
+\textit{\textbf{Executed basic blocks (BBs).}}
+We can count the number of executed BBs for a dynamic instance
+and use this number as computation cost. 
+The assumption to use this metric is that 
+each executed BB will roughly consume the same computation cost. 
+
+\textit{\textbf{Executed instructions.}}
+We can use the executed instruction number of a dynamic 
+Instance to represent computation cost for the dynamic instance. 
+Similar to executed BBs, we assume each instruction 
+roughly takes the same computation cost. 
+
+
+\textit{\textbf{Loop iterations (LIs).}}
+As we discussed in Section~\ref{sec:study},
+many complexity problems are caused by a loop.
+If we want to measure computation cost for a loop instance,
+we can use the number of loop iterations.
+By using this metric, we assume that computation 
+cost spent in each iteration is roughly the same. 
+
+\textit{\textbf{Recursive invocations (RIs).}}
+As we discussed in Section~\ref{sec:study},
+there are also complexity problems caused by recursive functions.
+If we want to measure computation cost for a dynamic instance \texttt{d}
+of a recursive function \texttt{f}, 
+we can use the number of times when
+\texttt{d} recursively call \texttt{f} directly or indirectly. 
+By using this metric, 
+we assume that except the recursive part, 
+computation spent in other parts is roughly 
+the same across different recursive instances. 
+
+
+\paragraph{\textit{\underline{Cost metric selection for \Tool}}}
+Similar input metrics,
+we want both generic cost metrics and cost metrics to cover common cases. 
+We use BBs as the generic metric.
+We do not use execution time, 
+because it is not accurate enough for dynamic instances taking too little time.
+We do not use the number of executed instructions, 
+because this number is highly correlated with BBs.  
+All our studied complexity problems are caused either by a loop or a recursive function. 
+Therefore, we will use LIs and RIs as cost metrics for loops and recursive functions, 
+respectively.
 
 \subsection{Cost Function Inference and Comparison}
 
+\paragraph{\textit{\underline{Inference}}}
+After collecting a set of (input size, cost) pairs for a code construct,
+we first use maximum cost to aggregate pairs with the same input size into one.
+We do this, because we want to infer worst-case complexity for the code construct. 
+To infer a cost function,
+we consider four possibilities: 
+an exponential function, or a polynomial function with degree from 1 to 3.
+ We use least square~\cite{least} to determine parameters for the four possible functions. 
+For example, we start a polynomial function with degree 2 as $y=a*x^2 + b*x +c$.
+We choose $a$, $b$ and $c$ to minimize the sum of squared difference between 
+observed value and fitted value.  
+To choose the best one among the four possible fitted functions, 
+we calculate coefficient of determination for each. 
+Coefficient of determination is commonly used to measure goodness-of-fit~\cite{codeter}.
+We choose the fitted function with highest coefficient of determination. 
+
+
+\paragraph{\textit{\underline{Comparison}}}
+We have more than one metric for both input and cost.
+We need to compare functions inferred under different metrics. 
+After collecting two sets of records, $a$ and $b$ using different metrics, 
+we do the comparison through the following steps. 
+We first standardize the two sets of data. 
+We then infer two cost functions, $f_a()$ and $f_b()$, 
+by using the two sets of standardized data.
+We random sample a set of $n$ numbers from $(-1, 1)$.
+We use $N$ to represent the set of $n$ sampled number.  
+We calculate the similarity between the two inferred 
+functions by using the following formula. 
+
+
+%\begin{equation} \label{eq:fun_similarity}
+%$1-|f_a(x) - f_b(x)|/(max(f_a(x),f_b(x))+1)$
+%\end{equation}
+
+\begin{equation} \label{eq:sim}
+%$$p_v(S_v(a)) = 1 - \prod\limits_{u \in S_v(a)}(1 - p_{u,v})$$
+S(f_a, f_b) = 1 - \frac{1}{n}\sum_{x \in N}\frac{|f_a(x) - f_b(x)|}{max(f_a(x),f_b(x))+1}
+\end{equation}
+
+The intuition of Equation~\ref{eq:sim} is to calculate the area under the two curves 
+plotted by $f_a()$ and $f_b()$, 
+and compute the similarity as the percentage of the area under both of the two curves, 
+compared with the area under either of the two curves.
+Since the minimum value of standardized data is $-1$ not $0$,
+we minus $-1$ in the denominator.
+The maximum value of $S(f_a, f_b)$ is $1$, and the minimum value is $0$.
+Larger result means the two functions inferred from $a$ and $b$ are more similar to each other. 
+
+
 
 \subsection{Implementation and Optimization}
-Both of the two methods can infer the same complexity, such as for MySQL\#27287,
+
+\paragraph{\textit{\underline{Input metric}}}
+As we discussed in Section~\ref{sec:input},
+both RMS+ and DSS have, top-down and bottom-up, 
+two methods to analyze profile records for multiple instances of 
+a code construct in one program run. 
+Both of these two methods can infer the same complexity, 
+such as for MySQL\#27287,
 but they require different implementations.
-If we want to apply the bottom-up method to analyze a code construct,
-we need to track distinct memory cells contributing RMS for the code construct.
+If we want to apply the bottom-up method,
+we need to track distinct memory cells already contributing 
+RMS+ or DSS for every code construct under analysis.
 During in-house testing, developers usually want to conduct algorithmic profiling 
 for all executed code constructs. 
 Tracking memory cells for every code construct will 
 incur a very large memory overhead.  
-As we will discuss later, to infer complexity in the top-down way 
-is not suitable in production runs. 
-Therefore, for in-house setting, we will the top-down method, 
-while we will use the bottom-up under production-run setting. 
+As we will discuss later, the top-down method 
+is not suitable in production-run usage. 
+To sum up, in in-house setting, we will apply the top-down method, 
+while we will use the bottom-up in production-run setting. 
 
-Since RMS considers memory accesses conducted by callees 
-and we take a top-down method for in-house setting,
+Since we take the top-down method for in-house setting,
 when a monitored program conducts a memory access,
-we need to check functions active on the call stack and 
-update information necessary to calculate RMS. 
+we need to check all functions active on the call stack and 
+update information necessary to calculate RMS+ or DSS. 
 For simplicity, we use function as granularity for code constructs under in-house setting.
 Otherwise, we need to check whether a monitored code construct enclose related call sites, 
 when we check functions active on the call stack.  
@@ -209,8 +357,8 @@ when we check functions active on the call stack.
 \citet{Aprof1,Aprof2} designed an algorithm to collect 
 RMS for all executed functions based on 
 Valgrind. We briefly discuss this algorithm firstly, 
-and then we will discuss our designed optimizations. 
-To count RMS for each function call instance, 
+and then we will discuss how to enhance this algorithm. 
+To count RMS for every function call instance, 
 several global variables are maintained: 
 \texttt{count}, serving as the current timestamp and incremented 
 by 1 after each function invocation,  
@@ -220,12 +368,44 @@ Four hook functions are instrumented for four types of instructions:
 \texttt{call}, \texttt{return}, \texttt{read}, and \texttt{write}.
 The \texttt{call} hook function will increment the timestamp variable \texttt{count} 
 and grow the shadow stack \texttt{S}.
-The \texttt{return} hook function will generate a log containing the returning function's RMS.
+The \texttt{return} hook function will generate a 
+log containing information about the returning function's RMS.
 The \texttt{read} hook function will query the hash table \texttt{ts} to decide whether 
 to increment RMS for all the functions active on the shadow stack \texttt{S}.
-Both the \texttt{read} and \texttt{write} hook functions will update the hash table \texttt{ts}
+Both the \texttt{read} and \texttt{write} hook 
+functions will update the hash table \texttt{ts}
 by using the value of \texttt{count} to maintain 
 the latest access timestamp for each memory cell. 
+
+
+To enhance RMS with LIS, we keep a list of library functions, which can take inputs.
+When these library functions are called,
+we will increase RMS by using the size of inputs from these libraries calls 
+for all functions active on the call stack. 
+To enhance RMS with IIV, 
+we consider cases where a function recursively invoke itself by using integer parameters. 
+We do not instrument stack memory \texttt{write}s to save integer 
+parameters when a function recursively calls itself. 
+Therefore, if the first accesses on these stack memory cells are \texttt{read}s, 
+they can increase RMS. 
+Since we do not know how the function will change input parameter when recursively calling itself, 
+we use the number of active integer parameters, not concrete integer values, as input size.   
+
+To implement DSS, we focus on array and linked list, 
+because they are the most common types of data structures in complexity problems. 
+We reuse the framework for RMS+ to collect DSS information.
+The difference is that we do not instrument \texttt{write} instructions,
+and we only instrument \texttt{read} conducted on elements in an array or a linked list.
+We analyze loops to figure out which address variables holding addresses 
+for array element or linked list element. 
+If an address variable is read in every iteration of a loop 
+and its value is changed by a integer value from its previous value, 
+we consider the address variable holds addresses for array elements.
+
+
+
+
+
 
 We design three optimizations to reduce the runtime overhead when collecting RMS
 from two aspects:
