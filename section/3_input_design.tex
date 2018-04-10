@@ -31,7 +31,7 @@ at the exit BB.
 After that, we only need to consider where 
 and how to update \texttt{local\_cost} 
 within a single function.
-We design and implement an intro-procedural control flow analysis
+We design and implement an intra-procedural control flow analysis
 to achieve this.
 Given a single function,
 we add a fake edge from the exit BB to the entry BB 

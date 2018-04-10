@@ -30,7 +30,7 @@ because it is time-consuming and also difficult for complex code constructs.
 There are several metrics, which can be used to measure input size.
 We discuss them as follows. 
 
-\textit{\textbf{Program input.}}
+\noindent\textbf{Program Input}
 As discussed in Section~\ref{sec:process}, 
 users tend to specify how to change the whole program 
 input to describe the perceived complexity problem.
@@ -44,7 +44,7 @@ all code constructs.
 Using the input size of the whole program as input size for a code 
 construct may lead to incorrect profiling results. 
 
-\textit{\textbf{Read memory size (RMS).}}
+\noindent\textbf{Read Memory Size (RMS)}}
 RMS is proposed as an input metric for a dynamic instance
 of a code construct~\cite{Aprof1,Aprof2}. 
 RMS is defined as the number of distinct memory cells 
@@ -108,10 +108,10 @@ polynomially in terms of RMS for the buggy loop
 or the buggy function, 
 which is shown in Figure~\ref{fig:mysql27287-merge}. 
 
-\textit{\textbf{Data structure size (DSS).}}
+\noindent\textbf{Data structure size (DSS)}
 The number of distinct accessed elements of a data 
 structure could also be used to measure 
-input size for a dynamic instance of the code construct~\cite{AlgoProf}. 
+input size for a dynamic instance of a code construct~\cite{AlgoProf}. 
 As we discussed in Section~\ref{sec:study_impli},
 array and linked list are the two types of data structures
 most commonly involved in complexity problems. 
@@ -133,7 +133,7 @@ we count distinct accessed array elements across all dynamic instances of the in
 the aggregate execution cost of the inner loop is in $O(N^2)$ relationship with its DSS, 
 as shown in Figure~\ref{fig:mysql27287-inner-array}.   
 
-\textit{\textbf{Library input size (LIS).}}
+\noindent\textbf{Library input size (LIS)}
 There are code constructs taking inputs from library calls. 
 As we discussed in Section~\ref{sec:tax}, 
 the loop shown in Figure~\ref{fig:apache34464} 
@@ -172,12 +172,12 @@ Execution time scales polynomially in the value of input parameter $n$.)}}
 \end{figure}
 
 
-\textit{\textbf{Important integer variable (IIV).}}
+\noindent\textbf{Important integer variable (IIV)}
 Sometimes, a code construct contains some important integer variables,
 whose values determine how many times a loop iterates 
 or how many times a recursive function is invoked. 
 Values of these important integer variables contain important information about input sizes. 
-For example, a recursive implementation to calculate fibonacci numbers shown in Figure~\ref{fig:fib}, 
+For example, a recursive implementation to calculate fibonacci numbers is shown in Figure~\ref{fig:fib}, 
 and it scales exponentially in the value of variable $n$.
 
 IIV can complement RMS, DSS and LIS for cases like 
@@ -189,10 +189,12 @@ the first \texttt{read} on parameter \texttt{n} will increase RMS.
 After that, RMS will not increase any more.
 This is because whenever \texttt{fib} recursively call itself on line 3,
 it must write parameter $n-1$ (or $n-2$) onto the stack, 
-which means the first access for the stack cell is \texttt{write}. 
+which means the first access for the stack cell is \texttt{write} 
+and future accesses on the stack cell will not increase RMS. 
 The recursive function does not
 involve any data structure or library call, 
-so that it cannot be measure by DSS and LIS.  
+so that it cannot be measure by DSS and LIS. 
+ 
 
 \paragraph{\textit{\underline{Input metric selection for \Tool}}}
 We choose input metrics to explore two directions. 
@@ -205,7 +207,7 @@ The second direction is to find a simple and semantic metric,
 which can cover  a good percentage of common cases. 
 We will apply DSS along this direction. 
 In the remainder of this paper, 
-we will focus on RMS+ and DSS. 
+we will focus on RMS+ and DSS as input metrics. 
 
 \subsection{Cost Metric Design}
 When a code construct is executed, 
@@ -218,27 +220,27 @@ there are many metrics can be used to measure computation
 cost for a dynamic instance of the code construct. 
 We discuss commonly used ones as follows.
 
-\textit{\textbf{Execution time.}}
+\noindent\textbf{Execution Time}
 We can use time elapsed during executing a dynamic instance to present computation cost 
 for the instance.
 One potential problem to use execution time is that, 
 when a dynamic instance takes very little time, 
 execution time may fail to provide an accurate measurement.  
 
-\textit{\textbf{Executed basic blocks (BBs).}}
+\noindent\textbf{Executed Basic Blocks (BBs)}
 We can count the number of executed BBs for a dynamic instance
 and use this number as computation cost. 
 The assumption to use this metric is that 
 each executed BB will roughly consume the same computation cost. 
 
-\textit{\textbf{Executed instructions.}}
+\noindent\textbf{Executed Instructions}
 We can use the executed instruction number of a dynamic 
-Instance to represent computation cost for the dynamic instance. 
+instance to represent computation cost for the instance. 
 Similar to executed BBs, we assume each instruction 
-roughly takes the same computation cost. 
+roughly takes the same computation cost by using this metric. 
 
 
-\textit{\textbf{Loop iterations (LIs).}}
+\noindent\textbf{{Loop Iterations (LIs)}}
 As we discussed in Section~\ref{sec:study},
 many complexity problems are caused by a loop.
 If we want to measure computation cost for a loop instance,
@@ -246,7 +248,7 @@ we can use the number of loop iterations.
 By using this metric, we assume that computation 
 cost spent in each iteration is roughly the same. 
 
-\textit{\textbf{Recursive invocations (RIs).}}
+\noindent\textbf{Recursive Invocations (RIs)}
 As we discussed in Section~\ref{sec:study},
 there are also complexity problems caused by recursive functions.
 If we want to measure computation cost for a dynamic instance \texttt{d}
@@ -257,7 +259,6 @@ By using this metric,
 we assume that except the recursive part, 
 computation spent in other parts is roughly 
 the same across different recursive instances. 
-
 
 \paragraph{\textit{\underline{Cost metric selection for \Tool}}}
 Similar input metrics,
@@ -273,7 +274,7 @@ respectively.
 
 \subsection{Cost Function Inference and Comparison}
 
-\paragraph{\textit{\underline{Inference}}}
+\noindent\textbf{Inference}
 After collecting a set of (input size, cost) pairs for a code construct,
 we first use maximum cost to aggregate pairs with the same input size into one.
 We do this, because we want to infer worst-case complexity for the code construct. 
@@ -290,16 +291,16 @@ Coefficient of determination is commonly used to measure goodness-of-fit~\cite{c
 We choose the fitted function with highest coefficient of determination. 
 
 
-\paragraph{\textit{\underline{Comparison}}}
+\noindent\textbf{Comparison}
 We have more than one metric for both input and cost.
 We need to compare functions inferred under different metrics. 
-After collecting two sets of records, $a$ and $b$ using different metrics, 
+After collecting two sets of records, $a$ and $b$, using different metrics, 
 we do the comparison through the following steps. 
 We first standardize the two sets of data. 
 We then infer two cost functions, $f_a()$ and $f_b()$, 
 by using the two sets of standardized data.
 We random sample a set of $n$ numbers from $(-1, 1)$.
-We use $N$ to represent the set of $n$ sampled number.  
+We use $N$ to represent the set of $n$ sampled numbers.  
 We calculate the similarity between the two inferred 
 functions by using the following formula. 
 
@@ -326,7 +327,7 @@ Larger result means the two functions inferred from $a$ and $b$ are more similar
 
 \subsection{Implementation and Optimization}
 
-We use LLVM-5.0.0~\cite{llvm} to instrument programs to be profiled.
+We use LLVM\cite{llvm} to instrument programs to be profiled.
 We use python to analyze profiling records 
 with input and cost information and to infer cost function. 
 We also design several optimizations to lower runtime overhead 
@@ -336,7 +337,7 @@ during dynamic monitoring.
 \subsubsection{Input Metric}
 As we discussed in Section~\ref{sec:input},
 both RMS+ and DSS have, top-down and bottom-up, 
-two methods to profile profile records for multiple instances of 
+two methods to analyze profiling records for multiple instances of 
 a code construct in one program run. 
 Both of these two methods can infer the same complexity, 
 such as for MySQL\#27287,
@@ -351,7 +352,7 @@ incur a very large memory overhead.
 As we will discuss later, the top-down method 
 is not suitable in production-run usage. 
 Therefore, we apply the top-down method under in-house setting, 
-and we will use the bottom-up under production-run setting. 
+and we will use the bottom-up method under production-run setting. 
 
 Since we take the top-down method for in-house setting,
 when a monitored program conducts a memory access,
@@ -413,7 +414,7 @@ or a linked list through analyzing loops.
 Given a pointer, 
 if it is deferenced in every iteration of a loop, 
 and its value is increased or decreased by an integer value in every iteration,
-we consider the pointer points to an array element, 
+we consider the pointer points to array elements, 
 and the loop is an array-processing loop. 
 For example, as shown in Figure~\ref{fig:mysql27287}, 
 \texttt{p} points to array elements. 
@@ -421,18 +422,19 @@ It is deferenced in every iteration of the loop in Figure~\ref{fig:mysql27287},
 and its value is decreased by one in every iteration. 
 
 For a pointer pointing to elements in a linked list,
-its base type needs to be a structure. 
+its base type needs to be a \texttt{struct}. 
 The pointer is also deferenced in every iteration of a loop.
 Its value is updated in every iteration, 
-and its new value is one field of the structure it is pointing to. 
+and its new value is one field of the \texttt{struct} it is pointing to. 
 After identifying a pointer pointing to linked list elements,
 we consider the loop deferencing the pointer and updating its value as 
 a linked-list-processing loop. 
 For example, \texttt{n} is deferenced in every iteration of the loop
 in Figure~\ref{fig:Mozilla477564}. 
 Its value is also updated in every iteration by 
-using the \texttt{prev} field of \texttt{node\_t} structure it is pointing to. 
-We will identify \texttt{n} pointing to elements in a linked list. 
+using the \texttt{prev} field of \texttt{node\_t} it is pointing to. 
+We will identify \texttt{n} pointing to elements in a linked list,
+and the loop shown in Figure~\ref{fig:Mozilla477564} as a linked-list-processing loop.
 
 \paragraph{\textit{\underline{How to do optimization}}}
 We design three optimizations to reduce the runtime overhead when collecting input information
@@ -440,18 +442,19 @@ from two aspects:
 we try to reduce the number of instrumentation sites, 
 and we try to accelerate hook functions. 
 
-\textit{\textbf{Optimization 1.}}
+
+\noindent\textbf{Optimization 1}
 The first optimization is designed for RMS+,
 and it targets to reduce the number of instrumentation sites 
 for \texttt{read} and \texttt{write} instructions. 
-The \texttt{read} hook function needs to query hashmap \texttt{ts} 
-to get the timestamp for the latest access and update RMS value when necessary. 
+The \texttt{read} hook function needs to query hash table \texttt{ts} 
+to get the timestamp for the latest access and update RMS+ value when necessary. 
 Both \texttt{read} and \texttt{write} hook functions 
-need to use the value of \texttt{count} to update hashmap \texttt{ts}.
+need to use the value of \texttt{count} to update hash table \texttt{ts}.
 As we discussed earlier, the value of texttt{count} will be increased 
 after each function invocation. 
 Therefore, given two consecutive memory accesses on the same memory cell,
-if there is no function calls between these two accesses, 
+if there is no function calls between them, 
 we do not need to instrument the second memory access. 
 
 We rely on dominance analysis to implement this optimization. 
@@ -462,11 +465,11 @@ We only focus on these memory cells,
 because we want to avoid pointer alias analysis, 
 which may potentially introduce inaccurate results. 
 For a \texttt{read} or \texttt{write} instruction on one of these memory cells,
-if it is dominated by another \texttt{read} or \texttt{write} instruction, 
+if it is dominated by another \texttt{read} or \texttt{write} instruction on the same cell, 
 and there is not function call on any path between these two instructions,
 we will skip the instrumentation for the second instruction.  
 
-\textit{\textbf{Optimization 2.}}
+\noindent\textbf{Optimization 2}}
 The second optimization is an attempt to improve the performance of 
 lookups in the hash table \texttt{ts}, 
 containing the latest access timestamp for each memory cell.
@@ -495,26 +498,30 @@ and can lead
 to a better cache performance. 
 To further improve performance, 
 we add an extra variable to hold the pointer pointing 
-to the last referenced memory area holding timestamp.
+to the last referenced memory area holding timestamps.
 For each memory read or write, 
 we first check whether the saved pointer value can be used. 
 We only conduct a page table lookup when the saved value cannot be used. 
 
-{\textit{\textbf{Optimization 3.}}}
+\noindent\textbf{Optimization 3}
 For this optimization, we apply inline functionality 
 provided by LLVM to make all instrumented hook functions inline.
 
 \subsubsection{Cost Metric}
-To count LIs, for every monitored loop, we instrument a global counter and 
-increase the counter value by one in the loop header.
+To count LIs, for every monitored loop, we initialize 
+a global counter to be 0 at the beginning of the program and 
+increase the counter by $1$ in the loop header to count the number of iterations.
 To count RIs, for each monitored recursive function, 
-we instrument a global counter and increase the counter 
-value in the entry block of the recursive function. 
-To count BBs, a naive method is to instrument a global counter
-and increase the counter in every basic block. 
+we initialize a global counter to be 0 at the beginning of the program
+and increase the counter 
+in the entry block of the recursive function 
+to count the number of recursive instances. 
+To count BBs, a naive method is to create a global counter
+and increase the counter value in every basic block. 
 
 
-{\textit{\textbf{Optimization 4.}}}
+
+\noindent\textbf{Optimization 4}
 To efficiently count executed BBs, 
 we apply an algorithm, which was originally designed to 
 efficiently count edge events through selectively instrumenting a counter 
@@ -530,7 +537,7 @@ at the exit BB.
 After that, we only need to consider where 
 and how to update \texttt{local\_cost} 
 within a single function.
-We design and implement an intro-procedural control flow analysis
+We design and implement an intra-procedural control flow analysis
 to achieve this.
 Given a single function,
 we add a fake edge from the exit BB to the entry BB 
@@ -546,8 +553,21 @@ to calculate on which chords we should change
 \texttt{local\_cost} 
 and how much we should change.
 
+\subsection{Experimental Evaluation}
+%\subsubsection{Methodology}
 
+\noindent\textbf{Implementation and Platform}
+We use \Tool by using LLVM-5.0.0, which was the latest LLVM version when we started this project.
+We conduct our experiment using Ubuntu-16.04 system, 
+with i7-7700 CPU and 32-GB memory. 
 
+\noindent\textbf{Benchmarks}
+\Tool is an algorithmic profiling tool chain.
+Developers can use \Tool to diagnose user-perceived performance failures caused by complexity problems, 
+in both in-house and production-run settings. 
+Therefore, we use known complexity problems in the real-world to evaluate \Tool. 
+To thoroughly conduct our evaluation, 
+we select complexity problems from three sources. 
 
 
 \input{section/tab_inhouse1}
