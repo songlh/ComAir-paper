@@ -557,22 +557,75 @@ and how much we should change.
 %\subsubsection{Methodology}
 
 \noindent\textbf{Implementation and Platform}
-We use \Tool by using LLVM-5.0.0, which was the latest LLVM version when we started this project.
-Our current implementation can only work on C/C++ programs, 
+We implement \Tool by using LLVM-5.0.0.
+Our current implementation focus on C/C++ programs, 
 but we believe that our algorithms are general enough to be extended 
 to other programming languages.
-We conduct our experiment using Ubuntu-16.04 system, 
+We conduct our experiments using a Ubuntu-16.04 machine, 
 with i7-7700 CPU and 32-GB memory. 
 
+\input{section/tab_inhouse1}
 
 \noindent\textbf{Benchmarks}
-\Tool is an algorithmic profiling tool chain.
-Developers can use \Tool to diagnose user-perceived performance failures caused by complexity problems, 
-in both in-house and production-run settings. 
-Therefore, we use known complexity problems in the real-world to evaluate \Tool. 
+%\Tool is an algorithmic profiling tool chain.
+%Developers can use \Tool to diagnose user-perceived performance failures caused by complexity problems, 
+%in both in-house and production-run settings. 
+%Therefore, we use known complexity problems in the real world to evaluate \Tool. 
 To thoroughly conduct our evaluation, 
-we select complexity problems from three sources. 
+we select complexity problems from three sources, as shown in Table~\ref{tab:benchmark_info}. 
 
+The first source is our studied complexity problems, 
+which are randomly sampled from representative applications in previous works~\cite{PerfBug,SongOOPSLA2014}.
+We successfully reproduce 17 complexity problems. 
+Among them, 6 bugs are extract from original Java or JS programs, 
+and re-implemented by using C/C++, 
+because our current implementation of \Tool can only work on C/C++ programs.
+One reproduced bug is extract from a very old Mozilla version, 
+and we fail to find dependent libraries to build that version. 
+We do the re-implementation after we thoroughly understand the complexity problems.
+During the re-implementation, we keep the original algorithms, 
+data structures, and caller-callee relationships. 
+We fail to reproduce other complexity problems, 
+because they depend on very special software or hardware environments, 
+which are not available to us. 
+We fail to re-implement them, 
+because their data structures are too complex to extract.
 
-\input{section/tab_inhouse1}
+The second source is from Toddler project~\cite{Alabama}. 
+Toddler is a dynamic technique that can detect inefficient loops in Java programs.
+In a previous work, \citet{ldoctor} re-implemented all 
+21 bugs detected by Toddler and verified by developers in C/C++.
+During the re-implementation, the researchers first reproduced all Java bugs, 
+then they referred JDK to re-implement 
+common data structures, like ArrayList, HashMap and Vector, 
+and finally, they re-implemented the performance bugs according to their root cases. 
+We use the 21 re-implemented bugs in our evaluation.  
+
+The third source is from a previous work, 
+which optimizes recursive programs by leveraging SIMD instructions~\cite{ren-bin}. 
+8 benchmarks are used in their evaluation part. 
+All of the benchmarks are recursive implementation for classic algorithms, 
+such as computing fibonacci number, knapsack, nqueens, and so on. 
+All their benchmarks are in C++. 
+We use all of them in our experiments. 
+
+In total, we evaluate \Tool on 46 benchmarks. 
+Information for all benchmarks is shown in Table~\ref{tab:benchmark_info}.
+In general, benchmarks used in our experiments are large. 
+Except 5 benchmarks, all other benchmarks are more than 100 lines of codes. 
+7 benchmarks contain more than 1 million lines of codes. 
+We implement a set of simple static analyzers to count static features for these benchmarks. 
+For large benchmarks, 
+they could contain more than 10 thousand loops and functions.
+Algorithmic profiling tools are needed by developers to 
+analyze different code constructs automatically.
+We also count how many array-processing loops, 
+linked-list-processing loops, and recursive functions for each benchmark.
+These code constructs are most common root causes for 
+benchmarks used in our evaluation.  
+The majority of benchmarks used in our experiments are in $O(N^2)$ complexity. 
+We also 10 benchmarks in $O(2^N)$ complexity, and 2 benchmarks in $O(N)$ complexity. 
+
+\noindent\textbf{Experimental Setting}
+
 \input{section/tab_inhouse2}
