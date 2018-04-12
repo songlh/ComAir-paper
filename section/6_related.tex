@@ -3,8 +3,7 @@
 \section{Related Works}
 \label{sec:related}
 
-\subsection{Empirical Studies on Performance Problems}
-
+\noindent\textbf{Empirical Studies on Performance Problems}}
 Many characteristics studies are conducted on real-world performance 
 problems~\cite{PerfBug,SongOOPSLA2014,ldoctor,Zaman2012MSR,Nistor2013MSR,HuangRegression,SmartphoneStudy,junwen-1, junwen-2}. 
 ~\citet{PerfBug} collect 110 real-world performance bugs from 5 representative applications.
@@ -16,45 +15,68 @@ and real-world inefficient loops~\cite{ldoctor}.
 ~\citet{Zaman2012MSR} conduct qualitative comparison between performance bugs 
 and non-performance bugs collected from FireFox and Chrome. 
 ~\citet{Nistor2013MSR} compare performance bugs with non-performance bugs 
-from aspects of discovering, reporting, and fixing. 
+from aspects of discovering, reporting and fixing. 
 ~\citet{HuangRegression} try to figure out what code changes are more likely to introduce performance regressions through 
 studying 100 performance regressions. 
 ~\citet{SmartphoneStudy} find common inefficiency patterns after 
 inspecting 70 performance problems from smartphone applications. 
-There are also research work focusing on inefficiency in web applications~\cite{junwen-1, junwen-2}. 
+There are also research work focusing on studying inefficiency in web applications~\cite{junwen-1, junwen-2}. 
+
 Similar to our work in Section~\ref{sec:study}, 
-these studies have important findings and can guide tool design to combat 
+these studies have important findings and can guide technical design to combat 
 real-world performance problems. 
 However, our work is the first empirical study on real-world complexity problems, 
 and it provides important supplement to existing studies. 
 
-\subsection{Profilers}
-
-
-{\underline{\textit{Profilers.}}
-Profiler is the most widely used tool during performance optimization and performance debugging. 
+\noindent\textbf{Profilers}}
+Traditional profilers are the most widely used tools 
+during performance optimization and performance debugging. 
 After collecting runtime information, 
-profilers wil associate performance metrics to executed instructions, 
+profilers will associate performance metrics to executed instructions, 
 functions, or calling context~\cite{oprofile,gprof, CCT}.
 Many research works are proposed to improve 
 accuracy of profilers~\cite{4Profilers, LagHunter, AppInsight} or 
-to reduce runtime~\cite{AdaptiveBurst} or memory overhead of profilers~\cite{HotCallingContext}. 
+to reduce runtime overhead~\cite{AdaptiveBurst} 
+or memory overhead of profilers~\cite{HotCallingContext}. 
 As we discussed earlier, profilers can only analyze one single execution, 
 but fail to connect analysis results from different executions 
 or to predict analysis results for inputs not seen before.  
 
+Aprof~\cite{Aprof1, Aprof2} and AlgoProf~\cite{AlgoProf} are existing 
+algorithmic profiling techniques.
+They infer cost functions for different code granularities 
+by using different input and cost metrics.
+We evaluate different input and cost metrics 
+by using real-world complexity problems in Section~\ref{sec:inhouse}.
+And we significantly lower run-time overhead by using on-line setting in Section~\ref{sec:online},
+and our tool can be deployed in production runs. 
 
-Both aprof~\cite{Aprof1, Aprof2} and AlgoProf~\cite{AlgoProf} try to 
-associate complexity to code constructs. 
-There are three differences between aprof and AlogProf. 
-First, aprof attributes complexity to functions, 
-while AlgoProf analyzes complexity for loops and recursive functions. 
-Second, aprof measure input size as the number distinct memory cells 
-first accessed read operations, but AlgoProf consider input size as the size of data structures. 
-Third, aprof use the number of executed basic blocks as cost metric, 
-while AlgoProf defines a set of primitive operations, like loop iteration, structure read, 
-and structure creation, and use the number of primitive operations as cost metric. 
-We compared different design points for in-house algorithmic profiling in Section~\ref{sec:inhouse}. 
-As we mentioned earlier, both aprof and AlgoProf can introduce large runtime overhead, 
-and are not suitable to apply in production runs. 
+\noindent\textbf{Performance Bug Detection}}
+There are many performance bug detectors.
+They leverage static or dynamic techniques to 
+identify performance problems matching specific inefficiency 
+patterns~\cite{yufei-perf,CLARITY,xiao13:context,PerfBug,Alabama,CARAMEL,XuDataStructure,XuBloatPLDI2009,XuBloatPLDI2010,Cachetor,LoopInvariant,falsesharing}.
+For some of them, their detected bugs overlap with complexity problems. 
+For example, as we discussed in Section~\ref{sec:inhouse_exp},
+all detected performance bugs by Toddler are in $O(N^2)$ complexity. 
+However, static detectors fail to provide any information 
+about detected bugs' performance impact,
+Dynamic detectors usually incur more than 10X runtime overhead,
+and can only be applied for in-house testing by using testing inputs. 
+Under production-run setting, 
+\Tool will incur very small overhead and can be deployed in the users' side. 
+Profiling results from \Tool can help developers better
+understand real-world workloads and diagnose performance failures caused by complexity problems. 
 
+
+\noindent\textbf{Input Generation for Performance Testing}}
+There are many test input generation techniques to expose performance problems.
+WISE~\cite{WISE} generates inputs with small sizes firstly, 
+then uses these inputs to profile the program in order to learn how to restrict conditional branches, 
+and finally generates large inputs to expose worst-case complexity by using learned policies. 
+EventBreak~\cite{EventBreak} generates inputs to identify 
+event handlers whose reaction time increases as the application is running. 
+SlowFuzz~\cite{slowfuzz} generates inputs to expose worst-case complexity by using
+resource-usage-guided evolutionary search. 
+These input generation techniques are orthogonal to our work, 
+and their generated inputs can be used to conduct algorithmic profiling. 
