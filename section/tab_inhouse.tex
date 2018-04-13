@@ -1,0 +1,33 @@
+\begin{table}[h!]
+  \centering
+  \scriptsize
+  {
+  \newcommand{\Yes}[1]{\checkmark{}$_#1$}
+  \newcommand{\No}[0]{-}
+  \begin{tabular}{lccccccccccc}
+    \toprule     
+    {\bf BugID}        &  \multicolumn{4}{c}{Benchmark Info.}  & \multicolumn{4}{c}{RMS+}         & \multicolumn{3}{c}{DSS}   \\
+     
+    \cmidrule(lr){2-5}                      
+    \cmidrule(lr){6-9}
+    \cmidrule(lr){10-12}
+                                  &  KLOC     &  P.L.  &  Comp. &  Buggy C.C.     & main    & outer    & overhead  & \# of S.P.         &   outer        &  overhead & \# of S.P.  \\
+    \midrule 
+
+    Mozilla\#347306              &  $88$    & C        &   46735  &   1177     &  483    &  136    &  1988  & 35   &  $O(N^{2})$                         &  A-L  & 10000   &\\
+
+
+
+    \bottomrule
+   \end{tabular}
+   }
+  %\nocaptionrule
+  \caption{Benchmark Information.
+  \footnotesize{(This table shows information for complexity problems used in our evaluation. 
+   $x^*$: thousands of lines of codes for re-implemented benchmarks; 
+   A-L: array-processing loop; 
+   LL-L: linked-list-processing loop; 
+   R.F.: recursive function; 
+   Buggy C.C.: buggy code construct.)}}
+  \label{tab:benchmark_info}
+\end{table}

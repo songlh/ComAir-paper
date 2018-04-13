@@ -14,13 +14,13 @@ First, \textit{study-guided}.
 We design the production-run version of \Tool
 under the guidance of the empirical study in Section~\ref{sec:study}.
 We focus on the majority of complexity problems, 
-caused either by repeated execution of loops ($N^k$)
-or recursive functions ($2^N$).
-We focus on common data structures, which are array and linked list.
+caused either by repeated execution of a loop ($N^k$)
+or a recursive function ($2^N$).
+We focus on common types of data structures, which are array and linked list.
 
 Second, \textit{focused checking}.
 To apply the production-run version of \Tool, 
-we expect developers to specify a suspicious loop or recursive function
+we expect developers to specify a suspicious loop or a suspicious recursive function
 to be monitored. 
 \Tool will automatically instrument the specified code construct 
 in order to collect runtime information from the user side in a low overhead. 
@@ -29,12 +29,12 @@ complexity and processed workload in the real world.
 \Tool can be used together with performance failure 
 diagnosis tools~\cite{SongOOPSLA2014} 
 or traditional profilers,
-and focus on suspicious code constructs leading 
-to user-perceived performance problems.
+focusing on suspicious code constructs leading 
+to user-perceived performance failures.
 
 Third, \textit{sampling}.
 Instead of recording all dynamic information, 
-we apply sampling and only record part of information. 
+we apply sampling and only record part of the information. 
 We infer information for the whole execution based on collected samples. 
 Sampling can effectively lower the runtime overhead. 
 
@@ -45,9 +45,9 @@ the majority of studied complexity problems are caused
 by repeated executions of a loop or a recursive function. 
 Previous works show that sampling code constructs that are executed 
 multiple times in one program run can lower runtime overhead, 
-while still able to collect enough runtime information 
+while still being able to collect enough runtime information 
 without hurting diagnosis latency~\cite{SongOOPSLA2014,ldoctor}. 
-Inspired by our study and the earlier work, 
+Inspired by our study and the earlier works, 
 we apply sampling to efficiently profile loops 
 and recursive functions with multiple executions. 
 
@@ -64,7 +64,7 @@ for multiple dynamic instances of a code construct in one program run.
 We leverage the top-down method for the in-house version of \Tool. 
 However, the top-down method is not suitable to be combined with sampling. 
 The reason is explained as follows.
-Assume that we have a code construct \texttt{c} to monitor. 
+Assume we have a code construct \texttt{c} to monitor. 
 It is inside a loop \texttt{l} and is executed multiple times in one program run.
 Dynamic instances of \texttt{l} are much less than 
 dynamic instances of \texttt{c}.
@@ -76,12 +76,14 @@ it will conduct more computation,
 compared with an instance of \texttt{c}.
 It will incur more overhead to collect 
 information for dynamic instances of \texttt{l}.
-Therefore, we apply the bottom-up method.
+Therefore, we apply the bottom-up method 
+in the production-run version of \Tool.
 We sample instances of \texttt{c} to record 
 distinct memory cells contributing RMS+ 
 or distinct elements in an array or a linked list.
 We use the sampled information to infer RMS+ 
 or DSS for all instances of \texttt{c} in one program run.
+
 
 How to do the sampling is similar to previous works in statistical 
 debugging~\cite{liblit03,liblit05,CCI,SongOOPSLA2014,ldoctor}.
@@ -94,15 +96,25 @@ Before each execution of the monitored code construct,
 we choose between the cloned version and the original version. 
 How many times the cloned version is executed 
 depends on a tunable sampling rate. 
+To make the choice between the two versions,
+we add a global counter to the monitored program. 
+If the counter value is larger than $0$, 
+we choose the original version and decrease the counter value by $1$.
+If the counter value is equal to $0$,
+we choose the cloned version and reset the counter value to 
+a random number, whose expected value is equal to $1$ divided by the sampling rate. 
+
 
 We leverage mark-and-recapture method~\citep{mark-recapture} to 
-estimate RMS+ or DSS for all instances based on collected samples. 
+estimate RMS+ or DSS for all dynamic instances of a code construct 
+based on collected samples. 
 Mark-and-recapture is a commonly used statistical method 
 to estimate the size of animal population. 
 By using this method, a portion of animals is captured, marked, and released. 
 Then, another portion is captured.
 The size of the whole animal population is estimated 
 based on the ratio of marked animals in the second captured portion.  
+
 
 Each sample of a monitored code construct is a set of memory cells 
 which contribute RMS+ or represent distinct elements in an array or a linked list. 
@@ -137,7 +149,7 @@ and they can still provide accurate profiling results.
 
 \subsection{Experimental Evaluation}
 
-
+\input{section/tab_online2}
 %{\underline{\textit{Input Size Metric.}}}
 
 
