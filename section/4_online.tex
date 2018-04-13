@@ -7,113 +7,96 @@ implementation for the production-run version of \Tool.
 For production-run usage, profiles are collected from the user side.
 It is very important to keep a low runtime overhead, since
 end users cannot tolerate any observable performance slowdown.
-
-To achieve the requirement of production-run usage,
+To achieve this requirement,
 our design follows several principles. 
 
 First, \textit{study-guided}. 
-In contrast to the in-house version,
-we design the production-run version of \Tool
+We design the production-run version of \Tool
 under the guidance of the empirical study in Section~\ref{sec:study}.
 We focus on the majority of complexity problems, 
-which are caused either by repeated execution of loops ($N^k$)
+caused either by repeated execution of loops ($N^k$)
 or recursive functions ($2^N$).
 We focus on common data structures, which are array and linked list.
 
 Second, \textit{focused checking}.
-Developers could choose a suspicious loop or recursive function to monitor 
-to better understand its complexity and processed workload in production runs.
-Our tool could be used together with performance diagnosis tools~\cite{SongOOPSLA2014} 
+To apply the production-run version of \Tool, 
+we expect developers to specify a suspicious loop or recursive function
+to be monitored. 
+\Tool will automatically instrument the specified code construct 
+in order to collect runtime information from the user side in a low overhead. 
+The profiling results can help developers better understand the code construct' 
+complexity and processed workload in the real world.
+\Tool can be used together with performance failure 
+diagnosis tools~\cite{SongOOPSLA2014} 
 or traditional profilers,
-and focus on loops or recursive functions leading 
+and focus on suspicious code constructs leading 
 to user-perceived performance problems.
 
 Third, \textit{sampling}.
 Instead of recording all dynamic information, 
 we apply sampling and only record part of information. 
 We infer information for the whole execution based on collected samples. 
+Sampling can effectively lower the runtime overhead. 
 
 
 \subsection{Technical Design}
 As we discussed in Section~\ref{sec:study}, 
-majority of complexity problems are caused 
-caused by repeated executions of a loop or a recursive function. 
-Previous works show that sampling code constructs that are executing 
-multiple 
-times can lower runtime overhead, 
-while still able to collect enough runtime information~\cite{SongOOPSLA2014,ldoctor}. 
+the majority of studied complexity problems are caused 
+by repeated executions of a loop or a recursive function. 
+Previous works show that sampling code constructs that are executed 
+multiple times in one program run can lower runtime overhead, 
+while still able to collect enough runtime information 
+without hurting diagnosis latency~\cite{SongOOPSLA2014,ldoctor}. 
 Inspired by our study and the earlier work, 
-we apply sampling to efficiently profile loops and recursive functions with multiple executions. 
+we apply sampling to efficiently profile loops 
+and recursive functions with multiple executions. 
 
-As we discussed in Section~\ref{sec:inhouse},
-there are, top-down and bottom-up, two methods to analyze RMS+ and DSS collected for multiple dynamic instances for a code construct. 
-We leverage the top-down method for the in-house version. 
-However, the top-down method is not suitable for sampling. 
-The reason is explained as follows. 
-For a code construct, \texttt{c}, inside a loop \texttt{l}.
-The dynamic instances for \texttt{l} are much less, 
-compared with dynamic instances of \texttt{c}.
+\noindent\textbf{Input Metric}
+If the specified code construct is an array-processing loop 
+or a linked-list-processing loop,
+we will use DSS as input metric. 
+Otherwise, we will use RMS+ as input metric. 
+
+As we discussed in Section~\ref{sec:inhouse}, 
+there are, top-down and bottom-up, 
+two methods to analyze RMS+ and DSS records collected 
+for multiple dynamic instances of a code construct in one program run. 
+We leverage the top-down method for the in-house version of \Tool. 
+However, the top-down method is not suitable to be combined with sampling. 
+The reason is explained as follows.
+Assume that we have a code construct \texttt{c} to monitor. 
+It is inside a loop \texttt{l} and is executed multiple times in one program run.
+Dynamic instances of \texttt{l} are much less than 
+dynamic instances of \texttt{c}.
 If we apply the top-down method, 
 we need to sample dynamic instances of \texttt{l}, 
 and it is very likely that we will miss these instances. 
-For each dynamic instance of \texttt{l}, it will conduct a lot of computation.
-There will be a very large runtime overhead during collecting dynamic instance of \texttt{l}.
-Therefore, we sample instances of \texttt{c}, and infer information for all instances of \textt{c} by using the bottom-up method. 
+For each dynamic instance of \texttt{l}, 
+it will conduct more computation, 
+compared with an instance of \texttt{c}.
+It will incur more overhead to collect 
+information for dynamic instances of \texttt{l}.
+Therefore, we apply the bottom-up method.
+We sample instances of \texttt{c} to record 
+distinct memory cells contributing RMS+ 
+or distinct elements in an array or a linked list.
+We use the sampled information to infer RMS+ 
+or DSS for all instances of \texttt{c} in one program run.
 
+How to do the sampling is similar to previous works in statistical 
+debugging~\cite{liblit03,liblit05,CCI,SongOOPSLA2014,ldoctor}.
+We make a cloned version of the monitored code construct.
+We instrument the cloned version to record information for RMS+ or DSS. 
+We dump the recorded information to log 
+whenever the cloned version finishes its execution. 
+We add extra delimiters to log to differ information collected from different instances.
+Before each execution of the monitored code construct, 
+we choose between the cloned version and the original version. 
+How many times the cloned version is executed 
+depends on a tunable sampling rate. 
 
-As we discussed in Section~\ref{sec:inhouse}, 
-to infer the complexity function, 
-we need select metrics for \textit{cost} and input \textit{size}.
-
-{\underline{\textit{Cost Metric.}}
-To efficiently profile a loop, we use the total loop iteration number 
-to estimate the total \textit{cost} of all executions.
-We initialize a local counter to be 0 at the beginning of the program.
-We increase the counter by 1 in the loop header of the monitored loop.
-We dump the counter value to log before the program exits. 
-Compared with using executed BBs discussed in Section~\ref{sec:inhouse}, 
-collecting loop iteration number will incur a smaller overhead.   
-
-
-{\underline{\textit{Input Size Metric.}}
-We still use RMS as input \textit{size} metric for a monitored loop, 
-but we will infer RMS from sampled information, 
-which is different from what we did in Section~\ref{sec:inhouse}.
-The algorithm discussed in Section~\ref{sec:inhouse} 
-focuses on memory reads conducted by a single execution 
-independently from other executions 
-of the same code construct. 
-For example, one single execution of 
-the buggy loop of MySQL\#27287 (Figure~\ref{fig:mysql27287})
-is always linear, as shown in Figure~\ref{fig:mysql27287-in}.
-After merging information of different executions from the outer loop,
-we can observe the polynomial complexity 
-in Figure~\ref{fig:mysql27287-out}.
-
-To estimate RMS for all executions of a monitored loop, 
-we first sample memory read and write information 
-from several loop executions. 
-We then merge sampled information and 
-infer RMS for all executions. 
-
-How to sample memory access information is similar to previous 
-statistical debugging works~\cite{liblit03,liblit05,CCI,SongOOPSLA2014,ldoctor}.
-We make a cloned version of the monitored loop.
-We instrument the cloned version to trace memory accesses.
-We consider memory accesses conducted by the loop directly
-and indirectly. 
-Before each execution of the monitored loop, 
-we randomly decide whether the instrumented version 
-or the original version will execute. 
-How many times the instrumented version is executed 
-depends on a configurable sampling rate. 
-We also add extra marks into the trace to 
-differ information sampled from different loop instances. 
-We use an off-line analysis to figure out which 
-memory addresses are read firstly by a sampled loop instance. 
-
-
-We apply mark-and-recapture method~\citep{mark-recapture} to estimate RMS. 
+We leverage mark-and-recapture method~\citep{mark-recapture} to 
+estimate RMS+ or DSS for all instances based on collected samples. 
 Mark-and-recapture is a commonly used statistical method 
 to estimate the size of animal population. 
 By using this method, a portion of animals is captured, marked, and released. 
@@ -121,14 +104,41 @@ Then, another portion is captured.
 The size of the whole animal population is estimated 
 based on the ratio of marked animals in the second captured portion.  
 
-Since mark-and-recapture needs to compare two captured portions, 
-we config our sampling policy to always sample 
-two consecutive loop execution instances. 
-Assume we have a pair of sampled instances with RMS 
-as $N_1$ and $N_2$ respectively.  
-If $M$ memory cells read firstly by both of the two loop instances, 
-we estimate the RMS for all loop instances as $N=N_1*N_2/M$. 
-{\bf xxx I am pretty sure that the current implementation is wrong}
+Each sample of a monitored code construct is a set of memory cells 
+which contribute RMS+ or represent distinct elements in an array or a linked list. 
+In one program run, we assume that we collect a sequence of $m$ samples. 
+Given the $i$th sample, we use $M_i$ to represent the 
+total number of distinct memory cells in the previous $i-1$ samples, 
+$C_i$ to represent the number of distinct memory cells in the $i$th sample,
+and $R_i$ to represent the number of distinct memory cells in 
+the $i$th sample and also appeared in one of the previous $i-1$ samples.
+The total distinct memory cells for all dynamic instances 
+of the monitored code construct can be estimated as:
+
+
+\begin{equation} \label{eq:mark}
+%$$p_v(S_v(a)) = 1 - \prod\limits_{u \in S_v(a)}(1 - p_{u,v})$$
+N = \frac{\sum\limits_{i=1}^m M_i*C_i}{\sum\limits_{i=1}^m R_i}
+\end{equation}
+
+\noindent\textbf{Cost Metric}
+The production-run version of \Tool focuses on recursive functions or loops.
+If the monitored code construct is a recursive function,
+we will use the total number of recursive call instances to estimate cost.
+If the monitored code construct is a loop, 
+we will use the total number of loop iterations for all loop instances to estimate cost. 
+We do not apply sampling during collecting these two metrics. 
+As we discussed in Section~\ref{sec:inhouse},
+these two metrics will incur a smaller overhead compared with BBs, 
+and they can still provide accurate profiling results.  
+
+
+
+
+\subsection{Experimental Evaluation}
+
+
+%{\underline{\textit{Input Size Metric.}}}
 
 
 
@@ -136,11 +146,20 @@ we estimate the RMS for all loop instances as $N=N_1*N_2/M$.
 
 
 
-\input{section/tab_online1}
-\input{section/tab_online2}
 
 
 
 
-\subsection{Discussions}
+
+
+
+
+
+%\input{section/tab_online1}
+%\input{section/tab_online2}
+
+
+
+
+%\subsection{Discussions}
 
