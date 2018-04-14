@@ -102,7 +102,8 @@ If the counter value is larger than $0$,
 we choose the original version and decrease the counter value by $1$.
 If the counter value is equal to $0$,
 we choose the cloned version and reset the counter value to 
-a random number, whose expected value is equal to $1$ divided by the sampling rate. 
+a random number, 
+whose expectation is equal to the inverse of the sampling rate.  
 
 
 We leverage mark-and-recapture method~\citep{mark-recapture} to 
@@ -145,9 +146,45 @@ these two metrics will incur a smaller overhead compared with BBs,
 and they can still provide accurate profiling results.  
 
 
-
-
 \subsection{Experimental Evaluation}
+%\subsubsection{Research Questions}
+
+We will conduct experiments to answer the following two research questions:
+
+\begin{itemize}
+\item {\bf RQ1.} 
+Can sampling lower the runtime overhead while maintaining the same profiling results? 
+A positive answer means the effectiveness of the production-run version of \Tool. 
+
+\item {\bf RQ2.} 
+Will sampling increase profiling latency? 
+After applying sampling, less information is collected in one single run. 
+If we have to monitor more program runs in order to get the same profiling results,
+profiling latency is increased.
+As we discussed earlier, the majority of complexity problems are caused 
+by repeated executions of a code construct. 
+It could be possible that sampling can still get enough information in one program, 
+while not increasing diagnosis latency. 
+
+\end{itemize}
+
+\noindent\textbf{Benchmarks and Inputs}
+We reuse all benchmarks in Table~\ref{tab:benchmark_info}.
+For each benchmark, 
+we use the same methodology in Section~\ref{sec:inhouse_exp} 
+to generate a sequence of inputs, 
+so that the difference between sizes of two consecutive inputs is constant.
+We name this input set as controlled inputs.
+We also randomly sample controlled inputs to generate a set of random 
+inputs to emulate inputs in production runs.    
+
+\noindent\textbf{Metrics}
+
+
+
+
+
+\input{section/tab_online1}
 
 \input{section/tab_online2}
 %{\underline{\textit{Input Size Metric.}}}
