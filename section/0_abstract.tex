@@ -1,3 +1,15 @@
-In this paper, we conduct an empirical study on real-world complexity bugs.
-We conduct a thorough study on in-house algorithmic profiling.
-We design two approximate algorithmic profiling algorithms for production-run usage. 
+Complexity problems are a common type of performance problems, 
+caused by algorithmic inefficiency. 
+Algorithmic profiling aims to attribute complexity to a code construct.
+It can detect previously unknown complexity problems and diagnose performance failures 
+caused by complexity problems. 
+
+In this paper, we present \Tool, a tool chain, 
+which can effectively conduct algorithmic profiling. 
+To design \Tool, we first conduct an empirical study on 
+real-world complexity problems in a representative performance-bug benchmark set. 
+Guided by our study, 
+we then explore different design points during algorithmic profiling.
+Finally, we apply sampling to lower runtime overhead and enable the production-run usage for \Tool.
+Experimental results show that \Tool can cover different types of complexity problems, 
+generate accurate profiling results, and incur a low runtime overhead. 
