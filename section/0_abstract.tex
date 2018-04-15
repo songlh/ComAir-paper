@@ -1,23 +1,23 @@
-Complexity problems are one common type of performance problems, 
-caused by algorithmic inefficiency. 
+Complexity problems are a common type of performance problems, 
+and they are caused by algorithmic inefficiency. 
 Algorithmic profiling aims to attribute complexity to a code construct.
 It can detect previously unknown complexity problems and diagnose performance failures 
 caused by complexity problems. 
-Existing techniques on algorithmic profiling 
-will incur more than $30$ times runtime overhead,
+Existing algorithmic profiling techniques
+incur more than $30$ times runtime overhead,
 and cannot be deployed in production runs, missing opportunities to understand 
-real-world workloads and how programs scale in the user side. 
+real-world workloads and how programs scale on the user side. 
 
-In this paper, we present a toolchain \Tool, 
+In this paper, we present a toolchain, \Tool, 
 which can effectively conduct algorithmic profiling. 
 To design \Tool, we first conduct an empirical study on 
-real-world complexity problems from a representative performance-bug benchmark suit. 
+real-world complexity problems from a representative performance-bug benchmark suite. 
 Guided by our study, 
 we then explore different 
-design points during algorithmic profiling.
-Finally, we apply sampling to lower runtime 
-overhead and enable the production-run usage for \Tool.
-Experimental results show that \Tool 
+design points of algorithmic profiling.
+Finally, we apply sampling to lower the runtime 
+overhead and enable \Tool to be used in production runs.
+Our experimental results show that \Tool 
 can cover different types of complexity problems, 
 generate accurate profiling results, 
 and incur a very low runtime overhead. 
