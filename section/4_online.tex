@@ -249,11 +249,64 @@ for the two inferred functions under
 in-house and production-run setting
 is constantly larger than $0.85$.
 
+As expected, the profiling capability will decrease by using sparser sampling rate. 
+As shown in Table~\ref{tab:sampling}, 
+by using the default 100 program runs,
+profiling capability is the same between $\frac{1}{10}$ sampling rate 
+and $\frac{1}{10^2}$ sample rate.
+Profiling capability will drop with $\frac{1}{10^3}$ sampling rate. 
+Nine benchmarks that can be accurately profiled with higher sampling rate
+cannot be profiled with $\frac{1}{10^3}$ sampling rate.
+Profiling capability will drop further with $\frac{1}{10^4}$ sampling rate. 
+Only six benchmarks can be accurately profiled with $\frac{1}{10^4}$ sampling rate. 
+More program runs are needed for $\frac{1}{10^3}$ sampling rate 
+and $\frac{1}{10^4}$ sampling rate. 
 
+As shown in Table~\ref{tab:sampling}, 
+different sets of inputs have slight impact on diagnosis capability. 
+Using $500$ and $1000$ program runs, 
+profiling capability is the same between controlled inputs and random inputs. 
+Using $100$ program runs, 
+profiling capability is better by using controlled inputs.
+Two benchmarks that can be accurately profiled by using controlled inputs 
+cannot be accurately profiled by using random inputs.
+Using $10$ program runs, 
+there are some benchmarks that can be accurately 
+profiled by using one input set, while cannot 
+be accurately profiled by the other, 
+for both controlled inputs and random inputs.
 
 
 \input{section/tab_online2}
-%{\underline{\textit{Input Size Metric.}}}
+
+
+\noindent\textbf{Profiling Latency}
+We conduct a quantitative measurement on the impact of sampling to profiling latency 
+in Table~\ref{tab:sampling}.
+As we can see, by using controlled inputs, 
+three benchmarks need around 100 program runs to accurately profile. 
+Mozilla\#490742 and Apache\#37184 need more than 1000 runs to profile. 
+By using random inputs, two benchmarks, GCC\#1687 and GCC\#27733, 
+need around 100 runs to profile. 
+Apache\#29743 needs around 500 runs to profile. 
+Mozilla\#490742 and Apache\#37184 also need more than 1000 runs to profile.   
+This means longer profiling latencies than the in-house version of \Tool,
+which only needs 10 runs to conduct accurately profile. 
+
+Sampling does not lengthen diagnosis latency for 32 benchmarks 
+under controlled 
+inputs and for 33 benchmarks under random inputs.
+As we discussed earlier, these bugs are caused by repeated executions of a loop. 
+Even though we apply sampling, 
+we can still collect enough information to make an accurate estimation for the whole execution. 
+Consequently, sampling allows us to achieve a low runtime overhead, 
+accurate profiling results, and low profiling latency simultaneously. 
+For other benchmarks, even though we use $\frac{1}{10^2}$ sample rate, 
+sampling does not lengthen profiling latency by 100 times. 
+For most benchmarks,100 runs are enough to conduct accurate profiling, 
+due to the same reason that the root-cause loop or recursive function is executed a lot of times, 
+
+
 
 
 
