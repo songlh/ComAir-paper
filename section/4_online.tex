@@ -217,6 +217,23 @@ We conduct each experiment multiple times,
 and our results are stable across multiple experiments. 
 Particularly, overhead is measured by using $10$ runs under the same setting. 
 
+\noindent\textbf{Runtime Overhead}
+The runtime overhead is small under the default sampling rate (1 out of 100) 
+in Table~\ref{tab:overhead}.
+It is below $5\%$ in $36$ out of $46$ cases, 
+and it is below $10\%$ in $39$ out of $46$ cases. 
+It is below $5\%$ for all real complexity problems, 
+except GCC\#1687. 
+
+The runtime overhead is influenced by the sampling rate, 
+as shown in Figure~\ref{tab:sampling}.
+We can lower the runtime overhead, by decreasing the sampling rate.
+The overhead can be lowered to be mostly ($33/46$) 
+under $1\%$ under the $\frac{1}{10^4}$.
+The runtime overhead will be increased, 
+if we sample more frequently.
+The runtime overhead will be more than $10\%$ for most cases ($37/46$), 
+when the sampling rate is $\frac{1}{10}$.
 
 
 \input{section/tab_online2}

@@ -58,21 +58,26 @@
     \midrule
     Groovy\#5739-0       & \ding{51}$_{0.99}$  & \ding{51}$_{0.99}$ & \ding{51}$_{0.99}$ & \ding{51}$_{0.98}$ & \ding{51}$_{0.89}$ & \ding{51}$_{0.94}$ & \ding{51}$_{0.95}$ & \ding{51}$_{0.96}$ & 4.53\% \\
     Groovy\#5739-1      & \ding{51}$_{0.99}$  & \ding{51}$_{0.99}$ & \ding{51}$_{0.99}$ & \ding{51}$_{0.99}$ & \ding{51}$_{0.95}$ & \ding{51}$_{0.97}$ & \ding{51}$_{0.99}$ & \ding{51}$_{0.99}$ & 1.93\% \\
-    \midrule
-    \midrule
-    knapsack      &  -  & -  & - & - & - & - & - & - & 8.09\% \\
-    fib      &  -  & -  & - & - & - & - & - & - & 90.70\% \\
-    parentheses     &  \ding{51}$_{0.91}$  & \ding{51}$_{0.91}$  & \ding{51}$_{0.91}$ & \ding{51}$_{0.91}$ & - & \ding{51}$_{0.91}$ & \ding{51}$_{0.91}$ & \ding{51}$_{0.91}$ & 44.81\% \\
-    nqueens      &  -  & -  & - & - & - & - & - & - & 8.74\% \\
-    graphcol      &  -  & -  & - & - & - & - & - & - & 11.87\% \\
-    uts      &  -  & -  & - & - & - & - & - & - & $<$0.01\% \\
-    binomial   &  -  & -  & - & - & - & - & - & - & 25.86\% \\
-    minmax    &  -  & -  & - & - & - & - & - & - & 3.42\% \\
+    %\midrule
+    %\midrule
+    %knapsack         &  -  & -  & - & - & - & - & - & - & 8.09\% \\
+    %fib              &  -  & -  & - & - & - & - & - & - & 90.70\% \\
+    %parentheses     &  \ding{51}$_{0.91}$  & \ding{51}$_{0.91}$  & \ding{51}$_{0.91}$ & \ding{51}$_{0.91}$ & - & \ding{51}$_{0.91}$ & \ding{51}$_{0.91}$ & \ding{51}$_{0.91}$ & 44.81\% \\
+    %nqueens         &  -  & -  & - & - & - & - & - & - & 8.74\% \\
+    %graphcol      &  -  & -  & - & - & - & - & - & - & 11.87\% \\
+    %uts      &  -  & -  & - & - & - & - & - & - & $<$0.01\% \\
+    %binomial   &  -  & -  & - & - & - & - & - & - & 25.86\% \\
+    %minmax    &  -  & -  & - & - & - & - & - & - & 3.42\% \\
 
 
     \bottomrule
    \end{tabular}
   %\nocaptionrule
-  \caption{Run-time overhead and diagnosis capability evaluated with the default sampling rate (1 out of 10000); 10, 100, 500, 1000 represents the different numbers of success/failure runs used for diagnosis.}
-  \label{tab:LBR}
+  \caption{Runtime overhead and diagnosis capability. \footnotesize{(This table shows runtime 
+  overhead and diagnosis capability 
+measured with the default sampling rate (1 out of 100); 
+10, 100, 500, and 1000 represent the different numbers of program runs used for algorithmic profiling;
+both controlled inputs and random inputs are used during the experiments.)} 
+}
+  \label{tab:overhead}
 \end{table}
