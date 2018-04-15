@@ -106,7 +106,7 @@ a random number,
 whose expectation is equal to the inverse of the sampling rate.  
 
 
-We leverage mark-and-recapture method~\citep{mark-recapture} to 
+We leverage the mark-and-recapture method~\citep{mark-recapture} to 
 estimate RMS+ or DSS for all dynamic instances of a code construct 
 based on collected samples. 
 Mark-and-recapture is a commonly used statistical method 
@@ -162,9 +162,10 @@ After applying sampling, less information is collected in one single run.
 If we have to monitor more program runs in order to get the same profiling results,
 profiling latency is increased.
 As we discussed earlier, the majority of complexity problems are caused 
-by repeated executions of a code construct. 
-It could be possible that sampling can still get enough information in one program, 
+by repeated executions of a loop or a recursive function.
+ It could be possible that sampling can still collect enough information in one program, 
 while not increasing diagnosis latency. 
+
 
 \end{itemize}
 
@@ -176,7 +177,7 @@ for all benchmarks,
 except for Mozilla\#347306 and GCC\#46401. 
 These two bugs are caused repeated execution of a loop, 
 whose total iteration numbers ranked 2nd. 
-We monitor these two loops.
+Instead, we monitor these two loops.
 
 For each benchmark, 
 we use the same methodology in Section~\ref{sec:inhouse_exp} 
@@ -184,36 +185,37 @@ to generate a sequence of inputs,
 so that the difference between sizes of two consecutive inputs is constant.
 We name this input set as controlled inputs.
 We also randomly sample controlled inputs to generate a set of random 
-inputs to emulate inputs in production runs.    
+inputs to emulate uncontrolled inputs in production runs.    
 
 \noindent\textbf{Metrics}
 We will measure the following three metrics during our experiments:
 1) runtime overhead, which is the slow down caused 
-by sampling information in each program run;
+by sampling information from each program run;
 2) profiling capability, which is measured as the similarity between two cost functions 
-inferred under in-house setting and production-run setting. 
+inferred under in-house setting and production-run setting; 
 3) profiling latency, which is measured by how many program 
 runs are needed to conduct the algorithmic profiling. 
+
 
 \input{section/tab_online1}
 
 
 \noindent\textbf{Settings}
-By default, we set the sampling rate to be 1 out of 100 
-and conduct algorithmic profiling by using 100 program runs with controlled inputs.  
+By default, we set the sampling rate to be $1$ out of $100$ 
+and conduct algorithmic profiling by using $100$ program runs with controlled inputs.  
 
 Besides the default setting,
-we evaluate the impact of different number of monitored program runs, 
-ranging from 10 to 1000, under the default sampling rate 1 out of 100.
+we evaluate the impact of different numbers of monitored program runs, 
+ranging from $10$ to $1000$, under the default sampling rate.
 We conduct this experiment by using both controlled inputs and random inputs 
 to understand whether different input sets will influence experimental results.
-We also evaluate the impact of sampling rate, ranging from 1 out of 10 to 1 out of 10000, 
-by using 100 program runs with controlled inputs.  
+We also evaluate the impact of sampling rate, ranging from $1$ out of $10$ to $1$ out of $10000$, 
+by using $100$ program runs with controlled inputs.  
 
 Sampling will introduce some randomness. 
 We conduct each experiment multiple times, 
 and our results are stable across multiple experiments. 
-Particularly, overhead is measured by using 10 runs under the same setting. 
+Particularly, overhead is measured by using $10$ runs under the same setting. 
 
 
 
