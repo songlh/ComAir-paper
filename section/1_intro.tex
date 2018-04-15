@@ -5,7 +5,7 @@
 \label{sec:motiv}
 
 Performance problems\footnote{We will use performance problems and performance bugs exchangeably, 
-following previous works in this area~\cite{SongOOPSLA2014,ldoctor}} 
+following previous works in this area~\cite{SongOOPSLA2014,ldoctor}.} 
 are one type of software implementation mistakes
 and can cause inefficient execution~\cite{PerfBug,perf.fse10,SongOOPSLA2014,ldoctor,Alabama}. 
 Performance problems cannot be optimized away by state-of-the-art compiler optimizations.
@@ -18,42 +18,42 @@ Combating performance problems is urgent.
 
 Many performance problems are caused by algorithmic inefficiency, 
 such as implementing a linear algorithm in a $O(N^2)$ way.
-We refer these performance problems as complexity problems in our paper.
+We refer to these performance problems as complexity problems in our paper.
 Our empirical study on a representative performance-bug 
 benchmark set~\cite{PerfBug,SongOOPSLA2014} shows that 
 nearly half of user-perceived performance problems are complexity problems. 
-Complexity problems are usually ranked high in developers' priority list. 
+Complexity problems are usually ranked high in a developers' priority list. 
 For example, Mozilla developers will immediately try to fix complexity bugs degrading exponentially~\cite{mozilla35294}. 
-Addressing complexity problems is an important aspect to fight performance bugs. 
+Addressing complexity problems is an important aspect of fighting performance bugs. 
 
 
 Algorithmic profiling~\cite{Aprof1,Aprof2,AlgoProf} collects profiles from multiple 
 runs of the same program and attributes complexity to different code constructs, such as a loop or a function,
 in the form of a \textit{cost} function of \textit{input} size. 
-Algorithmic profiling can be used detect previously unknown complexity problems and 
+Algorithmic profiling can be used to detect previously unknown complexity problems and 
 diagnose performance failures caused by complexity problems. 
-Conducting algorithmic profiling is challenging. 
+Algorithmic profiling is challenging. 
 Effective techniques need to satisfy the following three requirements.
 
-\begin{itemize}
+\begin{enumerate}
 
-\item First, \textit{coverage}. Complexity problems are in different types of complexity, 
+\item \textit{Coverage}. Complexity problems are due to different types of complexity, 
 and they are also caused by a large variety of root causes. 
-Given a code construct, it may take inputs and 
+A code construct may take inputs and 
 consume computation resources in various types.
 A good algorithmic profiling technique must cover a 
-large portion of various complexity types, root causes, inputs and costs.
+large portion of the various complexity types, root causes, types of inputs and costs.
 
 
-\item Second, \textit{accuracy}. 
+\item \textit{Accuracy}. 
 Given an analyzed code construct,
 algorithmic profiling needs accurately identify 
 how cost scales as input size changes.
 It is desired to conduct algorithmic profiling under the context of the whole program's execution. 
 Otherwise, missing how the code construct cooperates with other parts will lead to inaccurate results. 
 
-\item Third, \textit{performance}. 
-Lower runtime overhead can allow developers to run more tests 
+\item \textit{Performance}. 
+A lower runtime overhead can allow developers to run more tests 
 under a given time budget during in-house testing.
 Production-run algorithmic profiling can help developers 
 understand how their programs scale
@@ -62,24 +62,24 @@ To be deployed in production runs,
 techniques must not incur any observable slowdown.
 
 
-\end{itemize}
+\end{enumerate}
 
 Existing techniques do not satisfy the above three requirements and 
 cannot conduct algorithmic profiling effectively. 
 Traditional profilers are the most widely used tools to 
 diagnose performance failures~\cite{gprof,oprofile}. 
-Traditional profilers can only measure how much time spent in each code construct during one single run, 
+Traditional profilers can measure only how much time is spent in each code construct during one single run, 
 while failing to connect information from multiple runs 
-and failing to provide any indication about how execution time scales.
+and failing to provide any indication about how the execution time scales.
 Therefore, traditional profilers fail in both coverage and accuracy.  
 To understand asymptotic complexity for a code construct,
 experimental algorithmics~\cite{expalg1,expalg2,expalg3} requires developers to 
 extract the code construct and analyze it out of the original program. 
 Although useful,
 experimental algorithmics fail to consider how the code 
-construct interact with the whole program and does not provide desired accuracy. 
-Recent techniques on algorithmic profiling~\cite{Aprof1,Aprof2,AlgoProf} will incur more than $30$X runtime overhead.
-They cannot provide desired performance and are far from being deployed in production runs. 
+construct interacts with the rest of the whole program and does not provide the desired accuracy. 
+Recent techniques on algorithmic profiling~\cite{Aprof1,Aprof2,AlgoProf} will incur more than $30\times$ runtime overhead.
+They cannot provide the desired performance and are far from being deployed in production runs. 
 
 
 \begin{figure}
@@ -90,7 +90,7 @@ They cannot provide desired performance and are far from being deployed in produ
 \caption{A MySQL performance problem in polynomial complexity. 
 \footnotesize{(This figure shows the buggy code fragment for MySQL\#27287. 
    During performance failure runs, 
-   execution time scales polynomially in the size of \texttt{items}.)}}
+   the execution time scales polynomially with the size of \texttt{items}.)}}
 \vspace{-0.05in}
 \label{fig:mysql27287}
 \vspace{-0.05in}
@@ -104,70 +104,70 @@ All \texttt{XML\_NODE}s are maintained in array \texttt{items}.
 The loop searches by iterating array \texttt{items} 
 backward from the input and looking for the first \texttt{XML\_NODE} 
 whose level is one less than the input.
-This piece of codes looks innocent. 
+This piece of code looks innocent. 
 However, there is an outer loop not shown in the figure.
-The outer loop will keep calling \texttt{xml\_parent\_tag} by using 
+The outer loop will keep calling \texttt{xml\_parent\_tag} using 
 the next sibling of the previous \texttt{XML\_NODE}, 
-which is in $O(N^2)$ complexity in terms of the number of children of a parent \texttt{XML\_NODE}. 
-Developers may think using an implementation in $O(N^2)$ complexity is fine, 
-since a \texttt{XML\_NODE} usually does not have too many children.
+which has $O(N^2)$ complexity in terms of the number of children of a parent \texttt{XML\_NODE}. 
+Developers may think that using an implementation with $O(N^2)$ complexity is fine, 
+since an \texttt{XML\_NODE} usually does not have too many children.
 However, during performance failure runs, 
-one \texttt{XML\_NODE} contains tens of thousands of children, 
-and this leads significant showdown perceived by end users. 
+an \texttt{XML\_NODE} contains tens of thousands of children, 
+and this leads significant showdown perceived by the end users. 
 
-To fix this bug, developers add an extra field to each \texttt{XML\_NODE} to save its parent, 
-and this field is initialized when a \texttt{XML\_NODE} is created. 
-After applying this patch, codes shown in Figure~\ref{fig:mysql27287} are completely removed.
-This takes developers around 5 months to figure 
-out\footnote{We count the time from when developers confirmed this is performance bug 
-to when the patch was submitted}. 
-In-house algorithmic profiling can warn developers the $O(N^2)$ complexity, 
+To fix this bug, the developers added an extra field to each \texttt{XML\_NODE} to save its parent, 
+and this field is initialized when an \texttt{XML\_NODE} is created. 
+After applying this patch, the code shown in Figure~\ref{fig:mysql27287} was completely removed.
+This took developers around 5 months to figure 
+out.\footnote{We count the time from when developers confirmed this is performance bug 
+to when the patch was submitted.} 
+In-house algorithmic profiling can warn developers about the $O(N^2)$ complexity, 
 potentially obscured by the fact that inner and outer loops are not in the same function. 
 Production-run algorithmic profiling can provide information about the real-world workload 
 processed by this piece of code and its corresponding complexity,
-which are invaluable to diagnose performance failures caused by this complexity problem. 
+which are invaluable in diagnosing performance failures caused by this complexity problem. 
 
 
 \subsection{Our Contributions}
 \label{sec:con}
 
 In this paper, 
-we present a toolchain \Tool to effectively conduct algorithmic profiling with 
-good coverage, accuracy, and performance. 
-\Tool has in-house and production-run two settings. 
+we present a toolchain,\Tool, to effectively conduct algorithmic profiling with 
+good coverage, accuracy and performance. 
+\Tool has two settings, for in-house runs and production runs. 
 Under the in-house setting, 
-\Tool is launched by using existing tests, tests from end users, 
+\Tool is launched using existing tests, tests from end users, 
 or tests generated by test input generation techniques~\cite{KLEE,s2e,dart,EventBreak}. 
 \Tool will automatically merge profiles from multiple runs and 
 identify code constructs with super-linear complexity. 
 Under the production-run setting, 
 instrumented programs will be distributed to end users 
-and complexity information will be collected in negligible runtime overhead. 
-Developers can leverage this information to better understand real-world workloads
-and diagnose performance failures caused by complexity problems. 
+and complexity information will be collected with a negligible runtime overhead. 
+Developers can leverage this information to understand real-world workloads better
+and to diagnose performance failures caused by complexity problems. 
 
 
 We build \Tool through the following three steps.
 
 We first conduct an empirical study to better understand 
 real-world complexity problems.
-All studied complexity bugs come from a representative 
+All of the studied complexity bugs come from a representative 
 performance-bug benchmark suite~\cite{PerfBug,SongOOPSLA2014}.
 To the best of our knowledge, our work is the first study focusing on complexity problems.
 We categorize complexity problems into different complexity categories.
 We study root causes, 
 how user-perceived performance impact is generated, 
 and fix strategies for bugs in each category. 
-We also investigate the reporting and diagnosis process for complexity problems.
+We also investigate the reporting and diagnosis process of complexity problems.
 Our findings and implications can motivate future research on complexity problems. 
-They have already guided our design point selection when building the in-house version of \Tool, 
+They have already guided our selection of design points when building the in-house version of \Tool, 
 and inspired us to apply sampling to the production-run version of \Tool. 
 
 We then systematically explore different design points during algorithmic profiling 
 in order to build the in-house version of \Tool. 
 The design points include two types of input metrics, 
 three types of cost metrics, 
-one method to fit cost curve, 
+one method to fit the cost curve, 
 and one method to compare different cost curves. 
 Our experience shows that naive implementations 
 to collect runtime information
@@ -175,50 +175,49 @@ will lead to extremely large overhead.
 We design several optimizations to accelerate information collection 
 and avoid collecting redundant information.  
 We evaluate different design points and our optimizations 
-by using $46$ complexity problems from three sources. 
-Our evaluation results show that after choosing the correct design points, 
+using $38$ complexity problems from two sources. 
+Our evaluation shows that after choosing the correct design points, 
 \Tool can accurately attribute complexity to code constructs 
-leading to the perceived performance failures. 
+that cause the perceived performance failures. 
 
 To build the production-run version of \Tool,
 we apply software-based sampling to algorithmic profiling.
 Given a code construct with multiple dynamic instances in a program run,
 we sample some of the dynamic instances and leverage the mark-and-recapture 
 method~\citep{mark-recapture} to infer information for all instances. 
-Our evaluation results show that 
+Our evaluation shows that 
 sampling allows us to significantly lower the runtime overhead.
-The results also show that sampling does not hurt the profiling capability 
+The evaluation also shows that sampling does not hurt the profiling capability 
 and does not require to profile more program runs, 
 not increasing profiling latency, due to the fact that
 the majority of complexity problems are caused by 
-repeated executions of a loop or a recursive function as shown by our empirical study.
+repeated executions of a loop or a recursive function, as shown by our empirical study.
 
 
 
 Specifically, we make the following contributions:
 
-\begin{itemize}
+\begin{enumerate}
 
-\item First, we conduct the first empirical study on real-world complexity problems. 
+\item We conduct the first empirical study on real-world complexity problems. 
 We have several important findings and implications, including
-1) around three fourths of the studied complexity problems are 
+1) around three-fourths of the studied complexity problems are 
 caused by repeated executions of a loop or a recursive function;
 2) for most complexity problems, 
-users describe how to change input size to observe the scaling problem during reporting;
+the users describe how to change the input size to observe the scaling problem during reporting;
 and 3) complexity problems usually take longer time to diagnose and fix, 
 and more effective tool supports are needed.  
 
-\item Second, we design and implement the in-house version of \Tool through 
+\item We design and implement the in-house version of \Tool through 
 thoroughly investigating different design points during algorithmic profiling. 
-Experimental results show that \Tool can effectively analyze performance failures 
-caused by different types of complexity problems and attribute accurate complexity information.  
+Our experimental results show that \Tool can effectively analyze performance failures 
+caused by different types of complexity problems and attribute complexity information accurately.  
 
-\item Third, we design the production-run version of \Tool by applying 
+\item We design the production-run version of \Tool by applying 
 software-based sampling and a statistical estimation method. 
 Experimental results show that we can lower the runtime overhead to less than 
-$5\%$ for $36$ out of $46$ benchmarks, 
-without losing profiling capability and increasing profiling latency.  
+$5\%$ for $34$ out of $38$ benchmarks, 
+without sacrificing profiling capability and profiling latency.  
 
-
-\end{itemize}
+\end{enumerate}
 

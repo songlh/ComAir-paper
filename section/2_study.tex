@@ -161,7 +161,7 @@ scale as input size $O(N)$.
   \mbox{\lstinputlisting[mathescape,boxpos=t]{figure/Mozilla477564.js}}
 \caption{A Mozilla complexity problem in $O(N^2)$ complexity.
 \footnotesize{(This figure shows the buggy code fragment for Mozilla\#477564. 
-Execution time scales polynomially in the number of nodes in a linked list.)}}
+The execution time scales polynomially with the number of nodes in a linked list.)}}
 \vspace{-0.05in}
 \label{fig:Mozilla477564}\vspace{-0.05in}
 \end{figure}
@@ -173,8 +173,8 @@ Execution time scales polynomially in the number of nodes in a linked list.)}}
 \subfloat[Apache\#34464]{\includegraphics[width=0.22\linewidth]{figure/apache34464-runtime-buggy-fixed-line}\label{fig:apache34464-time}} 
 \subfloat[GCC\#27733]{\includegraphics[width=0.22\linewidth]{figure/gcc27733-runtime-buggy-fixed-line}\label{fig:gcc27733-time}} \\ 
 \vspace{-0.1in}
-\caption{How execution time scales with input size for four complexity problems. 
-\footnotesize{(These figures show how execution time change with the change of input size for MySQL\#27287, 
+\caption{How the execution time scales with input size for four complexity problems. 
+\footnotesize{(These figures show how the execution time change with the change of input size for MySQL\#27287, 
  Apache\#34464, Mozilla\#477564, and GCC\#27733. For each complexity problem, we use 10 distinct inputs.)}} 
 \label{fig:time} 
 \end{figure*} 
@@ -208,7 +208,7 @@ shown in Figure~\ref{fig:mysql27287-time} and Figure~\ref{fig:mozilla477564-time
   \mbox{\lstinputlisting[mathescape,boxpos=t]{figure/apache34464.c}}
 \caption{An Apache performance problem in $O(N^2)$ complexity and its patch. 
 \footnotesize{(This figure shows the buggy code fragment for Apache\#34464. 
- Execution time scales polynomially in the number of characters read from \texttt{getchar()}.)}}
+ The execution time scales polynomially with the number of characters read from \texttt{getchar()}.)}}
 \vspace{-0.05in}
 \label{fig:apache34464}
 \vspace{-0.05in}
@@ -276,7 +276,7 @@ or by skipping computation with exponential complexity for large workloads.
   \mbox{\lstinputlisting[mathescape,boxpos=t]{figure/gcc27733.c}}
 \caption{A GCC performance problem in exponential complexity. 
  \footnotesize{(During performance failure runs, how many times \texttt{mult\_alg} is invoked scales exponentially
-  in the number of 1s in the binary form of input \texttt{t}.)}}
+  with the number of 1s in the binary form of input \texttt{t}.)}}
 \vspace{-0.05in}
 \label{fig:gcc27733}
 \vspace{-0.05in}
