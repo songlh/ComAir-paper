@@ -220,20 +220,36 @@ Particularly, overhead is measured by using $10$ runs under the same setting.
 \noindent\textbf{Runtime Overhead}
 The runtime overhead is small under the default sampling rate (1 out of 100) 
 in Table~\ref{tab:overhead}.
-It is below $5\%$ in $36$ out of $46$ cases, 
-and it is below $10\%$ in $39$ out of $46$ cases. 
+It is below $5\%$ in $34$ out of $38$ cases, 
+and it is below $10\%$ in $35$ out of $38$ cases. 
 It is below $5\%$ for all real complexity problems, 
 except GCC\#1687. 
 
 The runtime overhead is influenced by the sampling rate, 
 as shown in Figure~\ref{tab:sampling}.
 We can lower the runtime overhead, by decreasing the sampling rate.
-The overhead can be lowered to be mostly ($33/46$) 
+The overhead can be lowered to be mostly ($30/38$) 
 under $1\%$ under the $\frac{1}{10^4}$.
 The runtime overhead will be increased, 
 if we sample more frequently.
-The runtime overhead will be more than $10\%$ for most cases ($37/46$), 
+The runtime overhead will be more than $10\%$ for most cases ($30/38$), 
 when the sampling rate is $\frac{1}{10}$.
+
+\noindent\textbf{Profiling Capability}
+As shown in Table~\ref{tab:overhead}, 
+with $1000$ program runs and controlled inputs, 
+sampling does very little damage to profiling capability. 
+We fail to profile Mozilla\#490742 and Apache\#37184.
+These two bugs are in $O(N)$ complexity. 
+Their monitored loops only execute once 
+and we fail to collect any sample.
+For all other bugs, 
+the calculated similarity by using Equation~\ref{eq:sim}
+for the two inferred functions under 
+in-house and production-run setting
+is constantly larger than $0.85$.
+
+
 
 
 \input{section/tab_online2}
