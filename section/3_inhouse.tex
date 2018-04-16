@@ -579,7 +579,7 @@ with i7-7700 CPU and 32-GB memory.
 %in both in-house and production-run settings. 
 %Therefore, we use known complexity problems in the real world to evaluate \Tool. 
 To thoroughly conduct our evaluation, 
-we select complexity problems from three sources, as shown in Table~\ref{tab:benchmark_info}. 
+we select complexity problems from two sources, as shown in Table~\ref{tab:benchmark_info}. 
 
 The first source is our studied complexity problems, 
 which are randomly sampled from representative applications in previous works~\cite{PerfBug,SongOOPSLA2014}.
@@ -603,36 +603,62 @@ Toddler is a dynamic technique that can detect inefficient loops in Java program
 In a previous work, \citet{ldoctor} re-implemented all 
 21 bugs detected by Toddler and verified by developers in C/C++.
 During the re-implementation, the researchers first reproduced all Java bugs, 
-then they referred JDK to re-implement 
+then they referenced JDK to re-implement 
 common data structures, like ArrayList, HashMap and Vector, 
 and finally, they re-implemented the performance bugs according to their root cases. 
-We use the 21 re-implemented bugs in our evaluation.  
+We use all the 21 re-implemented bugs in our evaluation.  
 
-The third source is from a previous work, 
-which optimizes recursive programs by leveraging SIMD instructions~\cite{ren-bin}. 
-8 benchmarks are used in their evaluation part. 
-All of the benchmarks are recursive implementation for classic algorithms, 
-such as computing fibonacci number, knapsack, nqueens, and so on. 
-All their benchmarks are in C++. 
-We use all of them in our experiments. 
 
-In total, we evaluate \Tool on 46 benchmarks. 
+In total, we evaluate \Tool on 38 benchmarks. 
 Information for all benchmarks is shown in Table~\ref{tab:benchmark_info}.
 In general, benchmarks used in our experiments are large. 
-Except 5 benchmarks, all other benchmarks are more than 100 lines of codes. 
-7 benchmarks contain more than 1 million lines of codes. 
+Except one benchmark, all other benchmarks are more than 100 lines of codes. 
+seven benchmarks contain more than one million lines of codes. 
 We implement a set of simple static analyzers to count static features for these benchmarks. 
 For large benchmarks, 
-they could contain more than 10 thousand loops and functions.
-Algorithmic profiling tools are needed by developers to 
-analyze different code constructs automatically.
-We also count how many array-processing loops, 
-linked-list-processing loops, and recursive functions for each benchmark.
-These code constructs are most common root causes for 
-benchmarks used in our evaluation.  
+they could contain more than ten thousand loops, more than one 
+thousand array-processing loops or linked-list-processing loops, 
+and more than ten thousand recursive functions. 
+Clearly, automated algorithmic profiling tools are needed to analyze these code constructs. 
 The majority of benchmarks used in our experiments are in $O(N^2)$ complexity. 
-We also 10 benchmarks in $O(2^N)$ complexity, and 2 benchmarks in $O(N)$ complexity. 
-
-\noindent\textbf{Experimental Setting}
+We also two benchmarks in $O(2^N)$ complexity, and two benchmarks in $O(N)$ complexity. 
 
 \input{section/tab_inhouse}
+
+\noindent\textbf{Experimental Setting}
+For each benchmark, 
+we conduct algorithmic profiling on $10$ program runs with distinct inputs, 
+following the previous practice during in-house 
+testing or diagnosis~\cite{SongOOPSLA2014,joy.asplos13}.
+
+For all benchmarks used in our experiments,
+their bug reports contain at least one bug-triggering inputs. 
+For 14 of them, 
+the users explicitly explain how to change input sizes to 
+observe the described scaling problems. 
+We follow the users' 
+descriptions to generate new inputs.
+For the other benchmarks, 
+it is not difficult to figure out how to generate new inputs based 
+on the bad inputs in the bug reports. 
+For example, when reporting GCC\#46401, 
+the user provided a C file, 
+containing an expression with thousands of strings as operands. 
+We change the number of strings to generate new inputs.
+For each benchmark, we choose the input sizes of the $10$ inputs to be 
+an arithmetic sequence with the input from the bug report as the largest input. 
+
+For each benchmark, we first fit a curve to understand how execution 
+time changes with input sizes. 
+We then examine fitted cost functions to 
+understand whether fitted functions can explain how execution times changes with input sizes. 
+For each benchmark, we focus on two fitted functions, one is main function, 
+and the other is recursion function. 
+As we discussed in Section~\ref{sec:study}, 
+the majority of complexity problems are caused by repeated executions 
+of a loop or a recursive function. 
+We consider the function leads to the repeated executions as recursion function. 
+We consider the buggy recursive function or the function containing the outer loop as the recursion 
+function for a benchmark.
+
+
