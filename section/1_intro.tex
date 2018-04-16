@@ -87,13 +87,14 @@ They cannot provide the desired performance and are far from being deployed in p
 \lstset{basicstyle=\ttfamily\fontsize{7}{8}\selectfont,
      morekeywords={+},keepspaces=true,numbers=left}
   \mbox{\lstinputlisting[mathescape,boxpos=t]{figure/mysql27287.c}}
+  \vspace{-0.1in}
 \caption{A MySQL performance problem in polynomial complexity. 
 \footnotesize{(This figure shows the buggy code fragment for MySQL\#27287. 
    During performance failure runs, 
    the execution time scales polynomially with the size of \texttt{items}.)}}
 \vspace{-0.05in}
 \label{fig:mysql27287}
-\vspace{-0.05in}
+\vspace{-0.15in}
 \end{figure}
 
 
@@ -204,7 +205,7 @@ We have several important findings and implications, including
 1) around three-fourths of the studied complexity problems are 
 caused by repeated executions of a loop or a recursive function;
 2) for most complexity problems, 
-the users describe how to change the input size to observe the scaling problem during reporting;
+the users describe how to change input sizes to observe the scaling problem during reporting;
 and 3) complexity problems usually take longer time to diagnose and fix, 
 and more effective tool supports are needed.  
 
