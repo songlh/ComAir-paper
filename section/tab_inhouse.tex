@@ -7,27 +7,27 @@
   \resizebox{\textwidth}{70mm}{
   \begin{tabular}{lccccccccccc}
     \toprule     
-    {\bf BugID}        &  \multicolumn{4}{c}{Benchmark Info.}  & \multicolumn{4}{c}{RMS+}         & \multicolumn{3}{c}{DSS}   \\
+    {\bf BugID}                     &  \multicolumn{4}{c}{Benchmark Information}           & \multicolumn{4}{c}{RMS+}         & \multicolumn{3}{c}{DSS}   \\
      
     \cmidrule(lr){2-5}                      
     \cmidrule(lr){6-9}
     \cmidrule(lr){10-12}
-                                  &  KLOC     &  P.L.  &  Comp. &  Buggy C.C.     & main    & outer    & overhead  & \# of S.P.         &   outer        &  overhead & \# of S.P.  \\
+                                    &  KLOC     &  P.L.      &  Complexity &  Buggy C.C.     & main-C    & Re-C    & Overhead  & \# of S.L.         &   Re-C        &  Overhead & \# of S.L.  \\
     \midrule 
 
-    Mozilla\#347306   &  $88$    & C  &   $O(N^{2})$ &  A-L &  \ding{51}$_{0.96}$  &  \ding{51}$_{0.96}$    &  56{\bf X}  & 25   &  \ding{51}$_{0.97}$  &  23{\bf X}  & 14   \\
-    Mozilla\#416628   &  $105$   & C  &  $O(N^{2})$  &  LL-L &  \ding{51}$_{0.92}$  &  \ding{51}$_{0.92}$    &  48{\bf X}  &  10  &  \ding{51}$_{0.92}$ &  20{\bf X} & 6  \\
-    Mozilla\#490742   &  $0.157^*$  & JS & $O(N)$ & A-L &  \ding{51}$_{0.99}$ & \ding{51}$_{0.99}$ &  1{\bf X} &  0   & - & $<$0.01\%  &  0              \\
-    Mozilla\#35294    &  $0.195^*$ & C++ & $O(N^{2})$ & A-L &  \ding{51}$_{0.99}$  & \ding{51}$_{0.98}$  & 49{\bf X}  & 2 &  \ding{51}$_{0.98}$ &  19{\bf X} & 2  \\
-    Mozilla\#477564   &  $0.116^*$ & JS  & $O(N^{2})$ & LL-L & \ding{51}$_{0.99}$ & \ding{51}$_{0.99}$   & 56{\bf X} & 2 &  \ding{51}$_{0.86}$ & 20{\bf X} & 2      \\
+    Mozilla\#347306   &  $88$       & C     &   $O(N^{2})$   &  A-L  &  \ding{51}$_{0.96}$  &  \ding{51}$_{0.96}$    &  56{\bf X}  & 25   &  \ding{51}$_{0.97}$  &  23{\bf X}  & 14   \\
+    Mozilla\#416628   &  $105$      & C     &   $O(N^{2})$   &  LL-L &  \ding{51}$_{0.92}$  &  \ding{51}$_{0.92}$    &  48{\bf X}  & 10   &  \ding{51}$_{0.92}$ &  20{\bf X} & 6  \\
+    Mozilla\#490742   &  $0.157^*$  & JS    &   $O(N)$       & A-L   &  \ding{51}$_{0.99}$  &  /                     &  1{\bf X}   &  0   & / & $<$0.01\%  &  0              \\
+    Mozilla\#35294    &  $0.195^*$  & C++   &   $O(N^{2})$   & A-L   &  \ding{51}$_{0.99}$  & \ding{51}$_{0.98}$     & 49{\bf X}  & 2 &  \ding{51}$_{0.98}$ &  19{\bf X} & 2  \\
+    Mozilla\#477564   &  $0.116^*$  & JS    &   $O(N^{2})$   & LL-L  &  \ding{51}$_{0.99}$  & \ding{51}$_{0.99}$     & 56{\bf X} & 2 &  \ding{51}$_{0.86}$ & 20{\bf X} & 2      \\
     \midrule
-    MySQL\#27287      &  $995$  & C++  & $O(N^{2})$  & A-L & \ding{51}$_{0.89}$ & \ding{51}$_{0.89}$ & 31{\bf X} & 12 &  \ding{51}$_{0.86}$  & 11{\bf X}   & 8  \\
-    MySQL\#15811      &  $1127$ & C++  & $O(N^{2})$ & A-L & \ding{51}$_{0.92}$ & \ding{51}$_{0.92}$ & 35{\bf X}& 2  & \ding{51}$_{0.89}$ & 18{\bf X}  & 2 \\
+    MySQL\#27287      &  $995$      & C++   & $O(N^{2})$     & A-L   & \ding{51}$_{0.89}$ & \ding{51}$_{0.89}$ & 31{\bf X} & 12 &  \ding{51}$_{0.86}$  & 11{\bf X}   & 8  \\
+    MySQL\#15811      &  $1127$     & C++   & $O(N^{2})$     & A-L   & \ding{51}$_{0.92}$ & \ding{51}$_{0.92}$ & 35{\bf X}& 2  & \ding{51}$_{0.89}$ & 18{\bf X}  & 2 \\
     \midrule
-    Apache\#37184     &  $0.092^*$ & Java  & $O(N)$ & Loop  & \ding{51}$_{0.92}$ & \ding{51}$_{0.92}$ & $<$0.01\% & 0  & -  & $<$0.01\% & 0     \\ 
-    Apache\#29743     &  $0.257^*$  & Java  & $O(N^{2})$ & Loop & \ding{51}$_{0.94}$ &  \ding{51}$_{0.94}$ & 32{\bf X} & 7  & - & $<$0.01\% & 0 \\
-    Apache\#34464     &  $0.16^*$  & Java  & $O(N^{2})$ & A-L & \ding{51}$_{0.98}$ & \ding{51}$_{0.98}$  & 45{\bf X} & 2 & \ding{51}$_{0.90}$  & 9{\bf X}  & 2 \\
-    Apache\#47223     &  $0.162^*$ & Java  & $O(N^{2})$ & A-L & \ding{51}$_{0.99}$ & \ding{51}$_{0.98}$  & 69{\bf X} & 2  & \ding{51}$_{0.99}$ & 23{\bf X}  & 2 \\
+    Apache\#37184     &  $0.092^*$  & Java  & $O(N)$     & Loop  & \ding{51}$_{0.92}$ &  /        & $<$0.01\% & 0  & /  & $<$0.01\% & 0     \\ 
+    Apache\#29743     &  $0.257^*$  & Java  & $O(N^{2})$ & Loop  & \ding{51}$_{0.94}$ &  \ding{51}$_{0.94}$ & 32{\bf X} & 7  & - & $<$0.01\% & 0 \\
+    Apache\#34464     &  $0.16^*$   & Java  & $O(N^{2})$ & A-L   & \ding{51}$_{0.98}$ & \ding{51}$_{0.98}$  & 45{\bf X} & 2 & \ding{51}$_{0.90}$  & 9{\bf X}  & 2 \\
+    Apache\#47223     &  $0.162^*$  & Java  & $O(N^{2})$ & A-L   & \ding{51}$_{0.99}$ & \ding{51}$_{0.98}$  & 69{\bf X} & 2  & \ding{51}$_{0.99}$ & 23{\bf X}  & 2 \\
     \midrule
     GCC\#46401        &  $5521$  & C  & $O(N^{2})$ & LL-L & \ding{51}$_{0.90}$ & \ding{51}$_{0.90}$ & 86{\bf X} & 81 & \ding{51}$_{0.92}$ & 9{\bf X} & 61 \\
     GCC\#1687         &  $2099$  & C  & $O(2^{N})$ & R.F. & \ding{51}$_{0.93}$ & \ding{51}$_{0.93}$  & 78{\bf X}  & 0  &\ding{51}$_{0.87}$ & 16{\bf X} & 0  \\
@@ -43,7 +43,7 @@
     Apache\#53821     & $0.417^*$  & Java  & $O(N^{2})$ & A-L & \ding{51}$_{0.98}$ & \ding{51}$_{0.98}$  & 52{\bf X} & 2 & \ding{51}$_{0.94}$    & 21{\bf X} & 2      \\
     Apache\#53822     & $0.417^*$  & Java  & $O(N^{2})$ & A-L & \ding{51}$_{0.99}$ & \ding{51}$_{0.99}$  & 54{\bf X} & 2 & \ding{51}$_{0.93}$    & 20{\bf X} & 2      \\
     \midrule
-    Collections\#406      & $0.253^*$  & Java  & $O(N^{2})$ & A-L & \ding{51}$_{0.99}$ & \ding{51}$_{0.99}$ & 53{\bf X} & 2 & \ding{51}$_{0.98}$ & 22{\bf X} & 2      \\
+    Collections\#406      & $0.253^*$  & Java & $O(N^{2})$ & A-L & \ding{51}$_{0.99}$ & \ding{51}$_{0.99}$ & 53{\bf X} & 2 & \ding{51}$_{0.98}$ & 22{\bf X} & 2      \\
     Collections\#407      & $0.766^*$  & Java & $O(N^{2})$ & A-L & \ding{51}$_{0.97}$ & \ding{51}$_{0.97}$ & 49{\bf X} & 2 & \ding{51}$_{0.97}$ & 20{\bf X} & 2   \\
     Collections\#408      & $0.742^*$  & Java & $O(N^{2})$ & A-L & \ding{51}$_{0.99}$ & \ding{51}$_{0.99}$ & 57{\bf X} & 2 & \ding{51}$_{0.97}$ & 20{\bf X} & 2    \\
     Collections\#409      & $0.781^*$  & Java & $O(N^{2})$ & A-L & \ding{51}$_{0.99}$ & \ding{51}$_{0.98}$ & 53{\bf X} & 2 &\ding{51}$_{0.98}$ & 23{\bf X} & 2     \\
@@ -77,12 +77,22 @@
    }
    }
   %\nocaptionrule
-  \caption{Benchmark Information.
-  \footnotesize{(This table shows information for complexity problems used in our evaluation. 
-   $x^*$: thousands of lines of codes for re-implemented benchmarks; 
+   \caption{Evaluation Results for the in-house version of \Tool.
+  \footnotesize{(This table shows benchmark information and evaluation results for the in-house version of \Tool. In the benchmark-information columns,
+   $x^*$: $x$ thousands of lines of codes for re-implemented benchmarks; 
+   Buggy C.C: buggy code construct;
    A-L: array-processing loop; 
-   LL-L: linked-list-processing loop; 
-   R.F.: recursive function; 
-   Buggy C.C.: buggy code construct.)}}
+   LL-L: linked-list-processing loop;
+   R.F.: recursive function.
+   In the RMS+ columns,
+   main-C: cost function comparison results for main functions;
+   Re-C: cost function comparison results for recursion functions;
+   /: Mozilla\#490742 and Apache\#37184 do not have recursion functions. 
+   \# of S.L.: the number of functions whose inferred complexity is superlinear. 
+   \ding{51}$_{y}$: calculated similarity using Equation~\ref{eq:sim} is $y$, and y is larger than $0.85$. 
+    In the DSS columns, 
+    -: the calculated similarity using Equation~\ref{eq:sim} is less than $0.85$.     
+)}}
   \label{tab:benchmark_info}
+
 \end{table}

@@ -57,34 +57,38 @@ RMS can provide important input information for many complexity problems.
 Given a code construct \texttt{c} of a program, 
 we assume \texttt{c} is inside a loop \texttt{l} and is executed
 $n$ times in one run of the program. 
-We would have $n$ RMS records collected for \texttt{c}. 
+We would have $n$ RMS records collected 
+for the $n$ dynamic instances of \texttt{c}. 
 There are two methods to analyze these $n$ RMS records.
 The first method aggregates the $n$ records in a \textit{top-down} way~\cite{Aprof1,Aprof2}.
 When analyzing complexity for \texttt{c}, 
 we consider the $n$ records independently from each other. 
-The effect of multiple executions of \texttt{c} 
+The effect of multiple instances of \texttt{c} 
 will be aggregated when analyzing complexity for \texttt{l}.
 The second method aggregates the $n$ records in a \textit{bottom-up} way.
 When analyzing complexity for \texttt{c}, 
 we merge the $n$ records and calculate the number of distinct memory cells 
-contributing RMS as the input size of \texttt{c} during the whole program run.
+contributing RMS as the input size 
+of \texttt{c} during the whole program run.
+
 
 
 \begin{figure*}
 \centering
-\subfloat[XXXX]{\includegraphics[width=0.22\linewidth]{figure/mysql27287-complexity-n-square}\label{fig:mysql27287-indep}} 
-\subfloat[XXXX]{\includegraphics[width=0.22\linewidth]{figure/mysql27287-complexity-n-square}\label{fig:mysql27287-outer}}
-\subfloat[XXXX]{\includegraphics[width=0.22\linewidth]{figure/gcc27733-time-cost-line}\label{fig:mysql27287-merge}} 
-\subfloat[XXXX]{\includegraphics[width=0.22\linewidth]{figure/gcc27733-time-cost-line}\label{fig:mysql27287-inner-array}} \\ 
+\subfloat[Inner]{\includegraphics[width=0.22\linewidth]{figure/mysql27287-complexity-n-square}\label{fig:mysql27287-indep}} 
+\subfloat[Outer]{\includegraphics[width=0.22\linewidth]{figure/mysql27287-complexity-n-square}\label{fig:mysql27287-outer}}
+\subfloat[Bottom-up]{\includegraphics[width=0.22\linewidth]{figure/gcc27733-time-cost-line}\label{fig:mysql27287-merge}} 
+\subfloat[Array]{\includegraphics[width=0.22\linewidth]{figure/gcc27733-time-cost-line}\label{fig:mysql27287-inner-array}} \\ 
 \vspace{-0.1in}
 \caption{XXXX
 \footnotesize{(These figures show how execution time change with the change of input size for MySQL\#27287, 
  Apache\#34464, Mozilla\#477564, and GCC\#27733. For each complexity problem, we use 10 distinct inputs.)}} 
 \label{fig:time} 
+\vspace{-0.15in}
 \end{figure*} 
 
 Take MySQL\#27287 as an example.
-RMS for one single execution of
+RMS for a dynamic instance of
 the buggy loop in Figure~\ref{fig:mysql27287}
 is roughly equal to 2 times the number of \texttt{XML\_NODE}s 
 accessed during the execution, 
@@ -104,7 +108,7 @@ The $O(N^2)$ complexity can be inferred from the side of the outer loop,
 as shown in Figure~\ref{fig:mysql27287-outer}. 
 If we use the bottom-up method, 
 we can observe the aggregated cost scales 
-polynomially in terms of RMS for the buggy loop 
+polynomially in terms of RMS of the buggy loop 
 or the buggy function, 
 which is shown in Figure~\ref{fig:mysql27287-merge}. 
 
@@ -112,9 +116,9 @@ which is shown in Figure~\ref{fig:mysql27287-merge}.
 The number of distinct accessed elements of a data 
 structure could also be used to measure 
 input size for a dynamic instance of a code construct~\cite{AlgoProf}. 
-As we discussed in Section~\ref{sec:study_impli},
-array and linked list are the two types of data structures
-most commonly involved in complexity problems. 
+%As we discussed in Section~\ref{sec:study_impli},
+%array and linked list are the two types of data structures
+%most commonly involved in complexity problems. 
 
 Similar to RMS, there are also, top-down and bottom-up, 
 two methods to analyze 
@@ -130,7 +134,7 @@ For the outer loop, its execution cost is in $O(N^2)$ relationship with its DSS,
 since DSS only considers distinct accessed elements.
 If we apply the bottom-up method, 
 we count distinct accessed array elements across all dynamic instances of the inner loop,
-the aggregate execution cost of the inner loop is in $O(N^2)$ relationship with its DSS, 
+the aggregated execution cost of the inner loop is in $O(N^2)$ relationship with its DSS, 
 as shown in Figure~\ref{fig:mysql27287-inner-array}.   
 
 \noindent\textbf{Library input size (LIS)}
@@ -145,7 +149,7 @@ from disk, terminal, network, and many other places.
 
 LIS can complement RMS for cases like Apache\#34464 in Figure~\ref{fig:apache34464}.
 RMS only considers memory cells whose first access is read. 
-The first accesses for all memory cells of string \texttt{source} are write on line $8$.
+The first accesses for all memory cells of string \texttt{source} are writes on line $8$.
 Therefore, all accesses on string 
 \texttt{source} will not increase RMS value.  
 %If we use RMS to measure input size for the loop in Figure~\ref{fig:apache34464},
@@ -154,7 +158,8 @@ on the size of string \texttt{target},
 variable \texttt{sourceLen}, and variable \texttt{targetLen}, 
 regardless of the number of characters from \texttt{getchar()}.
 DSS can correctly measure input size for Apache\#34464,
-since all characters from \texttt{getchar()} will be saved in string (or array) \texttt{source},
+since all characters from \texttt{getchar()} will be saved into 
+string (or array) \texttt{source},
 and each element of string \texttt{source} 
 will be accessed by the inner loop inside \texttt{indexOf()}. 
 
@@ -164,11 +169,13 @@ will be accessed by the inner loop inside \texttt{indexOf()}.
 \lstset{basicstyle=\ttfamily\fontsize{7}{8}\selectfont,
      morekeywords={+},keepspaces=true,numbers=left}
   \mbox{\lstinputlisting[mathescape,boxpos=t]{figure/fib.c}}
+  \vspace{-0.1in}
 \caption{A recursive function exponential complexity.
 \footnotesize{(This figure shows a recursive implement to compute fibonacci numbers. 
 Execution time scales polynomially in the value of input parameter $n$.)}}
-\vspace{-0.05in}
-\label{fig:fib}\vspace{-0.05in}
+\vspace{-0.1in}
+\label{fig:fib}
+\vspace{-0.15in}
 \end{figure}
 
 
@@ -185,18 +192,18 @@ computing fibonacci numbers in Figure~\ref{fig:fib}.
 If we use RMS to measure input size,
 no matter how large \texttt{n} is, the input size will always be constant. 
 For an invocation of \texttt{fib},
-the first \texttt{read} on parameter \texttt{n} will increase RMS.
+the first read on parameter \texttt{n} will increase RMS.
 After that, RMS will not increase any more.
 This is because whenever \texttt{fib} recursively call itself on line 3,
 it must write parameter $n-1$ (or $n-2$) onto the stack, 
-which means the first access for the stack cell is \texttt{write} 
+which means the first access for the stack cell is write 
 and future accesses on the stack cell will not increase RMS. 
 The recursive function does not
 involve any data structure or library call, 
-so that it cannot be measure by DSS and LIS. 
+so that it cannot be measured by DSS and LIS. 
  
 
-\paragraph{\textit{\underline{Input metric selection for \Tool}}}
+\noindent{\textit{\underline{Input metric selection for \Tool.}}}
 We choose input metrics to explore two directions. 
 The first one is to cover as many cases as possible. 
 RMS is the most general metric.
@@ -221,7 +228,7 @@ cost for a dynamic instance of the code construct.
 We discuss commonly used ones as follows.
 
 \noindent\textbf{Execution Time}
-We can use time elapsed during executing a dynamic instance to present computation cost 
+We can use time elapsed during executing a dynamic instance to represent computation cost 
 for the instance.
 One potential problem to use execution time is that, 
 when a dynamic instance takes very little time, 
@@ -260,9 +267,9 @@ we assume that except the recursive part,
 computation spent in other parts is roughly 
 the same across different recursive instances. 
 
-\paragraph{\textit{\underline{Cost metric selection for \Tool}}}
+\noindent{\textit{\underline{Cost metric selection for \Tool.}}}
 Similar input metrics,
-we want both generic cost metrics and cost metrics to cover common cases. 
+we want both generic cost metrics and cost metrics that can cover common cases. 
 We use BBs as the generic metric.
 We do not use execution time, 
 because it is not accurate enough for dynamic instances taking too little time.
@@ -270,18 +277,19 @@ We do not use the number of executed instructions,
 because this number is highly correlated with BBs.  
 All our studied complexity problems are caused either by a loop or a recursive function. 
 Therefore, we will use LIs and RIs as cost metrics for loops and recursive functions, 
-respectively.
+respectively, in order to cover common cases. 
+
 
 \subsection{Cost Function Inference and Comparison}
 
 \noindent\textbf{Inference}
 After collecting a set of (input size, cost) pairs for a code construct,
-we first use maximum cost to aggregate pairs with the same input size into one.
-We do this, because we want to infer worst-case complexity for the code construct. 
+we first use the maximum cost value to aggregate pairs with the same input size into one.
+We do this, because we want to infer the worst-case complexity for the code construct. 
 To infer a cost function,
 we consider four possibilities: 
 an exponential function, or a polynomial function with degree from 1 to 3.
- We use least square~\cite{least} to determine parameters for the four possible functions. 
+We use least square~\cite{least} to determine parameters for the four possible functions. 
 For example, we start a polynomial function with degree 2 as $y=a*x^2 + b*x +c$.
 We choose $a$, $b$ and $c$ to minimize the sum of squared difference between 
 observed value and fitted value.  
@@ -299,8 +307,8 @@ we do the comparison through the following steps.
 We first standardize the two sets of data. 
 We then infer two cost functions, $f_a()$ and $f_b()$, 
 by using the two sets of standardized data.
-We random sample a set of $n$ numbers from $(-1, 1)$.
-We use $N$ to represent the set of $n$ sampled numbers.  
+We randomly sample a set of $n$ numbers from $(-1, 1)$.
+We use $N$ to represent the set of the $n$ sampled numbers.  
 We calculate the similarity between the two inferred 
 functions by using the following formula. 
 
@@ -321,20 +329,20 @@ compared with the area under either of the two curves.
 Since the minimum value of standardized data is $-1$ not $0$,
 we minus $-1$ in the denominator.
 The maximum value of $S(f_a, f_b)$ is $1$, and the minimum value is $0$.
-Larger result means the two functions inferred from $a$ and $b$ are more similar to each other. 
+A larger result means the two functions inferred 
+from $a$ and $b$ are more similar to each other. 
 
 
 
 \subsection{Implementation and Optimization}
 
-We use LLVM\cite{llvm} to instrument programs to be profiled.
+We use LLVM~\cite{llvm} to instrument programs to be profiled.
 We use python to analyze profiling records 
-with input and cost information and to infer cost function. 
-We also design several optimizations to lower runtime overhead 
+with input and cost information and to infer the cost function. 
+We also design several optimizations to lower the runtime overhead 
 during dynamic monitoring.  
 
-
-\subsubsection{Input Metric}
+\subsubsection{Input Metrics}
 As we discussed in Section~\ref{sec:input},
 both RMS+ and DSS have, top-down and bottom-up, 
 two methods to analyze profiling records for multiple instances of 
@@ -362,7 +370,7 @@ For simplicity, we use function as granularity for code constructs under in-hous
 Otherwise, we need to check whether a monitored code construct enclose related call sites, 
 when checking active functions on the call stack.  
 
-\paragraph{\textit{\underline{How to implement RMS+}}}
+{\textit{\underline{How to implement RMS+?}}}
 \citet{Aprof1,Aprof2} designed an algorithm to collect 
 RMS for all executed functions based on 
 Valgrind. We briefly discuss this algorithm firstly, 
@@ -401,7 +409,7 @@ By doing this, we basically use the number of integer parameters
 active simultaneously on the recursive call chain, 
 not concrete integer values, as input size.
 
-\paragraph{\textit{\underline{How to implement DSS}}}
+{\textit{\underline{How to implement DSS?}}}
 To implement DSS, we focus on array and linked list, 
 because they are the most common types of data structures in complexity problems. 
 We reuse the framework for RMS+ to collect DSS information.
@@ -433,17 +441,17 @@ For example, \texttt{n} is deferenced in every iteration of the loop
 in Figure~\ref{fig:Mozilla477564}. 
 Its value is also updated in every iteration by 
 using the \texttt{prev} field of \texttt{node\_t} it is pointing to. 
-We will identify \texttt{n} pointing to elements in a linked list,
-and the loop shown in Figure~\ref{fig:Mozilla477564} as a linked-list-processing loop.
+We identify \texttt{n} pointing to linked list elements,
+and the loop in Figure~\ref{fig:Mozilla477564} as a linked-list-processing loop.
 
-\paragraph{\textit{\underline{How to do optimization}}}
+{\textit{\underline{How to do optimization?}}}
 We design three optimizations to reduce the runtime overhead when collecting input information
 from two aspects:
 we try to reduce the number of instrumentation sites, 
 and we try to accelerate hook functions. 
 
 
-\noindent\textbf{Optimization 1}
+\textbf{Optimization 1}
 The first optimization is designed for RMS+,
 and it targets to reduce the number of instrumentation sites 
 for \texttt{read} and \texttt{write} instructions. 
@@ -451,7 +459,7 @@ The \texttt{read} hook function needs to query hash table \texttt{ts}
 to get the timestamp for the latest access and update RMS+ value when necessary. 
 Both \texttt{read} and \texttt{write} hook functions 
 need to use the value of \texttt{count} to update hash table \texttt{ts}.
-As we discussed earlier, the value of texttt{count} will be increased 
+As we discussed earlier, the value of \texttt{count} will be increased 
 after each function invocation. 
 Therefore, given two consecutive memory accesses on the same memory cell,
 if there is no function calls between them, 
@@ -469,7 +477,7 @@ if it is dominated by another \texttt{read} or \texttt{write} instruction on the
 and there is not function call on any path between these two instructions,
 we will skip the instrumentation for the second instruction.  
 
-\noindent\textbf{Optimization 2}}
+\textbf{Optimization 2}}
 The second optimization is an attempt to improve the performance of 
 lookups in the hash table \texttt{ts}, 
 containing the latest access timestamp for each memory cell.
@@ -503,25 +511,23 @@ For each memory read or write,
 we first check whether the saved pointer value can be used. 
 We only conduct a page table lookup when the saved value cannot be used. 
 
-\noindent\textbf{Optimization 3}
+\textbf{Optimization 3}
 For this optimization, we apply inline functionality 
 provided by LLVM to make all instrumented hook functions inline.
 
-\subsubsection{Cost Metric}
+\subsubsection{Cost Metrics}
 To count LIs, for every monitored loop, we initialize 
-a global counter to be 0 at the beginning of the program and 
-increase the counter by $1$ in the loop header to count the number of iterations.
-To count RIs, for each monitored recursive function, 
-we initialize a global counter to be 0 at the beginning of the program
+a global counter to be $0$ at the beginning of the program and 
+increase the counter by $1$ in the loop header.
+To count RIs, for every monitored recursive function, 
+we initialize a global counter to be $0$ at the beginning of the program
 and increase the counter 
-in the entry block of the recursive function 
-to count the number of recursive instances. 
-To count BBs, a naive method is to create a global counter
-and increase the counter value in every basic block. 
+in the entry BB of the recursive function. 
+To count executed BBs, a naive method is to create a global counter
+and increase the counter value in every BB. 
 
 
-
-\noindent\textbf{Optimization 4}
+\textbf{Optimization 4}
 To efficiently count executed BBs, 
 we apply an algorithm, which was originally designed to 
 efficiently count edge events through selectively instrumenting a counter 
@@ -531,7 +537,7 @@ conduct path profiling efficiently~\cite{peter-ase,path-profiling}.
 
 To apply the algorithm,
 we instrument a local counter \texttt{local\_cost} for each function
-and initialize its value to be 0 at the entry BB. 
+and initialize its value to be $0$ at the entry BB. 
 We will add the value of \texttt{local\_cost} to a global counter \texttt{cost} 
 at the exit BB.
 After that, we only need to consider where 
@@ -544,11 +550,11 @@ we add a fake edge from the exit BB to the entry BB
 to make its CFG strongly connected. 
 Since the original algorithm is design to count edge events,
 we split each BB into two 
-and label the event number to be 1 for each edge connecting a pair of split BBs 
+and label the event number to be 1 for each edge connecting a pair of split BBs. 
 We label the event number to be 0 for all other edges.
 We compute a spanning tree~\cite{spanning} for the new CFG.
 Edges not in the spanning tree are called chords.
-We apply the depth-first search algorithm proposed in~\cite{event-counting} 
+We apply the depth-first search algorithm proposed by~\citet{event-counting} 
 to calculate on which chords we should change 
 \texttt{local\_cost} 
 and how much we should change.
