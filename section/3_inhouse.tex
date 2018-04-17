@@ -129,7 +129,7 @@ multiple DSS records collected for the same code
 construct in one program run.
 Take MySQL\#27287 in Figure~\ref{fig:mysql27287} as an example.
 If we focus on array \texttt{items},
-DSS for one execution of the inner loop is the number of 
+DSS for an execution of the inner loop is the number of 
 accessed array elements during the execution.
 If we use the top-down method, the execution cost 
 of the inner loop is in linear relationship with its DSS.
@@ -188,7 +188,7 @@ whose values determine how many times a loop iterates
 or how many times a recursive function is invoked. 
 Values of these important integer variables contain important information about input sizes. 
 For example, a recursive implementation to calculate fibonacci numbers is shown in Figure~\ref{fig:fib}, 
-and it scales exponentially in the value of variable $n$.
+and it scales exponentially with the value of variable $n$.
 
 IIV can complement RMS, DSS and LIS for cases like 
 computing fibonacci numbers in Figure~\ref{fig:fib}. 
@@ -197,7 +197,7 @@ no matter how large \texttt{n} is, the input size will always be constant.
 For an invocation of \texttt{fib},
 the first read on parameter \texttt{n} will increase RMS.
 After that, RMS will not increase any more.
-This is because whenever \texttt{fib} recursively call itself on line 3,
+This is because whenever \texttt{fib} recursively calls itself on line 3,
 it must write parameter $n-1$ (or $n-2$) onto the stack, 
 which means the first access for the stack cell is write 
 and future accesses on the stack cell will not increase RMS. 
@@ -214,7 +214,7 @@ RMS can largely cover cases DSS can handle.
 We use LIS and IIV to enhance RMS.
 We name the enhanced version as RMS+.
 The second direction is to find a simple and semantic metric, 
-which can cover  a good percentage of common cases. 
+which can cover a large percentage of common cases. 
 We will apply DSS along this direction. 
 In the remainder of this paper, 
 we will focus on RMS+ and DSS as input metrics. 
@@ -280,7 +280,7 @@ We do not use the number of executed instructions,
 because this number is highly correlated with BBs.  
 All our studied complexity problems are caused either by a loop or a recursive function. 
 Therefore, we will use LIs and RIs as cost metrics for loops and recursive functions, 
-respectively, in order to cover common cases. 
+respectively. %in order to cover common cases. 
 
 
 \subsection{Cost Function Inference and Comparison}
@@ -295,7 +295,7 @@ an exponential function, or a polynomial function with degree from 1 to 3.
 We use least square~\cite{least} to determine parameters for the four possible functions. 
 For example, we start a polynomial function with degree 2 as $y=a*x^2 + b*x +c$.
 We choose $a$, $b$ and $c$ to minimize the sum of squared difference between 
-observed value and fitted value.  
+observed values and fitted values.  
 To choose the best one among the four possible fitted functions, 
 we calculate coefficient of determination for each. 
 Coefficient of determination is commonly used to measure goodness-of-fit~\cite{codeter}.
@@ -304,16 +304,16 @@ We choose the fitted function with highest coefficient of determination.
 
 \noindent\textbf{Comparison}
 We have more than one metric for both input and cost.
-We need to compare functions inferred under different metrics. 
+We need to compare functions inferred with different metrics. 
 After collecting two sets of records, $a$ and $b$, using different metrics, 
 we do the comparison through the following steps. 
 We first standardize the two sets of data. 
 We then infer two cost functions, $f_a()$ and $f_b()$, 
-by using the two sets of standardized data.
+using the two sets of standardized data.
 We randomly sample a set of $n$ numbers from $(-1, 1)$.
 We use $N$ to represent the set of the $n$ sampled numbers.  
 We calculate the similarity between the two inferred 
-functions by using the following formula. 
+functions using the following formula. 
 
 
 %\begin{equation} \label{eq:fun_similarity}
@@ -332,16 +332,17 @@ compared with the area under either of the two curves.
 Since the minimum value of standardized data is $-1$ not $0$,
 we minus $-1$ in the denominator.
 The maximum value of $S(f_a, f_b)$ is $1$, and the minimum value is $0$.
-A larger result means the two functions inferred 
+A larger similarity result means the two functions inferred 
 from $a$ and $b$ are more similar to each other. 
 
 
 
 \subsection{Implementation and Optimization}
 
-We use LLVM~\cite{llvm} to instrument programs to be profiled.
+We use LLVM~\cite{llvm} to instrument the programs to be profiled.
 We use python to analyze profiling records 
-with input and cost information and to infer the cost function. 
+%with input and cost information 
+and to infer the cost function. 
 We also design several optimizations to lower the runtime overhead 
 during dynamic monitoring.  
 
@@ -361,15 +362,15 @@ for all executed code constructs.
 Tracking memory cells for every code construct will 
 incur a very large memory overhead.  
 As we will discuss later, the top-down method 
-is not suitable in production-run usage. 
-Therefore, we apply the top-down method under in-house setting, 
-and we will use the bottom-up method under production-run setting. 
+is not suitable for production-run usage. 
+Therefore, we apply the top-down method under the in-house setting, 
+and we will use the bottom-up method under the production-run setting. 
 
-Since we take the top-down method for in-house setting,
+Since we take the top-down method for the in-house setting,
 when a monitored program conducts a memory access,
 we need to check all functions active on the call stack and 
 update information necessary to calculate RMS+ or DSS. 
-For simplicity, we use function as granularity for code constructs under in-house setting.
+For simplicity, we use function as granularity for code constructs under the in-house setting.
 Otherwise, we need to check whether a monitored code construct enclose related call sites, 
 when checking active functions on the call stack.  
 
@@ -459,7 +460,7 @@ The first optimization is designed for RMS+,
 and it targets to reduce the number of instrumentation sites 
 for \texttt{read} and \texttt{write} instructions. 
 The \texttt{read} hook function needs to query hash table \texttt{ts} 
-to get the timestamp for the latest access and update RMS+ value when necessary. 
+to get the timestamp of the latest access and update RMS+ value when necessary. 
 Both \texttt{read} and \texttt{write} hook functions 
 need to use the value of \texttt{count} to update hash table \texttt{ts}.
 As we discussed earlier, the value of \texttt{count} will be increased 
@@ -468,12 +469,12 @@ Therefore, given two consecutive memory accesses on the same memory cell,
 if there is no function calls between them, 
 we do not need to instrument the second memory access. 
 We rely on dominance analysis to implement this optimization. 
-%We focus on stack memory cells that hold 
-%scalar variables and only have \texttt{read} and \texttt{write} as uses 
-%(i.e., not having ``address of'' as uses).
-%We only focus on these memory cells,
-%because we want to avoid pointer alias analysis, 
-%which may potentially introduce inaccurate results. 
+We focus on stack memory cells that hold 
+scalar variables and only have \texttt{read} and \texttt{write} as uses 
+(i.e., not having ``address of'' as uses).
+We only focus on these memory cells,
+because we want to avoid pointer alias analysis, 
+which may potentially introduce inaccurate results. 
 For a \texttt{read} or \texttt{write} instruction accessing a memory cell,
 if it is dominated by another \texttt{read} or \texttt{write} instruction accessing the same cell, 
 and there is not function call on any path between these two instructions,
@@ -490,7 +491,7 @@ we need to query \texttt{ts} and decide
 whether RMS+ or DSS should be incremented.
 For both memory read and write, 
 we need to update \texttt{ts} by using the current timestamp \texttt{count}
-for accessed memory cells. 
+for the accessed memory cells. 
 Instead of using a hash table, 
 we use a page table to contain the timestamp information. 
 To balance runtime overhead and memory overhead, 
@@ -506,9 +507,9 @@ Compared with the hash table,
 the page table leverages the locality of memory accesses 
 and can lead 
 to a better cache performance. 
-%To further improve performance, 
-%we add an extra variable to hold the pointer pointing 
-%to the last referenced memory area holding timestamps.
+To further improve performance, 
+we add an extra variable to hold the pointer pointing 
+to the last referenced memory area holding timestamps.
 %For each memory read or write, 
 %we first check whether the saved pointer value can be used. 
 %We only conduct a page table lookup when the saved value cannot be used. 
@@ -554,7 +555,7 @@ Since the original algorithm is design to count edge events,
 we split each BB into two 
 and label the event number to be 1 for each edge connecting a pair of split BBs. 
 We label the event number to be 0 for all other edges.
-We compute a spanning tree~\cite{spanning} for the new CFG.
+We compute a spanning tree~\cite{spanning} for the CFG.
 Edges not in the spanning tree are called chords.
 We apply the depth-first search algorithm proposed by~\citet{event-counting} 
 to calculate on which chords we should change 
@@ -600,14 +601,14 @@ In a previous work, \citet{ldoctor} re-implemented all
 During the re-implementation, the researchers first reproduced all Java bugs, 
 then they referenced JDK to re-implement 
 common data structures, like ArrayList, HashMap and Vector, 
-and finally, they re-implemented the performance bugs according to their root cases. 
+and finally, they re-implemented the performance bugs according to their root causes. 
 We use all the 21 re-implemented bugs in our evaluation.  
 
 In total, we evaluate \Tool on 38 benchmarks. 
 All benchmark information is shown in Table~\ref{tab:benchmark_info}.
 In general, benchmarks used in our experiments are large. 
 Except one benchmark, all other benchmarks are more than 100 lines of code. 
-seven benchmarks contain more than one million lines of code. 
+Seven benchmarks contain more than one million lines of code. 
 We implement a set of static analyzers to count static features for these benchmarks. 
 For large benchmarks, 
 they could contain more than ten thousand loops, more than one 
@@ -629,7 +630,7 @@ For all benchmarks used in our experiments,
 their bug reports contain at least one bug-triggering input. 
 For 14 of them, 
 the users explicitly explained how to change input sizes to 
-observe the described scaling problems when they reported these bugs. 
+reproduce the described scaling problems when they reported these bugs. 
 We follow the users' 
 descriptions to generate new inputs.
 For the other benchmarks, 
@@ -640,9 +641,9 @@ the user provided a C file,
 containing an expression with thousands of strings as operands. 
 We change the number of strings to generate new inputs.
 For each benchmark, we choose the input sizes of the $10$ inputs to be 
-an arithmetic sequence with the largest input as the input for its bug report 
+an arithmetic sequence with the largest input as the input from the bug report 
 and the smallest input whose input size is 
-only $\frac{1}{10}$ of the largest input.
+$\frac{1}{10}$ of the largest input.
 
 For each benchmark, we first fit a curve to understand how execution 
 time changes with input size. 
@@ -655,7 +656,7 @@ If a complexity problem is caused by repeated executions of a loop,
 its recursion function is the function containing the outer loop.
 If a complexity problem is caused by a recursive function, 
 its recursion function is the recursive function. 
-Otherwise, the complexity problem does not have recursion functions. 
+Otherwise, the complexity problem does not have a recursion function. 
 
 
 \textbf{Research Questions to Answer}
@@ -707,7 +708,7 @@ but the calculated similarity values are smaller,
 compared with using BBs as cost metric 
 (the second value in the ``RMS+/Re-C'' column). 
 
-The combination of DSS and LIs fail to explain how execution time scales for six benchmarks.
+The combination of DSS and LIs fails to explain how execution time scales for six benchmarks.
 The buggy code constructs for these benchmarks 
 are not array-processing loops or linked-list-processing loops. 
 We cannot get input information 
@@ -737,7 +738,7 @@ We consider these functions as benign false positives,
 since they can easily be filtered out 
 by comparing cost with recursion functions. 
 In general, \Tool is accurate, and it does not report any true false positives. 
-Compare with the two combinations, DSS plus 
+Comparing the two combinations, DSS plus 
 LIs will generate fewer benign false positives. 
 
 \textbf{Performance Results}
