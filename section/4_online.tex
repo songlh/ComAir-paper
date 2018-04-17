@@ -44,7 +44,7 @@ As we discussed in Section~\ref{sec:study},
 the majority of complexity problems studied are caused 
 by repeated executions of a loop or a recursive function. 
 Previous works show that sampling code constructs that are executed 
-multiple times in one program run can lower the runtime overhead compared to not sampling, 
+multiple times in one program run can lower the runtime overhead, 
 while still being able to collect enough runtime information 
 without hurting diagnosis latency~\cite{SongOOPSLA2014,ldoctor}. 
 Inspired by our study and the earlier works, 
@@ -162,7 +162,7 @@ Can sampling lower the runtime overhead while giving the same profiling results?
 A positive answer means the effectiveness of the production-run version of \Tool. 
 
 \item {\bf RQ2.} 
-Will sampling increase profiling latency? 
+Will sampling increase the profiling latency? 
 By applying sampling, less information is collected in one single run. 
 If we have to monitor more program runs to get the same profiling results,
 the profiling latency is increased.
@@ -258,7 +258,7 @@ For all other bugs,
 %in-house and production-run setting
 %is constantly larger than $0.85$.
 the similarity calculated with Equation~\ref{eq:sim} for the two functions with the same input and cost metrics
-under in-house setting and production-run setting is consistently larger than $0.85$.
+under the in-house setting and the production-run setting is consistently larger than $0.85$.
 
 As expected, the profiling capability will decrease when using sparser sampling rate. 
 As shown in Table~\ref{tab:sampling}, 
@@ -297,7 +297,7 @@ need around 100 runs for an accurate profile to be produced.
 Apache\#29743 needs around 500 runs. 
 Mozilla\#490742 and Apache\#37184 also need more than 1000 runs.   
 This means longer profiling latencies than the in-house version of \Tool,
-which needs only 10 runs to for an accurate profile. 
+which needs only 10 runs for an accurate profile. 
 
 Sampling does not lengthen the profiling latency for 32 benchmarks 
 with controlled 
