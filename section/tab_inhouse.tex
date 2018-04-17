@@ -30,8 +30,8 @@
     Apache\#47223     &  $0.162^*$  & Java  & $O(N^{2})$ & A-L   & \ding{51}$_{0.99}$ & \ding{51}$_{0.98}$  & 69{\bf X} & -  & \ding{51}$_{0.99}$ & 23{\bf X}  & - \\
     \midrule
     GCC\#46401        &  $5521$  & C  & $O(N^{2})$ & LL-L & \ding{51}$_{0.90}$ & \ding{51}$_{0.90}$ & 86{\bf X} & 0$_{56}$ & \ding{51}$_{0.92}$ & 9{\bf X} & 0$_{13}$ \\
-    GCC\#1687         &  $2099$  & C  & $O(2^{N})$ & R.F. & \ding{51}$_{0.93}$ & \ding{51}$_{0.93/0.87}$  & 78{\bf X}/16{\bf X}  & 0$_{14}$/-  & - & 3{\bf X} & - \\
-    GCC\#27733        &  $3217$  & C  & $O(2^{N})$ & R.F. & \ding{51}$_{0.91}$ & \ding{51}$_{0.91/0.86}$  & 67{\bf X}/7{\bf X}  & 0$_{27}$/-  & - & 2{\bf X} & -  \\
+    GCC\#1687         &  $2099$  & C  & $O(2^{N})$ & R.F. & \ding{51}$_{0.93/0.87}$ & \ding{51}$_{0.93/0.87}$  & 78{\bf X}/16{\bf X}  & 0$_{14}$/-  & - & 3{\bf X} & - \\
+    GCC\#27733        &  $3217$  & C  & $O(2^{N})$ & R.F. & \ding{51}$_{0.91/0.86}$ & \ding{51}$_{0.91/0.86}$  & 67{\bf X}/7{\bf X}  & 0$_{27}$/-  & - & 2{\bf X} & -  \\
     GCC\#8805         &  $2538$  & C  & $O(N^{2})$ & LL-L & \ding{51}$_{0.86}$ & \ding{51}$_{0.86}$ & 88{\bf X}  & 0$_{30}$  & \ding{51}$_{0.90}$& 19{\bf X} & 0$_{11}$ \\
     GCC\#21430        &  $3844$  & C  & $O(N^{2})$ & LL-L & \ding{51}$_{0.98}$ & \ding{51}$_{0.97}$ & 80{\bf X} & 0$_{26}$    & \ding{51}$_{0.89}$ & 18{\bf X} & 0$_8$  \\
     GCC\#12322        &  $2341$  & C  & $O(N^{2})$ & LL-L & \ding{51}$_{0.92}$ & \ding{51}$_{0.92}$ & 84{\bf X}  & 0$_{37}$    & \ding{51}$_{0.92}$ & 16{\bf X} & - \\
@@ -78,21 +78,24 @@
    }
   %\nocaptionrule
    \caption{Evaluation Results for the in-house version of \Tool.
-  \footnotesize{(This table shows benchmark information and evaluation results for the in-house version of \Tool. In the benchmark-information columns,
+  \footnotesize{(This table shows benchmark information and evaluation results for the in-house version of \Tool. 
+   In the benchmark-information columns,
    $x^*$: $x$ thousands of lines of codes for re-implemented benchmarks; 
    Buggy C.C: buggy code construct;
    A-L: array-processing loop; 
-   LL-L: linked-list-processing loop;
+   LL-L: linked-list-processing loop; and
    R.F.: recursive function.
    In the RMS+ columns,
    main-C: cost function comparison results for main functions;
    Re-C: cost function comparison results for recursion functions;
    /: Mozilla\#490742 and Apache\#37184 do not have recursion functions; 
-   \# of F.P.: the number of false positives. 
-   \ding{51}$_{y}$: calculated similarity using Equation~\ref{eq:sim} is $y$, and y is larger than $0.85$. 
+   \# of F.P.: the number of false positives;
+   $x_y$: real ($x$) and benign false positives ($y$);
+   For GCC\#1687 and GCC\#27733, we also use RI as cost metric;
+   and \ding{51}$_{y}$: calculated similarity using Equation~\ref{eq:sim} is $y$, and y is larger than $0.85$. 
     In the DSS columns, 
     -: the calculated similarity using Equation~\ref{eq:sim} is less than $0.85$.     
 )}}
   \label{tab:benchmark_info}
-\vspace{-0.4in}
+\vspace{-0.45in}
 \end{table}

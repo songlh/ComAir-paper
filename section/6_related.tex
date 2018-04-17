@@ -1,4 +1,4 @@
-\newpage
+%\newpage
 
 \section{Related Works}
 \label{sec:related}
@@ -21,7 +21,6 @@ studying 100 performance regressions.
 ~\citet{SmartphoneStudy} find common inefficiency patterns after 
 inspecting 70 performance problems from smartphone applications. 
 There are also research work focusing on studying inefficiency in web applications~\cite{junwen-1, junwen-2}. 
-
 Similar to our work in Section~\ref{sec:study}, 
 these studies have important findings and can guide technical design to combat 
 real-world performance problems. 
@@ -45,11 +44,11 @@ or to predict analysis results for inputs not seen before.
 Aprof~\cite{Aprof1, Aprof2} and AlgoProf~\cite{AlgoProf} are existing 
 algorithmic profiling techniques.
 They infer cost functions for different code granularities 
-by using different input and cost metrics.
+using different input and cost metrics.
 We evaluate different input and cost metrics 
-by using real-world complexity problems in Section~\ref{sec:inhouse}.
-And we significantly lower run-time overhead by using on-line setting in Section~\ref{sec:online},
-and our tool can be deployed in production runs. 
+using real-world complexity problems in Section~\ref{sec:inhouse}.
+We significantly lower runtime overhead after applying sampling in Section~\ref{sec:online}.
+Different from existing techniques, \Tool can be deployed in production runs. 
 
 \noindent\textbf{Performance Bug Detection}
 There are many performance bug detectors.
@@ -60,9 +59,9 @@ For some of them, their detected bugs overlap with complexity problems.
 For example, as we discussed in Section~\ref{sec:inhouse_exp},
 all detected performance bugs by Toddler are in $O(N^2)$ complexity. 
 However, static detectors fail to provide any information 
-about detected bugs' performance impact,
-Dynamic detectors usually incur more than 10X runtime overhead,
-and can only be applied for in-house testing by using testing inputs. 
+about detected bugs' performance impact.
+Dynamic detectors usually incur more than $10\times$ runtime overhead,
+and can only be applied for in-house testing using testing inputs. 
 Under production-run setting, 
 \Tool will incur very small overhead and can be deployed in the users' side. 
 Profiling results from \Tool can help developers better
@@ -70,13 +69,13 @@ understand real-world workloads and diagnose performance failures caused by comp
 
 
 \noindent\textbf{Input Generation for Performance Testing}
-There are many test input generation techniques to expose performance problems.
-WISE~\cite{WISE} generates inputs with small sizes firstly, 
-then uses these inputs to profile the program in order to learn how to restrict conditional branches, 
-and finally generates large inputs to expose worst-case complexity by using learned policies. 
-EventBreak~\cite{EventBreak} generates inputs to identify 
-event handlers whose reaction time increases as the application is running. 
-SlowFuzz~\cite{slowfuzz} generates inputs to expose worst-case complexity by using
-resource-usage-guided evolutionary search. 
+There are many test input generation techniques to expose performance problems~\cite{WISE,EventBreak,slowfuzz}.
+%WISE~\cite{WISE} generates inputs with small sizes firstly, 
+%then uses these inputs to profile the program in order to learn how to restrict conditional branches, 
+%and finally generates large inputs to expose worst-case complexity by using learned policies. 
+%EventBreak~\cite{EventBreak} generates inputs to identify 
+%event handlers whose reaction time increases as the application is running. 
+%SlowFuzz~\cite{slowfuzz} generates inputs to expose worst-case complexity by using
+%resource-usage-guided evolutionary search. 
 These input generation techniques are orthogonal to our work, 
 and their generated inputs can be used to conduct algorithmic profiling. 

@@ -404,7 +404,7 @@ for all functions active on the call stack.
 To enhance RMS with IIV, 
 we consider cases where a function recursively invoke itself using integer parameters. 
 We do not instrument \texttt{write} instructions that store integer 
-parameters on stack when a function recursively calls itself. 
+parameters onto stack when a function recursively calls itself. 
 If the first accesses on these stack memory cells are \texttt{read} 
 instructions inside recursive callees, 
 they can increase RMS. 
@@ -467,18 +467,18 @@ after each function invocation.
 Therefore, given two consecutive memory accesses on the same memory cell,
 if there is no function calls between them, 
 we do not need to instrument the second memory access. 
-
 We rely on dominance analysis to implement this optimization. 
-We focus on stack memory cells that hold 
-scalar variables and only have \texttt{read} and \texttt{write} as uses 
-(i.e., not having ``address of'' as uses).
-We only focus on these memory cells,
-because we want to avoid pointer alias analysis, 
-which may potentially introduce inaccurate results. 
-For a \texttt{read} or \texttt{write} instruction on one of these memory cells,
-if it is dominated by another \texttt{read} or \texttt{write} instruction on the same cell, 
+%We focus on stack memory cells that hold 
+%scalar variables and only have \texttt{read} and \texttt{write} as uses 
+%(i.e., not having ``address of'' as uses).
+%We only focus on these memory cells,
+%because we want to avoid pointer alias analysis, 
+%which may potentially introduce inaccurate results. 
+For a \texttt{read} or \texttt{write} instruction accessing a memory cell,
+if it is dominated by another \texttt{read} or \texttt{write} instruction accessing the same cell, 
 and there is not function call on any path between these two instructions,
 we will skip the instrumentation for the second instruction.  
+
 
 \textbf{Optimization 2}}
 The second optimization is an attempt to improve the performance of 
@@ -491,7 +491,6 @@ whether RMS+ or DSS should be incremented.
 For both memory read and write, 
 we need to update \texttt{ts} by using the current timestamp \texttt{count}
 for accessed memory cells. 
-
 Instead of using a hash table, 
 we use a page table to contain the timestamp information. 
 To balance runtime overhead and memory overhead, 
@@ -499,20 +498,21 @@ we design a four-layer page table for 32-bit programs.
 We use 4-KB consecutive memory areas to hold pointers pointing to 
 memory areas in the next layer 
 or memory areas holding timestamps for memory cells. 
-For a monitored 32-bit program, 
-we need to calculate four addresses using bitwise operations 
-and use the four addresses to refer to each layer of the page table.  
-For 64-bit programs, we use six layers.  
+%For a monitored 32-bit program, 
+%we need to calculate four addresses using bitwise operations 
+%and use the four addresses to refer to each layer of the page table.  
+%For 64-bit programs, we use six layers.  
 Compared with the hash table, 
 the page table leverages the locality of memory accesses 
 and can lead 
 to a better cache performance. 
-To further improve performance, 
-we add an extra variable to hold the pointer pointing 
-to the last referenced memory area holding timestamps.
-For each memory read or write, 
-we first check whether the saved pointer value can be used. 
-We only conduct a page table lookup when the saved value cannot be used. 
+%To further improve performance, 
+%we add an extra variable to hold the pointer pointing 
+%to the last referenced memory area holding timestamps.
+%For each memory read or write, 
+%we first check whether the saved pointer value can be used. 
+%We only conduct a page table lookup when the saved value cannot be used. 
+
 
 \textbf{Optimization 3}
 For this optimization, we apply inline functionality 
@@ -537,7 +537,6 @@ efficiently count edge events through selectively instrumenting a counter
 on CFG~\cite{event-counting}.
 The algorithm has already been proved to be able to 
 conduct path profiling efficiently~\cite{peter-ase,path-profiling}. 
-
 To apply the algorithm,
 we instrument a local counter \texttt{local\_cost} for each function
 and initialize its value to be $0$ at the entry BB. 
@@ -548,9 +547,9 @@ and how to update \texttt{local\_cost}
 within a single function.
 We design and implement an intra-procedural control flow analysis
 to achieve this.
-Given a single function,
-we add a fake edge from the exit BB to the entry BB 
-to make its CFG strongly connected. 
+%Given a single function,
+%we add a fake edge from the exit BB to the entry BB 
+%to make its CFG strongly connected. 
 Since the original algorithm is design to count edge events,
 we split each BB into two 
 and label the event number to be 1 for each edge connecting a pair of split BBs. 
@@ -566,45 +565,38 @@ and how much we should change.
 \label{sec:inhouse_exp}
 
 \subsubsection{Methodology}
-%\noindent\textbf{Implementation and Platform}
-We implement \Tool by using LLVM-5.0.0.
-Our current implementation focus on C/C++ programs, 
+Our current implementation of \Tool focuses on C/C++ programs, 
 but we believe that our algorithms are general enough to be extended 
 to other programming languages.
 We conduct our experiments using a Ubuntu-16.04 machine, 
 with i7-7700 CPU and 32-GB memory. 
 
+
 %\input{section/tab_inhouse1}
 
 \textbf{Benchmarks}
-%\Tool is an algorithmic profiling tool chain.
-%Developers can use \Tool to diagnose user-perceived performance failures caused by complexity problems, 
-%in both in-house and production-run settings. 
-%Therefore, we use known complexity problems in the real world to evaluate \Tool. 
-To thoroughly conduct our evaluation, 
-we select complexity problems from two sources, as shown in Table~\ref{tab:benchmark_info}. 
-
+We select complexity problems from two sources. 
 The first source is our studied complexity problems, 
 which are randomly sampled from representative applications in previous works~\cite{PerfBug,SongOOPSLA2014}.
 We successfully reproduce 17 complexity problems. 
-Among them, 6 bugs are extract from original Java or JS programs, 
+Among them, 6 bugs are extracted from original Java or JS programs, 
 and re-implemented by using C/C++, 
 because our current implementation of \Tool can only work on C/C++ programs.
-One reproduced bug is extract from a very old Mozilla version, 
+One reproduced bug is extracted from a very old Mozilla version, 
 and we fail to find dependent libraries to build that version. 
 We do the re-implementation after we thoroughly understand the complexity problems.
-During the re-implementation, we keep the original algorithms, 
+During the re-implementation, we maintain the original algorithms, 
 data structures, and caller-callee relationships. 
 We fail to reproduce other complexity problems, 
-because they depend on very special software or hardware environments, 
-which are not available to us. 
+because they depend on very special software or hardware environments.
+%which are not available to us. 
 We fail to re-implement them, 
 because their data structures are too complex to extract.
 
 The second source is from Toddler project~\cite{Alabama}. 
 Toddler is a dynamic technique that can detect inefficient loops in Java programs.
 In a previous work, \citet{ldoctor} re-implemented all 
-21 bugs detected by Toddler and verified by developers in C/C++.
+21 bugs detected by Toddler and verified by developers using C/C++.
 During the re-implementation, the researchers first reproduced all Java bugs, 
 then they referenced JDK to re-implement 
 common data structures, like ArrayList, HashMap and Vector, 
@@ -612,18 +604,19 @@ and finally, they re-implemented the performance bugs according to their root ca
 We use all the 21 re-implemented bugs in our evaluation.  
 
 In total, we evaluate \Tool on 38 benchmarks. 
-Information for all benchmarks is shown in Table~\ref{tab:benchmark_info}.
+All benchmark information is shown in Table~\ref{tab:benchmark_info}.
 In general, benchmarks used in our experiments are large. 
 Except one benchmark, all other benchmarks are more than 100 lines of codes. 
 seven benchmarks contain more than one million lines of codes. 
-We implement a set of simple static analyzers to count static features for these benchmarks. 
+We implement a set of static analyzers to count static features for these benchmarks. 
 For large benchmarks, 
 they could contain more than ten thousand loops, more than one 
 thousand array-processing loops or linked-list-processing loops, 
 and more than ten thousand recursive functions. 
 Clearly, automated algorithmic profiling tools are needed to analyze these code constructs. 
 The majority of benchmarks used in our experiments are in $O(N^2)$ complexity. 
-We also two benchmarks in $O(2^N)$ complexity, and two benchmarks in $O(N)$ complexity. 
+We also two benchmarks in $O(2^N)$ complexity, 
+and two benchmarks in $O(N)$ complexity. 
 
 \input{section/tab_inhouse}
 
@@ -635,7 +628,7 @@ testing and diagnosis~\cite{SongOOPSLA2014,joy.asplos13}.
 For all benchmarks used in our experiments,
 their bug reports contain at least one bug-triggering input. 
 For 14 of them, 
-the users explicitly explain how to change input sizes to 
+the users explicitly explained how to change input sizes to 
 observe the described scaling problems when they reported these bugs. 
 We follow the users' 
 descriptions to generate new inputs.
@@ -647,7 +640,7 @@ the user provided a C file,
 containing an expression with thousands of strings as operands. 
 We change the number of strings to generate new inputs.
 For each benchmark, we choose the input sizes of the $10$ inputs to be 
-an arithmetic sequence with the largest input as the input in the bug report 
+an arithmetic sequence with the largest input as the input for its bug report 
 and the smallest input whose input size is 
 only $\frac{1}{10}$ of the largest input.
 
@@ -655,26 +648,26 @@ For each benchmark, we first fit a curve to understand how execution
 time changes with input size. 
 We then examine whether fitted functions can explain the observed scaling problem, 
 by calculating similarity using Equation~\ref{eq:sim}. 
-We consider a similarity value larger than $0.85$ to be able to explain the scaling problem. 
-We focus on two fitted functions, one is fitted for main function, 
-and the other is fitted for recursion function. 
+We consider a similarity value larger than $0.85$ as being able to explain the scaling problem. 
+We focus on two fitted functions, one is calculated for main function, 
+and the other is calculated for recursion function. 
 If a complexity problem is caused by repeated executions of a loop,
 its recursion function is the function containing the outer loop.
 If a complexity problem is caused by a recursive function, 
 its recursion function is the recursive function. 
-Otherwise, the complexity problem does not have recursion function. 
+Otherwise, the complexity problem does not have recursion functions. 
+
 
 \textbf{Research Questions to Answer}
-Our experiments are designed to evaluate whether the in-house version 
-of \Tool can provide desired profiling coverage and profiling accuracy. 
+Our experiments are designed to evaluate whether \Tool can provide the desired profiling coverage 
+and profiling accuracy. 
 Specifically, we aim to answer the following two questions:
 
 \begin{itemize}
 
 \item {\bf RQ1.} 
 Benchmarks used in our evaluation are in different types of complexity and 
-are caused by different types of buggy code constructs 
-as shown in Table~\ref{tab:benchmark_info}. 
+are caused by different types of buggy code constructs. 
 Can \Tool cover all of them? 
  
 \item {\bf RQ2.}
@@ -697,57 +690,71 @@ All experimental results are shown in Table~\ref{tab:benchmark_info}.
 To answer {\bf RQ1}, 
 we examine fitted functions for main and recursion functions 
 under different combinations. 
-
 Under the combination of RMS+ and BBs, 
 the fitted functions of main can explain 
-how the whole program execution time scales for all benchmarks, 
+how the execution time of the whole program scales for all benchmarks, 
 as shown by the check-marks 
 in Table~\ref{tab:benchmark_info} (the ``main-C'' column).
-The minimum similarity value is $0.86$.
 Two benchmarks are in $O(N)$ complexity, and they do not have recursion functions.
 The fitted functions of recursion functions fail in these two cases. 
-They can successfully explain how execution time scales for all other benchmarks, 
-with minimum similarity value $0.86$ 
-(the ``RMS+/Re-C'' column).
+The fitted functions can successfully 
+explain how execution time scales for all other benchmarks (the ``RMS+/Re-C'' column).
 The combination of RMS+ and BBs does provide good profiling coverage. 
-
 GCC\#1687 and GCC\#27733 are caused by recursive functions. 
 We also evaluate the combination of RMS+ and RIs for these two benchmarks.
 The fitted functions of the two recursive functions can also explain how execution time scales, 
-but the calculated similarity values are less, 
+but the calculated similarity values are smaller, 
 compared with using BBs as cost metric 
 (the second value in the ``RMS+/Re-C'' column). 
 
-We have six benchmarks, 
-whose buggy code constructs are not array-processing loops or linked-list-processing loops. 
+The combination of DSS and LIs fail to explain how execution time scales for six benchmarks.
+The buggy code constructs for these benchmarks 
+are not array-processing loops or linked-list-processing loops. 
 We cannot get input information 
-when analyzing their recursion functions using the combination of DSS and LIs 
+when analyzing their recursion functions 
 (``RMS+/Re-C'' column).  
-The fitted functions of recursion functions also fail in the two $O(N)$ cases.
+The fitted functions of recursion functions fail in the two $O(N)$ cases too.
 For all other cases, the fitted functions of recursion functions can 
-explain how execution time scales under the combination of DSS and LIs. 
-The combination of DSS and LIs can effectively profile complexity problems caused by 
-repeated executions of array-processing loops 
-and linked-list-processing loops. 
+explain how execution time scales. 
+The combination of DSS and LIs can effectively 
+profile complexity problems caused by 
+repeated executions of an array-processing loop 
+and a linked-list-processing loop. 
 
 
 \textbf{Accuracy Results}
 To answer {\bf RQ2},
 we manually examine all functions with superlinear complexity reported by \Tool.
-They can be divided into two categorizations. 
-Some of them are on the call chain between main function to the recursion function.
-These functions can also explain how execution time scales with different inputs. 
+They can be divided into two categories. 
+Some of them are on the call chain between main function and the recursion function.
+These functions can also explain how execution time scales with input size. 
 We do not consider them as false positives. 
 For others (the two ``\# of F.P.'' columns), they do scale superlinearly. 
 However, their costs are smaller than the cost of 
-the recursion function from the same benchmark. 
+the recursion function in the same benchmark. 
 They are not the main contributors to the perceived performance degradation. 
 We consider these functions as benign false positives, 
-since they can easily be filtered out. 
+since they can easily be filtered out 
+by comparing cost with recursion functions. 
 In general, \Tool is accurate, and it does not report any true false positives. 
-Compare with the two combination, DSS plus 
-LIs will bring fewer true false positives. 
+Compare with the two combinations, DSS plus 
+LIs will generate fewer benign false positives. 
+
+\textbf{Performance Results}
+Although the runtime overhead is not a major concern 
+for the in-house version of \Tool, 
+smaller overhead can allow developers to run 
+more test cases under a given time budget. 
+Overhead results are shown in Table~\ref{tab:benchmark_info}. 
+Compared with RMS+, DSS will incur a smaller overhead across all benchmarks. 
 
 
-
+\subsubsection{Discussion} 
+Two design points are particularly useful 
+to conduct algorithmic profiling for real-world complexity problems.
+They are RMS+ plus executed BBs and DSS plus executed LIs. 
+The combination of RMS+ and BBs can cover all cases in our evaluation. 
+The combination of DSS and LIs can cover most common cases, 
+where a complexity problem is caused by an array-processing loop or a linked-list-processing loop, 
+while incurring a much lower runtime overhead compared with the combination of RMS+ and BBs. 
 

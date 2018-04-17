@@ -1,50 +1,50 @@
-\newpage
+%\newpage
 \section{Production-Run Algorithmic Profiling}
 \label{sec:online}
 
 In this section, we discuss our design and 
 implementation for the production-run version of \Tool. 
 For production-run usage, profiles are collected from the user side.
-It is very important to keep a low runtime overhead, since
+It is very important to keep the runtime overhead low, since
 end users cannot tolerate any observable performance slowdown.
 To achieve this requirement,
 our design follows several principles. 
 
-First, \textit{study-guided}. 
-We design the production-run version of \Tool
-under the guidance of the empirical study in Section~\ref{sec:study}.
+First, \textit{study guided}. 
+The design of the production-run version of \Tool
+is guided by the empirical study in Section~\ref{sec:study}.
 We focus on the majority of complexity problems, 
-caused either by repeated execution of a loop ($N^k$)
+caused either by repeated executions of a loop ($N^k$)
 or a recursive function ($2^N$).
 We focus on common types of data structures, which are array and linked list.
 
 Second, \textit{focused checking}.
-To apply the production-run version of \Tool, 
-we expect developers to specify a suspicious loop or a suspicious recursive function
+When applying the production-run version of \Tool, 
+we expect developers will specify a suspicious loop or a suspicious recursive function
 to be monitored. 
 \Tool will automatically instrument the specified code construct 
-in order to collect runtime information from the user side in a low overhead. 
-The profiling results can help developers better understand the code construct' 
-complexity and processed workload in the real world.
+to collect runtime information from the user side in a low overhead. 
+The profiling results can help developers better understand the complexity of the code construct 
+and its processed workloads in the real world.
 \Tool can be used together with performance failure 
 diagnosis tools~\cite{SongOOPSLA2014} 
-or traditional profilers,
-focusing on suspicious code constructs leading 
+or traditional profilers to
+focus on suspicious code constructs leading 
 to user-perceived performance failures.
 
 Third, \textit{sampling}.
 Instead of recording all dynamic information, 
-we apply sampling and only record part of the information. 
-We infer information for the whole execution based on collected samples. 
+we apply sampling and record only part of the information. 
+We infer information for the whole execution based on the collected samples. 
 Sampling can effectively lower the runtime overhead. 
 
 
 \subsection{Technical Design}
 As we discussed in Section~\ref{sec:study}, 
-the majority of studied complexity problems are caused 
+the majority of complexity problems studied are caused 
 by repeated executions of a loop or a recursive function. 
 Previous works show that sampling code constructs that are executed 
-multiple times in one program run can lower runtime overhead, 
+multiple times in one program run can lower the runtime overhead compared to not sampling, 
 while still being able to collect enough runtime information 
 without hurting diagnosis latency~\cite{SongOOPSLA2014,ldoctor}. 
 Inspired by our study and the earlier works, 
@@ -54,27 +54,27 @@ and recursive functions with multiple executions.
 \noindent\textbf{Input Metric}
 If the specified code construct is an array-processing loop 
 or a linked-list-processing loop,
-we will use DSS as input metric. 
-Otherwise, we will use RMS+ as input metric. 
+we will use DSS as the input metric. 
+Otherwise, we will use RMS+ as the input metric. 
 
 As we discussed in Section~\ref{sec:inhouse}, 
-there are, top-down and bottom-up, 
-two methods to analyze RMS+ and DSS records collected 
+there are two methods, top-down and bottom-up, 
+to analyze RMS+ and DSS records collected 
 for multiple dynamic instances of a code construct in one program run. 
 We leverage the top-down method for the in-house version of \Tool. 
-However, the top-down method is not suitable to be combined with sampling. 
-The reason is explained as follows.
+However, the top-down method is not suitable for sampling. 
+The reason is as follows.
 Assume we have a code construct \texttt{c} to monitor. 
 It is inside a loop \texttt{l} and is executed multiple times in one program run.
-Dynamic instances of \texttt{l} are much less than 
-dynamic instances of \texttt{c}.
+There are fewer dynamic instances of \texttt{l}
+than dynamic instances of \texttt{c}.
 If we apply the top-down method, 
 we need to sample dynamic instances of \texttt{l}, 
 and it is very likely that we will miss these instances. 
 For each dynamic instance of \texttt{l}, 
-it will conduct more computation, 
+there will be more computation, 
 compared with an instance of \texttt{c}.
-It will incur more overhead to collect 
+More overhead will be incurred to collect 
 information for dynamic instances of \texttt{l}.
 Therefore, we apply the bottom-up method 
 in the production-run version of \Tool.
@@ -85,13 +85,13 @@ We use the sampled information to infer RMS+
 or DSS for all instances of \texttt{c} in one program run.
 
 
-How to do the sampling is similar to previous works in statistical 
+The sampling method is similar to that described in previous works on statistical 
 debugging~\cite{liblit03,liblit05,CCI,SongOOPSLA2014,ldoctor}.
 We make a cloned version of the monitored code construct.
 We instrument the cloned version to record information for RMS+ or DSS. 
 We dump the recorded information to log 
-whenever the cloned version finishes its execution. 
-We add extra delimiters to log to differ information collected from different instances.
+whenever the cloned version finishes execution. 
+We add extra delimiters to log to differentiate information collected from different instances.
 Before each execution of the monitored code construct, 
 we choose between the cloned version and the original version. 
 How many times the cloned version is executed 
@@ -108,39 +108,43 @@ whose expectation is equal to the inverse of the sampling rate.
 
 We leverage the mark-and-recapture method~\citep{mark-recapture} to 
 estimate RMS+ or DSS for all dynamic instances of a code construct 
-based on collected samples. 
+based on the collected samples. 
 Mark-and-recapture is a commonly used statistical method 
-to estimate the size of animal population. 
-By using this method, a portion of animals is captured, marked, and released. 
-Then, another portion is captured.
+for estimating the size of an animal population. 
+In this method, some of the animals are captured, marked, and released. 
+Then, another group of the animials are captured.
 The size of the whole animal population is estimated 
-based on the ratio of marked animals in the second captured portion.  
+based on the ratio of marked animals in the second captured sample.  
 
 
-Each sample of a monitored code construct is a set of memory cells 
+Each sample of a monitored code construct is a set of memory cells, 
 which contribute RMS+ or represent distinct elements in an array or a linked list. 
 In one program run, we assume that we collect a sequence of $m$ samples. 
-Given the $i$th sample, we use $M_i$ to represent the 
+Given the $i$th sample, $M_i$ represents the 
 total number of distinct memory cells in the previous $i-1$ samples, 
-$C_i$ to represent the number of distinct memory cells in the $i$th sample,
-and $R_i$ to represent the number of distinct memory cells in 
-the $i$th sample and also appeared in one of the previous $i-1$ samples.
-The total distinct memory cells for all dynamic instances 
+$C_i$ represents the number of distinct memory cells in the $i$th sample,
+and $R_i$ represents the number of distinct memory cells in 
+the $i$th sample that also appeared in one of the previous $i-1$ samples.
+The total number of distinct memory cells for all dynamic instances 
 of the monitored code construct can be estimated as:
 
 
-\begin{equation} \label{eq:mark}
+%\begin{equation} \label{eq:mark}
 %$$p_v(S_v(a)) = 1 - \prod\limits_{u \in S_v(a)}(1 - p_{u,v})$$
-N = \frac{\sum\limits_{i=1}^m M_i*C_i}{\sum\limits_{i=1}^m R_i}
+%N = \frac{\sum\limits_{i=1}^m M_i*C_i}{\sum\limits_{i=1}^m R_i}
+%\end{equation}
+
+\begin{equation} \label{eq:mark}
+N = \sum\limits_{i=1}^m M_i*C_i\Big/\sum\limits_{i=1}^m R_i
 \end{equation}
 
 \noindent\textbf{Cost Metric}
 The production-run version of \Tool focuses on recursive functions or loops.
 If the monitored code construct is a recursive function,
-we will use the total number of recursive call instances to estimate cost.
+we use RIs as the cost metric.
 If the monitored code construct is a loop, 
-we will use the total number of loop iterations for all loop instances to estimate cost. 
-We do not apply sampling during collecting these two metrics. 
+we use LIs as the cost metric. 
+We do not apply sampling when collecting these two metrics. 
 As we discussed in Section~\ref{sec:inhouse},
 these two metrics will incur a smaller overhead compared with BBs, 
 and they can still provide accurate profiling results.  
@@ -149,77 +153,82 @@ and they can still provide accurate profiling results.
 \subsection{Experimental Evaluation}
 %\subsubsection{Research Questions}
 
+\subsubsection{Methodology}
 We will conduct experiments to answer the following two research questions:
 
 \begin{itemize}
 \item {\bf RQ1.} 
-Can sampling lower the runtime overhead while maintaining the same profiling results? 
+Can sampling lower the runtime overhead while giving the same profiling results? 
 A positive answer means the effectiveness of the production-run version of \Tool. 
 
 \item {\bf RQ2.} 
 Will sampling increase profiling latency? 
-After applying sampling, less information is collected in one single run. 
-If we have to monitor more program runs in order to get the same profiling results,
-profiling latency is increased.
+By applying sampling, less information is collected in one single run. 
+If we have to monitor more program runs to get the same profiling results,
+the profiling latency is increased.
 As we discussed earlier, the majority of complexity problems are caused 
 by repeated executions of a loop or a recursive function.
- It could be possible that sampling can still collect enough information in one program, 
-while not increasing diagnosis latency. 
+It is possible that sampling can still collect enough information in one program run, 
+while not increasing the profiling latency. 
 
 
 \end{itemize}
 
 \noindent\textbf{Benchmarks and Inputs}
 We reuse all benchmarks in Table~\ref{tab:benchmark_info}.
-We monitor the loop or the recursive function with largest iteration 
-numbers\footnote{We consider a recursive function call instance as a loop iteration.} 
+We monitor the loop or the recursive function with the most iterations\footnote{We consider a recursive function call instance as a loop iteration.} 
 for all benchmarks,
 except for Mozilla\#347306 and GCC\#46401. 
-These two bugs are caused repeated execution of a loop, 
-whose total iteration numbers ranked 2nd. 
-Instead, we monitor these two loops.
+%These two bugs are caused repeated execution of a loop, 
+%whose total iteration numbers ranked 2nd. 
+%Instead, we monitor these two loops.
+These two bugs are caused by the repeated executions of a loop with the second
+highest number of iterations. Instead of using the loop with the most iterations,
+we monitor these two loops.
+
 
 For each benchmark, 
-we use the same methodology in Section~\ref{sec:inhouse_exp} 
+we use the same methodology described in Section~\ref{sec:inhouse_exp} 
 to generate a sequence of inputs, 
-so that the difference between sizes of two consecutive inputs is constant.
-We name this input set as controlled inputs.
+so that the difference between the sizes of two consecutive inputs is constant.
+This input set contains controlled inputs.
 We also randomly sample controlled inputs to generate a set of random 
-inputs to emulate uncontrolled inputs in production runs.    
+inputs to emulate the uncontrolled inputs in production runs.    
 
 \noindent\textbf{Metrics}
 We will measure the following three metrics during our experiments:
-1) runtime overhead, which is the slow down caused 
+1) runtime overhead, which is the slowdown caused 
 by sampling information from each program run;
 2) profiling capability, which is measured as the similarity between two cost functions 
-inferred under in-house setting and production-run setting; 
-3) profiling latency, which is measured by how many program 
-runs are needed to conduct the algorithmic profiling. 
+inferred under the in-house setting and the production-run setting using the same metrics;
+and 3) profiling latency, which is measured by how many program 
+runs are needed for the algorithmic profiling. 
 
 
 \input{section/tab_online1}
 
+\input{section/tab_online2}
 
 \noindent\textbf{Settings}
 By default, we set the sampling rate to be $1$ out of $100$ 
-and conduct algorithmic profiling by using $100$ program runs with controlled inputs.  
+and run the algorithmic profiling using $100$ program runs with controlled inputs.  
 
 Besides the default setting,
 we evaluate the impact of different numbers of monitored program runs, 
 ranging from $10$ to $1000$, under the default sampling rate.
 We conduct this experiment by using both controlled inputs and random inputs 
-to understand whether different input sets will influence experimental results.
-We also evaluate the impact of sampling rate, ranging from $1$ out of $10$ to $1$ out of $10000$, 
-by using $100$ program runs with controlled inputs.  
+to understand whether different input sets will influence the experimental results.
+We also evaluate the impact of changing the sampling rate, ranging from $1$ out of $10$ to $1$ out of $10000$, 
+using $100$ program runs with controlled inputs.  
 
 Sampling will introduce some randomness. 
 We conduct each experiment multiple times, 
 and our results are stable across multiple experiments. 
-Particularly, overhead is measured by using $10$ runs under the same setting. 
+In particular, overhead is measured using $10$ runs under the same setting. 
 
 \noindent\textbf{Runtime Overhead}
-The runtime overhead is small under the default sampling rate (1 out of 100) 
-in Table~\ref{tab:overhead}.
+Table~\ref{tab:overhead} shows that the runtime overhead is small under the 
+default sampling rate (1 out of 100).
 It is below $5\%$ in $34$ out of $38$ cases, 
 and it is below $10\%$ in $35$ out of $38$ cases. 
 It is below $5\%$ for all real complexity problems, 
@@ -227,10 +236,10 @@ except GCC\#1687.
 
 The runtime overhead is influenced by the sampling rate, 
 as shown in Figure~\ref{tab:sampling}.
-We can lower the runtime overhead, by decreasing the sampling rate.
+We can lower the runtime overhead by decreasing the sampling rate.
 The overhead can be lowered to be mostly ($30/38$) 
-under $1\%$ under the $\frac{1}{10^4}$.
-The runtime overhead will be increased, 
+under $1\%$ when the sampling rate is $\frac{1}{10^4}$.
+The runtime overhead increases, 
 if we sample more frequently.
 The runtime overhead will be more than $10\%$ for most cases ($30/38$), 
 when the sampling rate is $\frac{1}{10}$.
@@ -238,73 +247,70 @@ when the sampling rate is $\frac{1}{10}$.
 \noindent\textbf{Profiling Capability}
 As shown in Table~\ref{tab:overhead}, 
 with $1000$ program runs and controlled inputs, 
-sampling does very little damage to profiling capability. 
+sampling does very little damage to the profiling capability. 
 We fail to profile Mozilla\#490742 and Apache\#37184.
 These two bugs are in $O(N)$ complexity. 
-Their monitored loops only execute once 
+Their monitored loops execute only once 
 and we fail to collect any sample.
 For all other bugs, 
-the calculated similarity by using Equation~\ref{eq:sim}
-for the two inferred functions under 
-in-house and production-run setting
-is constantly larger than $0.85$.
+%the calculated similarity by using Equation~\ref{eq:sim}
+%for the two inferred functions under 
+%in-house and production-run setting
+%is constantly larger than $0.85$.
+the similarity calculated with Equation~\ref{eq:sim} for the two functions with the same input and cost metrics
+under in-house setting and production-run setting is consistently larger than $0.85$.
 
-As expected, the profiling capability will decrease by using sparser sampling rate. 
+As expected, the profiling capability will decrease when using sparser sampling rate. 
 As shown in Table~\ref{tab:sampling}, 
-by using the default 100 program runs,
-profiling capability is the same between $\frac{1}{10}$ sampling rate 
-and $\frac{1}{10^2}$ sample rate.
-Profiling capability will drop with $\frac{1}{10^3}$ sampling rate. 
-Nine benchmarks that can be accurately profiled with higher sampling rate
-cannot be profiled with $\frac{1}{10^3}$ sampling rate.
-Profiling capability will drop further with $\frac{1}{10^4}$ sampling rate. 
-Only six benchmarks can be accurately profiled with $\frac{1}{10^4}$ sampling rate. 
-More program runs are needed for $\frac{1}{10^3}$ sampling rate 
-and $\frac{1}{10^4}$ sampling rate. 
+when using the default 100 program runs,
+the profiling capability is the same for the $\frac{1}{10}$ sampling rate 
+and the $\frac{1}{10^2}$ sample rate.
+The profiling capability will drop with the $\frac{1}{10^3}$ sampling rate. 
+Nine benchmarks that can be accurately profiled with a higher sampling rate
+cannot be profiled with the $\frac{1}{10^3}$ sampling rate.
+The profiling capability drops further with the $\frac{1}{10^4}$ sampling rate. 
+Only six benchmarks can be accurately profiled with the $\frac{1}{10^4}$ sampling rate. 
+More program runs are needed for the $\frac{1}{10^3}$ sampling rate 
+and the $\frac{1}{10^4}$ sampling rate. 
 
 As shown in Table~\ref{tab:sampling}, 
-different sets of inputs have slight impact on diagnosis capability. 
-Using $500$ and $1000$ program runs, 
-profiling capability is the same between controlled inputs and random inputs. 
-Using $100$ program runs, 
-profiling capability is better by using controlled inputs.
-Two benchmarks that can be accurately profiled by using controlled inputs 
-cannot be accurately profiled by using random inputs.
-Using $10$ program runs, 
-there are some benchmarks that can be accurately 
-profiled by using one input set, while cannot 
-be accurately profiled by the other, 
+using different inputs has a slight impact on the profiling capability. 
+For $500$ and $1000$ program runs, 
+the profiling capability is the same between controlled inputs and random inputs. 
+For $100$ program runs, 
+the profiling capability is better when using controlled inputs.
+Two benchmarks that can be accurately profiled with controlled inputs 
+cannot be accurately profiled with random inputs.
+For $10$ program runs, 
+some benchmarks can be accurately 
+profiled with one input set, but they cannot 
+be accurately profiled with the other, 
 for both controlled inputs and random inputs.
 
-
-\input{section/tab_online2}
-
-
 \noindent\textbf{Profiling Latency}
-We conduct a quantitative measurement on the impact of sampling to profiling latency 
-in Table~\ref{tab:sampling}.
-As we can see, by using controlled inputs, 
-three benchmarks need around 100 program runs to accurately profile. 
-Mozilla\#490742 and Apache\#37184 need more than 1000 runs to profile. 
-By using random inputs, two benchmarks, GCC\#1687 and GCC\#27733, 
-need around 100 runs to profile. 
-Apache\#29743 needs around 500 runs to profile. 
-Mozilla\#490742 and Apache\#37184 also need more than 1000 runs to profile.   
+Table~\ref{tab:sampling} shows the quantitative measurements for the impact of sampling on the profiling latency.
+As we can see, with controlled inputs, 
+three benchmarks need around 100 program runs for an accurate profile. 
+Mozilla\#490742 and Apache\#37184 need more than 1000 runs for an accurate profile to be produced. 
+With random inputs, two benchmarks, GCC\#1687 and GCC\#27733, 
+need around 100 runs for an accurate profile to be produced. 
+Apache\#29743 needs around 500 runs. 
+Mozilla\#490742 and Apache\#37184 also need more than 1000 runs.   
 This means longer profiling latencies than the in-house version of \Tool,
-which only needs 10 runs to conduct accurately profile. 
+which needs only 10 runs to for an accurate profile. 
 
-Sampling does not lengthen diagnosis latency for 32 benchmarks 
-under controlled 
-inputs and for 33 benchmarks under random inputs.
+Sampling does not lengthen the profiling latency for 32 benchmarks 
+with controlled 
+inputs and for 33 benchmarks with random inputs.
 As we discussed earlier, these bugs are caused by repeated executions of a loop. 
 Even though we apply sampling, 
-we can still collect enough information to make an accurate estimation for the whole execution. 
+we can still collect enough information to make an accurate estimate for the whole execution. 
 Consequently, sampling allows us to achieve a low runtime overhead, 
-accurate profiling results, and low profiling latency simultaneously. 
-For other benchmarks, even though we use $\frac{1}{10^2}$ sample rate, 
-sampling does not lengthen profiling latency by 100 times. 
-For most benchmarks,100 runs are enough to conduct accurate profiling, 
-due to the same reason that the root-cause loop or recursive function is executed a lot of times, 
+accurate profiling results, and a low profiling latency at the same time. 
+For other benchmarks, even though we use the $\frac{1}{10^2}$ sample rate, 
+sampling does not lengthen the profiling latency by 100 times. 
+For most benchmarks, 100 runs are enough for an accurate profile, 
+since the root-cause loop or recursive function is executed many times, 
 
 
 
