@@ -12,7 +12,7 @@
     \cmidrule(lr){2-5}                      
     \cmidrule(lr){6-9}
     \cmidrule(lr){10-12}
-                                    &  KLOC     &  P.L.      &  Complexity &  Buggy C.C.     & main-C    & Re-C    & Overhead  & \# of S.L.         &   Re-C        &  Overhead & \# of S.L.  \\
+                                    &  KLOC     &  P.L.      &  Complexity &  Buggy C.C.     & main-C    & Re-C    & Overhead  & \# of F.P.         &   Re-C        &  Overhead & \# of F.P.  \\
     \midrule 
 
     Mozilla\#347306   &  $88$       & C     &   $O(N^{2})$   &  A-L  &  \ding{51}$_{0.96}$  &  \ding{51}$_{0.96}$    &  56{\bf X}  & 0$_1$   &  \ding{51}$_{0.97}$  &  23{\bf X}  & -   \\
@@ -87,8 +87,8 @@
    In the RMS+ columns,
    main-C: cost function comparison results for main functions;
    Re-C: cost function comparison results for recursion functions;
-   /: Mozilla\#490742 and Apache\#37184 do not have recursion functions. 
-   \# of S.L.: the number of functions whose inferred complexity is superlinear. 
+   /: Mozilla\#490742 and Apache\#37184 do not have recursion functions; 
+   \# of F.P.: the number of false positives. 
    \ding{51}$_{y}$: calculated similarity using Equation~\ref{eq:sim} is $y$, and y is larger than $0.85$. 
     In the DSS columns, 
     -: the calculated similarity using Equation~\ref{eq:sim} is less than $0.85$.     

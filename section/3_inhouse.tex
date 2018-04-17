@@ -75,17 +75,20 @@ of \texttt{c} during the whole program run.
 
 \begin{figure*}
 \centering
-\subfloat[Inner]{\includegraphics[width=0.22\linewidth]{figure/mysql27287-complexity-n-square}\label{fig:mysql27287-indep}} 
-\subfloat[Outer]{\includegraphics[width=0.22\linewidth]{figure/mysql27287-complexity-n-square}\label{fig:mysql27287-outer}}
-\subfloat[Bottom-up]{\includegraphics[width=0.22\linewidth]{figure/gcc27733-time-cost-line}\label{fig:mysql27287-merge}} 
-\subfloat[Array]{\includegraphics[width=0.22\linewidth]{figure/gcc27733-time-cost-line}\label{fig:mysql27287-inner-array}} \\ 
+\subfloat[Inner]{\includegraphics[width=0.22\linewidth]{figure/mysql27287-inner-loop-line}\label{fig:mysql27287-indep}} 
+\subfloat[Outer]{\includegraphics[width=0.22\linewidth]{figure/mysql27287-outer-loop-line}\label{fig:mysql27287-outer}}
+\subfloat[Bottom-up]{\includegraphics[width=0.22\linewidth]{figure/mysql27287-loop-bb-line}\label{fig:mysql27287-merge}} 
+\subfloat[Array]{\includegraphics[width=0.22\linewidth]{figure/mysql27287-loop-array-line}\label{fig:mysql27287-inner-array}} \\ 
 \vspace{-0.1in}
-\caption{XXXX
-\footnotesize{(These figures show how execution time change with the change of input size for MySQL\#27287, 
- Apache\#34464, Mozilla\#477564, and GCC\#27733. For each complexity problem, we use 10 distinct inputs.)}} 
-\label{fig:time} 
+\caption{How cost scales for MySQL\#27287. 
+\footnotesize{(These figures show how cost scales using RMS or \# of array elements 
+as input metric for different code constructs of MySQL\#27287. 
+The first two figures are analyzed using the top-down method, 
+and the last two are analyzed using the bottom-up method.)}} 
+\label{fig:cost} 
 \vspace{-0.15in}
 \end{figure*} 
+ 
 
 Take MySQL\#27287 as an example.
 RMS for a dynamic instance of
@@ -661,7 +664,7 @@ If a complexity problem is caused by a recursive function,
 its recursion function is the recursive function. 
 Otherwise, the complexity problem does not have recursion function. 
 
-\textbf{Research Question to Answer}
+\textbf{Research Questions to Answer}
 Our experiments are designed to evaluate whether the in-house version 
 of \Tool can provide desired profiling coverage and profiling accuracy. 
 Specifically, we aim to answer the following two questions:
@@ -694,12 +697,57 @@ All experimental results are shown in Table~\ref{tab:benchmark_info}.
 To answer {\bf RQ1}, 
 we examine fitted functions for main and recursion functions 
 under different combinations. 
+
 Under the combination of RMS+ and BBs, 
 the fitted functions of main can explain 
 how the whole program execution time scales for all benchmarks, 
 as shown by the check-marks 
 in Table~\ref{tab:benchmark_info} (the ``main-C'' column).
+The minimum similarity value is $0.86$.
+Two benchmarks are in $O(N)$ complexity, and they do not have recursion functions.
+The fitted functions of recursion functions fail in these two cases. 
+They can successfully explain how execution time scales for all other benchmarks, 
+with minimum similarity value $0.86$ 
+(the ``RMS+/Re-C'' column).
 The combination of RMS+ and BBs does provide good profiling coverage. 
+
+GCC\#1687 and GCC\#27733 are caused by recursive functions. 
+We also evaluate the combination of RMS+ and RIs for these two benchmarks.
+The fitted functions of the two recursive functions can also explain how execution time scales, 
+but the calculated similarity values are less, 
+compared with using BBs as cost metric 
+(the second value in the ``RMS+/Re-C'' column). 
+
+We have six benchmarks, 
+whose buggy code constructs are not array-processing loops or linked-list-processing loops. 
+We cannot get input information 
+when analyzing their recursion functions using the combination of DSS and LIs 
+(``RMS+/Re-C'' column).  
+The fitted functions of recursion functions also fail in the two $O(N)$ cases.
+For all other cases, the fitted functions of recursion functions can 
+explain how execution time scales under the combination of DSS and LIs. 
+The combination of DSS and LIs can effectively profile complexity problems caused by 
+repeated executions of array-processing loops 
+and linked-list-processing loops. 
+
+
+\textbf{Accuracy Results}
+To answer {\bf RQ2},
+we manually examine all functions with superlinear complexity reported by \Tool.
+They can be divided into two categorizations. 
+Some of them are on the call chain between main function to the recursion function.
+These functions can also explain how execution time scales with different inputs. 
+We do not consider them as false positives. 
+For others (the two ``\# of F.P.'' columns), they do scale superlinearly. 
+However, their costs are smaller than the cost of 
+the recursion function from the same benchmark. 
+They are not the main contributors to the perceived performance degradation. 
+We consider these functions as benign false positives, 
+since they can easily be filtered out. 
+In general, \Tool is accurate, and it does not report any true false positives. 
+Compare with the two combination, DSS plus 
+LIs will bring fewer true false positives. 
+
 
 
 
