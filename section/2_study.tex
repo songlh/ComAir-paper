@@ -9,7 +9,7 @@ complexity problems. Our empirical study is conducted in two steps.
 
 \item We build a taxonomy for the studied complexity bugs. 
 For bugs in each category, 
-we study what code constructs conduct efficient computation,
+we study what code constructs conduct the inefficient computation,
 how the user-perceived slowdown is generated, 
 and how to fix these bugs. 
 Our studying results can help us 
@@ -39,7 +39,7 @@ software suites: Apache, Chrome, GCC, Mozilla, and MySQL.
 These software suites cover various types of functionalities and are implemented 
 in a variety of programming languages, including C/C++, Java, C\#, and JavaScript. 
 All the five studied software suites are large and mature, 
-with millions of lines of codes and long development histories. 
+with millions of lines of code and long development histories. 
 In their following work~\cite{SongOOPSLA2014}, 
 the authors further identified 65 user-perceived performance bugs, 
 whose bugs reports contain detailed information 
@@ -74,7 +74,7 @@ We believe that end users could report perceived complexity problems through oth
 We also believe that there could be some complexity problems noticed 
 and fixed by developers through manual inspection or in-house testing, 
 before releasing their software to end users.  
-However, the field has not found methods to study bugs not tracked by bug databases.
+%However, the field has not found methods to study bugs not tracked by bug databases.
 We believe that the studied bugs can serve as a representative sample
 of complexity problems in the real world. 
 
@@ -107,7 +107,7 @@ even though the average loop iteration numbers are not large.
 Patching these 5 bugs involves aggregating I/O operations 
 or completely eliminating unnecessary I/O operations. 
 For example, Mozilla\#490742 is caused by bookmarking 
-tabs by using individual database transactions. 
+tabs using individual database transactions. 
 Even bookmarking 50 tabs can cause a timeout dialog 
 window to pop up in a performance failure run. 
 To fix this bug, Mozilla developers use one single aggregated transaction 
@@ -140,7 +140,7 @@ Similar to the complexity problems in linear complexity,
 the polynomial complexity for each problem is also caused by a buggy loop.
 However, {\bf both} of the loop execution number 
 and the average loop iteration number
-scale as input size $O(N)$.
+scale as input size $N$.
 
 
 \begin{figure}
@@ -205,7 +205,7 @@ Given a node,
 its \texttt{count} value is calculated by adding one 
 to the \texttt{count} value of 
 its nearest previous node with the same \texttt{localName} and \texttt{URI}.  
-How the complexity changes after fix for MySQL\#27287 and Mozilla\#477564 are 
+How the complexity changes after patching for MySQL\#27287 and Mozilla\#477564 are 
 shown in Figure~\ref{fig:mysql27287-time} and Figure~\ref{fig:mozilla477564-time}, respectively. 
 
 
@@ -245,8 +245,8 @@ There is an inner loop inside \texttt{indexOf()}, whose total iterations
 scale polynomially in terms of the number of characters from \texttt{getchar()}. 
 After fixing this bug, the inner loop will only check the most recent \texttt{targetLen} characters.
 The developers do not change the inner loop, 
-while reduce the workload it processes.   
-How execution time scales before and after fix for 
+while reducing the workload it processes.   
+How execution time scales before and after patching for 
 Apache\#34464 is shown in Figure~\ref{fig:apache34464-time}.
 
 
@@ -263,7 +263,7 @@ Apache\#34464 is shown in Figure~\ref{fig:apache34464-time}.
 Four of the studied complexity problems are in exponential complexity. 
 These complexity problems are fixed 
 either by leveraging memoization to reuse previous results 
-or by skipping computation with exponential complexity for large workloads. 
+or by skipping the computation with exponential complexity for large workloads. 
 
 
 
@@ -276,7 +276,7 @@ or by skipping computation with exponential complexity for large workloads.
 \caption{A GCC performance problem in exponential complexity. 
  \footnotesize{(During performance failure runs, how many times \texttt{mult\_alg} is invoked scales exponentially
   with the number of 1s in the binary form of input \texttt{t}.)}}
-\vspace{-0.3in}
+\vspace{-0.1in}
 \label{fig:gcc27733}
 \vspace{-0.15in}
 \end{figure}
@@ -299,7 +299,7 @@ and this error causes \texttt{t} larger than the maximum unsigned integer to nev
 For large \texttt{t}, \texttt{mult\_alg} is still in exponential complexity. 
 After fixing the type declaration error, 
 memoization is enabled for large \texttt{t}. 
-How the complexity changes after fix for GCC\#27733 is shown in Figure~\ref{fig:gcc27733-time}.
+How the complexity changes after patching for GCC\#27733 is shown in Figure~\ref{fig:gcc27733-time}.
 
 GCC\#32540 is in the exponential complexity category and is caused by an inefficient loop. 
 The loop applies an iterative algorithm to implement a compiler optimization. 
@@ -321,7 +321,7 @@ to better understand state-of-the-art combating process for complexity problems.
 As shown in Table~\ref{tab:study},
 for most complexity bugs (24/30), 
 users' reports specify how to change input sizes 
-in order to observe the performance scaling problems. 
+in order to reproduce the performance scaling problems. 
 As discussed in previous works~\cite{SongOOPSLA2014}, 
 all collected user-perceived performance-bug reports
 contain bug-triggering inputs from end users. 
@@ -365,7 +365,7 @@ we also observe that developers consistently need more time to diagnose complexi
 %while the time they spend is still 0.43 times longer. 
 
 As discussed in the previous works~\cite{SongOOPSLA2014}, 
-traditional profilers are the only type of diagnosis tools mentioned in bug reports 
+traditional profilers are the only type of diagnosis tools mentioned in bug reports. 
 %when diagnosing the collected user-perceived performance problems. 
 Tradisional profilers are mentioned in 7 out of 30 complexity-bug reports. 
 A similar percentage of bug reports mention traditional profilers
@@ -421,14 +421,14 @@ because the developers' workload assumptions are wrong or the workloads changed.
 This result motivates to monitor workloads and conduct algorithmic profiling in production runs. 
 Workload monitoring tools can warn developers when the workload assumption is wrong.
 Online algorithmic profiling tools can tell developers 
-how each piece of codes scales under real-world workloads on the user side.  
+how each piece of code scales under real-world workloads on the user side.  
 
 {\underline{\textit{Implication 5}}}
 Our study shows that approximately three-fourths of the studied complexity problems (22/30)
-are caused by repeated execution of a loop or a recursive function. 
+are caused by repeated executions of a loop or a recursive function. 
 These bugs are categorized as polynomial complexity and exponential complexity in Section~\ref{sec:tax}.
 Previous works~\cite{SongOOPSLA2014,ldoctor} 
 show that sampling code constructs 
-that execute many times can lower the runtime overhead 
+that execute many times in one program run can lower the runtime overhead 
 while preserving the same diagnosis or detection capability. 
 It is promising to apply sampling to design production-run algorithmic profiling techniques. 
