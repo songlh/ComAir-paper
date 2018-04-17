@@ -561,9 +561,9 @@ and how much we should change.
 
 \subsection{Experimental Evaluation}
 \label{sec:inhouse_exp}
-%\subsubsection{Methodology}
 
-\noindent\textbf{Implementation and Platform}
+\subsubsection{Methodology}
+%\noindent\textbf{Implementation and Platform}
 We implement \Tool by using LLVM-5.0.0.
 Our current implementation focus on C/C++ programs, 
 but we believe that our algorithms are general enough to be extended 
@@ -573,7 +573,7 @@ with i7-7700 CPU and 32-GB memory.
 
 %\input{section/tab_inhouse1}
 
-\noindent\textbf{Benchmarks}
+\textbf{Benchmarks}
 %\Tool is an algorithmic profiling tool chain.
 %Developers can use \Tool to diagnose user-perceived performance failures caused by complexity problems, 
 %in both in-house and production-run settings. 
@@ -608,7 +608,6 @@ common data structures, like ArrayList, HashMap and Vector,
 and finally, they re-implemented the performance bugs according to their root cases. 
 We use all the 21 re-implemented bugs in our evaluation.  
 
-
 In total, we evaluate \Tool on 38 benchmarks. 
 Information for all benchmarks is shown in Table~\ref{tab:benchmark_info}.
 In general, benchmarks used in our experiments are large. 
@@ -625,17 +624,16 @@ We also two benchmarks in $O(2^N)$ complexity, and two benchmarks in $O(N)$ comp
 
 \input{section/tab_inhouse}
 
-\noindent\textbf{Experimental Setting}
+\textbf{Experimental Settings}
 For each benchmark, 
 we conduct algorithmic profiling on $10$ program runs with distinct inputs, 
 following the previous practice during in-house 
-testing or diagnosis~\cite{SongOOPSLA2014,joy.asplos13}.
-
+testing and diagnosis~\cite{SongOOPSLA2014,joy.asplos13}.
 For all benchmarks used in our experiments,
-their bug reports contain at least one bug-triggering inputs. 
+their bug reports contain at least one bug-triggering input. 
 For 14 of them, 
 the users explicitly explain how to change input sizes to 
-observe the described scaling problems. 
+observe the described scaling problems when they reported these bugs. 
 We follow the users' 
 descriptions to generate new inputs.
 For the other benchmarks, 
@@ -646,19 +644,49 @@ the user provided a C file,
 containing an expression with thousands of strings as operands. 
 We change the number of strings to generate new inputs.
 For each benchmark, we choose the input sizes of the $10$ inputs to be 
-an arithmetic sequence with the input from the bug report as the largest input. 
+an arithmetic sequence with the largest input as the input in the bug report 
+and the smallest input whose input size is 
+only $\frac{1}{10}$ of the largest input.
 
 For each benchmark, we first fit a curve to understand how execution 
-time changes with input sizes. 
-We then examine fitted cost functions to 
-understand whether fitted functions can explain how execution times changes with input sizes. 
-For each benchmark, we focus on two fitted functions, one is main function, 
-and the other is recursion function. 
-As we discussed in Section~\ref{sec:study}, 
-the majority of complexity problems are caused by repeated executions 
-of a loop or a recursive function. 
-We consider the function leads to the repeated executions as recursion function. 
-We consider the buggy recursive function or the function containing the outer loop as the recursion 
-function for a benchmark.
+time changes with input size. 
+We then examine whether fitted functions can explain the observed scaling problem, 
+by calculating similarity using Equation~\ref{eq:sim}. 
+We consider a similarity value larger than $0.85$ to be able to explain the scaling problem. 
+We focus on two fitted functions, one is fitted for main function, 
+and the other is fitted for recursion function. 
+If a complexity problem is caused by repeated executions of a loop,
+its recursion function is the function containing the outer loop.
+If a complexity problem is caused by a recursive function, 
+its recursion function is the recursive function. 
+Otherwise, the complexity problem does not have recursion function. 
+
+For each benchmark, we conduct experiments using two 
+combinations of input metric and cost metric, one is with 
+RMS+ as input metric and BBs as cost metric, 
+and the other is with DSS as input metric and LIs as cost metric. 
+The two bugs in $O(2^N)$ complexity are caused by recursive functions.
+We also evaluate \Tool on these two bugs 
+using RMS+ as input metric and RIs as cost metric. 
 
 
+\textbf{Research Question to Answer}
+Our experiments are designed to evaluate whether the in-house version 
+of \Tool can provide desired profiling coverage and profiling accuracy. 
+Specifically, we aim to answer the following two questions:
+
+\begin{itemize}
+
+\item {\bf RQ1.} 
+Benchmarks used in our evaluation are in different types of complexity and 
+are caused by different types of buggy code constructs 
+as shown in Table~\ref{tab:benchmark_info}. 
+Can \Tool cover all of them? 
+ 
+\item {\bf RQ2.}
+Will \Tool generate many inaccurate profiling results and report many false positives? 
+
+\end{itemize}
+
+\subsubsection{Experimental Results}
+All experimental results are shown in Table~\ref{tab:benchmark_info}.
