@@ -661,15 +661,6 @@ If a complexity problem is caused by a recursive function,
 its recursion function is the recursive function. 
 Otherwise, the complexity problem does not have recursion function. 
 
-For each benchmark, we conduct experiments using two 
-combinations of input metric and cost metric, one is with 
-RMS+ as input metric and BBs as cost metric, 
-and the other is with DSS as input metric and LIs as cost metric. 
-The two bugs in $O(2^N)$ complexity are caused by recursive functions.
-We also evaluate \Tool on these two bugs 
-using RMS+ as input metric and RIs as cost metric. 
-
-
 \textbf{Research Question to Answer}
 Our experiments are designed to evaluate whether the in-house version 
 of \Tool can provide desired profiling coverage and profiling accuracy. 
@@ -688,5 +679,27 @@ Will \Tool generate many inaccurate profiling results and report many false posi
 
 \end{itemize}
 
-\subsubsection{Experimental Results}
+\subsubsection{Experimental Results} 
+For each benchmark, we conduct experiments using two 
+combinations of input and cost metrics, one is with 
+RMS+ as input metric and BBs as cost metric, 
+and the other is with DSS as input metric and LIs as cost metric. 
+The two bugs in $O(2^N)$ complexity are caused by recursive functions.
+We also evaluate \Tool on these two bugs 
+using RMS+ as input metric and RIs as cost metric. 
 All experimental results are shown in Table~\ref{tab:benchmark_info}.
+
+
+\textbf{Coverage Results}
+To answer {\bf RQ1}, 
+we examine fitted functions for main and recursion functions 
+under different combinations. 
+Under the combination of RMS+ and BBs, 
+the fitted functions of main can explain 
+how the whole program execution time scales for all benchmarks, 
+as shown by the check-marks 
+in Table~\ref{tab:benchmark_info} (the ``main-C'' column).
+The combination of RMS+ and BBs does provide good profiling coverage. 
+
+
+
