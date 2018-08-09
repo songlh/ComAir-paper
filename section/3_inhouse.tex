@@ -46,7 +46,7 @@ construct may lead to incorrect profiling results.
 
 \noindent\textbf{Read Memory Size (RMS)}}
 RMS is proposed as an input metric for a dynamic instance
-of a code construct~\cite{Aprof1,Aprof2}. 
+of a code construct\cite{Aprof1,Aprof2}. 
 RMS is defined as the number of distinct memory cells 
 whose first access is read. 
 RMS considers both reads conducted by a code construct directly 
@@ -60,7 +60,7 @@ $n$ times in one run of the program.
 We would have $n$ RMS records collected 
 for the $n$ dynamic instances of \texttt{c}. 
 There are two methods to analyze these $n$ RMS records.
-The first method aggregates the $n$ records in a \textit{top-down} way~\cite{Aprof1,Aprof2}.
+The first method aggregates the $n$ records in a \textit{top-down} way\cite{Aprof1,Aprof2}.
 When analyzing complexity for \texttt{c}, 
 we consider the $n$ records independently from each other. 
 The effect of multiple instances of \texttt{c} 
@@ -118,7 +118,7 @@ which is shown in Figure~\ref{fig:mysql27287-merge}.
 \noindent\textbf{Data structure size (DSS)}
 The number of distinct accessed elements of a data 
 structure could also be used to measure 
-input size for a dynamic instance of a code construct~\cite{AlgoProf}. 
+input size for a dynamic instance of a code construct\cite{AlgoProf}. 
 %As we discussed in Section~\ref{sec:study_impli},
 %array and linked list are the two types of data structures
 %most commonly involved in complexity problems. 
@@ -292,13 +292,13 @@ We do this, because we want to infer the worst-case complexity for the code cons
 To infer a cost function,
 we consider four possibilities: 
 an exponential function, or a polynomial function with degree from 1 to 3.
-We use least square~\cite{least} to determine parameters for the four possible functions. 
+We use least square\cite{least} to determine parameters for the four possible functions. 
 For example, we start a polynomial function with degree 2 as $y=a*x^2 + b*x +c$.
 We choose $a$, $b$ and $c$ to minimize the sum of squared difference between 
 observed values and fitted values.  
 To choose the best one among the four possible fitted functions, 
 we calculate coefficient of determination for each. 
-Coefficient of determination is commonly used to measure goodness-of-fit~\cite{codeter}.
+Coefficient of determination is commonly used to measure goodness-of-fit\cite{codeter}.
 We choose the fitted function with highest coefficient of determination. 
 
 
@@ -339,7 +339,7 @@ from $a$ and $b$ are more similar to each other.
 
 \subsection{Implementation and Optimization}
 
-We use LLVM~\cite{llvm} to instrument the programs to be profiled.
+We use LLVM\cite{llvm} to instrument the programs to be profiled.
 We use python to analyze profiling records 
 %with input and cost information 
 and to infer the cost function. 
@@ -375,7 +375,7 @@ Otherwise, we need to check whether a monitored code construct enclose related c
 when checking active functions on the call stack.  
 
 {\textit{\underline{How to implement RMS+?}}}
-\citet{Aprof1,Aprof2} designed an algorithm to collect 
+\cite{Aprof1,Aprof2} designed an algorithm to collect 
 RMS for all executed functions based on 
 Valgrind. We briefly discuss this algorithm firstly, 
 and then we will discuss how to enhance this algorithm. 
@@ -535,9 +535,9 @@ and increase the counter value in every BB.
 To efficiently count executed BBs, 
 we apply an algorithm, which was originally designed to 
 efficiently count edge events through selectively instrumenting a counter 
-on CFG~\cite{event-counting}.
+on CFG\cite{event-counting}.
 The algorithm has already been proved to be able to 
-conduct path profiling efficiently~\cite{peter-ase,path-profiling}. 
+conduct path profiling efficiently\cite{peter-ase,path-profiling}. 
 To apply the algorithm,
 we instrument a local counter \texttt{local\_cost} for each function
 and initialize its value to be $0$ at the entry BB. 
@@ -555,9 +555,9 @@ Since the original algorithm is design to count edge events,
 we split each BB into two 
 and label the event number to be 1 for each edge connecting a pair of split BBs. 
 We label the event number to be 0 for all other edges.
-We compute a spanning tree~\cite{spanning} for the CFG.
+We compute a spanning tree\cite{spanning} for the CFG.
 Edges not in the spanning tree are called chords.
-We apply the depth-first search algorithm proposed by~\citet{event-counting} 
+We apply the depth-first search algorithm proposed by\cite{event-counting} 
 to calculate on which chords we should change 
 \texttt{local\_cost} 
 and how much we should change.
@@ -578,7 +578,7 @@ with i7-7700 CPU and 32-GB memory.
 \textbf{Benchmarks}
 We select complexity problems from two sources. 
 The first source is our studied complexity problems, 
-which are randomly sampled from representative applications in previous works~\cite{PerfBug,SongOOPSLA2014}.
+which are randomly sampled from representative applications in previous works\cite{PerfBug,SongOOPSLA2014}.
 We successfully reproduce 17 complexity problems. 
 Among them, 6 bugs are extracted from original Java or JS programs, 
 and re-implemented by using C/C++, 
@@ -594,9 +594,9 @@ because they depend on very special software or hardware environments.
 We fail to re-implement them, 
 because their data structures are too complex to extract.
 
-The second source is from Toddler project~\cite{Alabama}. 
+The second source is from Toddler project\cite{Alabama}. 
 Toddler is a dynamic technique that can detect inefficient loops in Java programs.
-In a previous work, \citet{ldoctor} re-implemented all 
+In a previous work, \cite{ldoctor} re-implemented all 
 21 bugs detected by Toddler and verified by developers using C/C++.
 During the re-implementation, the researchers first reproduced all Java bugs, 
 then they referenced JDK to re-implement 
@@ -625,7 +625,7 @@ and two benchmarks in $O(N)$ complexity.
 For each benchmark, 
 we conduct algorithmic profiling on $10$ program runs with distinct inputs, 
 following the previous practice during in-house 
-testing and diagnosis~\cite{SongOOPSLA2014,joy.asplos13}.
+testing and diagnosis\cite{SongOOPSLA2014,joy.asplos13}.
 For all benchmarks used in our experiments,
 their bug reports contain at least one bug-triggering input. 
 For 14 of them, 

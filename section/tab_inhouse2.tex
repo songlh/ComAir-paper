@@ -1,15 +1,15 @@
-\begin{table}[h!]
+\begin{table*}[h!]
   \centering
   \scriptsize
   \newcommand{\Yes}[1]{\checkmark{}$_#1$}
   \newcommand{\No}[0]{-}
   \begin{tabular}{lccccccccccc}
-    \toprule     
+    \toprule
     {\bf BugID}                   & KLOC  &  P.L.    & \multicolumn{6}{c}{\# of Static Features}                                          &   Complexity  & Buggy C.C.        & \# of Inputs \\
-                           
+
     \cmidrule(lr){4-9}
                                  &        &          &  BB      &  Loop     & A-L    &  LL-L    &  F.  & R.F.                             &               &                             & \\
-    \midrule 
+    \midrule
 
     Mozilla\#347306              &  88    & C        &          &           &       &           &       &                                 &               &&         \\
     Mozilla\#416628              &  105   & C        &          &           &       &           &       &                                 &               &&                \\
@@ -20,7 +20,7 @@
     MySQL\#27287      &  995  & C++  &  &              &    &                                 &                   &                           &                   &&             \\
     MySQL\#15811      &  1127 & C++  &  &              &    &                                 &                   &                           &                   &&             \\
     \midrule
-    Apache\#37184     &  -  & Java  &  &              &    &                                 &                   &                           &                    &&           \\ 
+    Apache\#37184     &  -  & Java  &  &              &    &                                 &                   &                           &                    &&           \\
     Apache\#29743     &  -  & Java  &  &              &    &                                 &                   &                           &                    &&          \\
     Apache\#34464     &  -  & Java  &  &              &    &                                 &                   &                           &                    &&           \\
     Apache\#47223     &  -  & Java  &  &              &    &                                 &                   &                           &                    &&           \\
@@ -73,4 +73,4 @@
   %\nocaptionrule
   \caption{Run-time overhead and diagnosis capability evaluated with the default sampling rate (1 out of 10000); 10, 100, 500, 1000 represents the different numbers of success/failure runs used for diagnosis.}
   \label{tab:LBR}
-\end{table}
+\end{table*}

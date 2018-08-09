@@ -1,0 +1,110 @@
+%\documentclass[pldi]{sigplanconf-pldi16}
+%\documentclass[letterpaper,twocolumn,10pt]{article}
+%\usepackage{usenix,epsfig,endnotes}
+\documentclass[10pt,conference]{IEEEtran}
+
+\documentclass[acmsmall,review,anonymous]{acmart}\settopmatter{printfolios=true,printccs=false,printacmref=false}
+
+
+
+
+
+\settopmatter{printacmref=false} % Removes citation information below abstract
+\renewcommand\footnotetextcopyrightpermission[1]{} % removes footnote with conference information in first column
+\pagestyle{fancy} % removes running headers
+% standard LaTeX packages
+%\usepackage{changebar}
+
+\usepackage{balance}
+\usepackage{alltt}
+\usepackage{amsmath}
+\usepackage{balance}
+\usepackage{booktabs}
+\usepackage{fixltx2e}
+\usepackage{graphicx}
+\usepackage{boxedminipage}
+\usepackage{hyperref}
+\usepackage{nicefrac}
+\usepackage{subfig}
+
+\usepackage{setspace}
+\usepackage{xspace}
+\usepackage{multirow}
+\usepackage{colortbl}
+\usepackage{amsfonts}
+\usepackage{blindtext}
+\usepackage{chngpage}
+\usepackage{listings}
+\usepackage{color}
+\usepackage{natbib}
+\usepackage{amssymb}% http://ctan.org/pkg/amssymb
+\usepackage{pifont}% http://ctan.org/pkg/pifont
+\bibliographystyle{abbrvnat}
+\setcitestyle{authoryear,open={(},close={)}}
+
+
+
+\captionsetup{format=default, font=bf}
+
+
+\newcommand*{\Scale}[2][4]{\scalebox{#1}{$#2$}}%
+\newcommand{\Tool}{ComAir\xspace}
+\newcommand{\ComBugs}{30\xspace}
+%\newcommand{\Code}[1]{\lstinline{#1}}
+%\newcommand{\comment}[1]{{}}
+
+
+\lstset{
+  basicstyle=\tiny,
+  columns=fullflexible,
+  numbersep=5pt,
+  numberstyle=\scriptsize,
+  showstringspaces=false,
+  escapeinside={/*@}{@*/},
+  belowcaptionskip=1\baselineskip,
+  language=C,
+  showstringspaces=true,
+  keywordstyle=\bfseries,
+  commentstyle=\itshape,
+}
+
+
+\sloppy
+
+\input macros.tex
+
+
+\begin{document}
+
+
+
+
+
+\title{Algorithmic Profiling for Real-World Complexity Problems}
+
+
+\begin{abstract}
+\input{section/0_abstract}
+\end{abstract}
+
+\maketitle
+
+\input{section/1_intro}
+\input{section/2_study}
+\input{section/3_inhouse}
+\input{section/4_online}
+%\input{section/3_input_design}
+%\input{section/5_exp}
+\input{section/6_related}
+
+
+
+\balance
+{
+
+%\bibliographystyle{plainnat}
+%\setcitestyle{authoryear,open={((},close={))}}
+\bibliography{perf}
+}
+
+\end{document}

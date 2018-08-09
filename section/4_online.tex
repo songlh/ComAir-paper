@@ -27,7 +27,7 @@ to collect runtime information from the user side in a low overhead.
 The profiling results can help developers better understand the complexity of the code construct 
 and its processed workloads in the real world.
 \Tool can be used together with performance failure 
-diagnosis tools~\cite{SongOOPSLA2014} 
+diagnosis tools\cite{SongOOPSLA2014} 
 or traditional profilers to
 focus on suspicious code constructs leading 
 to user-perceived performance failures.
@@ -46,7 +46,7 @@ by repeated executions of a loop or a recursive function.
 Previous works show that sampling code constructs that are executed 
 multiple times in one program run can lower the runtime overhead, 
 while still being able to collect enough runtime information 
-without hurting diagnosis latency~\cite{SongOOPSLA2014,ldoctor}. 
+without hurting diagnosis latency\cite{SongOOPSLA2014,ldoctor}. 
 Inspired by our study and the earlier works, 
 we apply sampling to efficiently profile loops 
 and recursive functions with multiple executions. 
@@ -86,7 +86,7 @@ or DSS for all instances of \texttt{c} in one program run.
 
 
 The sampling method is similar to that described in previous works on statistical 
-debugging~\cite{liblit03,liblit05,CCI,SongOOPSLA2014,ldoctor}.
+debugging\cite{liblit03,liblit05,CCI,SongOOPSLA2014,ldoctor}.
 We make a cloned version of the monitored code construct.
 We instrument the cloned version to record information for RMS+ or DSS. 
 We dump the recorded information to log 
@@ -106,7 +106,7 @@ a random number,
 whose expectation is equal to the inverse of the sampling rate.  
 
 
-We leverage the mark-and-recapture method~\citep{mark-recapture} to 
+We leverage the mark-and-recapture method\citep{mark-recapture} to 
 estimate RMS+ or DSS for all dynamic instances of a code construct 
 based on the collected samples. 
 Mark-and-recapture is a commonly used statistical method 
