@@ -17,9 +17,9 @@ the value of the counter will be dumped to log.
 To efficiently count executed BBs, 
 we apply an algorithm, which was originally designed to 
 efficiently count edge events through selectively instrumenting a counter 
-on CFG~\cite{event-counting}.
+on CFG\cite{event-counting}.
 The algorithm has already been proved to be able to 
-conduct path profiling efficiently~\cite{peter-ase,path-profiling}. 
+conduct path profiling efficiently\cite{peter-ase,path-profiling}. 
 
 
 
@@ -40,9 +40,9 @@ Since the original algorithm is design to count edge events,
 we split each BB into two 
 and label the event number to be 1 for each edge connecting a pair of split BBs 
 We label the event number to be 0 for all other edges.
-We compute a spanning tree~\cite{spanning} for the new CFG.
+We compute a spanning tree\cite{spanning} for the new CFG.
 Edges not in the spanning tree are called chords.
-We apply the depth-first search algorithm proposed in~\cite{event-counting} 
+We apply the depth-first search algorithm proposed in\cite{event-counting} 
 to calculate on which chords we should change 
 \texttt{local\_cost} 
 and how much we should change.
@@ -51,7 +51,7 @@ If a monitored code construct is not a function,
 We need to figure out the accurate value for the global counter \texttt{cost} 
 before dumping its value 
 at the first and last BB of the monitored code construct.
-The algorithm we apply is also discussed in~\cite{event-counting}.
+The algorithm we apply is also discussed in\cite{event-counting}.
 
 
 

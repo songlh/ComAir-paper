@@ -1,17 +1,17 @@
-\begin{table}[h!]
+\begin{table*}[h!]
 \vspace{-0.05in}
   \centering
   \scriptsize
   \newcommand{\Yes}[1]{\checkmark{}$_#1$}
   \newcommand{\No}[0]{-}
   \begin{tabular}{lccccccccc}
-    \toprule     
+    \toprule
    {\bf BugID}                   &  \multicolumn{4}{c}{Controlled Inputs}            &     \multicolumn{4}{c}{Random Inputs}          & Overhead \\
-                           
+
     \cmidrule(lr){2-5}
     \cmidrule(lr){6-9}
     (\# of runs)                 &  (10)     &   (100)    &    (500)    & (1000)     &  (10)     &   (100)    &    (500)    & (1000)   &   per run\\
-    \midrule 
+    \midrule
 
     Mozilla\#347306   & \ding{51}$_{0.96}$ & \ding{51}$_{0.96}$  & \ding{51}$_{0.96}$ & \ding{51}$_{0.96}$ & \ding{51}$_{0.95}$ & \ding{51}$_{0.96}$ & \ding{51}$_{0.96}$ & \ding{51}$_{0.95}$ &  1.31\% \\
     Mozilla\#416628   & \ding{51}$_{0.94}$ & \ding{51}$_{0.95}$  & \ding{51}$_{0.96}$  & \ding{51}$_{0.96}$ & \ding{51}$_{0.88}$ & \ding{51}$_{0.94}$ & \ding{51}$_{0.95}$ & \ding{51}$_{0.95}$ & 0.32\% \\
@@ -74,12 +74,12 @@
     \bottomrule
    \end{tabular}
   %\nocaptionrule
-  \caption{Runtime overhead and profiling capability. \footnotesize{(This table shows runtime 
-  overhead and profiling capability 
-measured with the default sampling rate (1 out of 100); 
+  \caption{Runtime overhead and profiling capability. \footnotesize{(This table shows runtime
+  overhead and profiling capability
+measured with the default sampling rate (1 out of 100);
 Here, 10, 100, 500, and 1000 represent the different numbers of program runs used for algorithmic profiling;
-both controlled inputs and random inputs are used during the experiments.)} 
+both controlled inputs and random inputs are used during the experiments.)}
 }
-\vspace{-0.35in}
+\vspace{-0.15in}
   \label{tab:overhead}
-\end{table}
+\end{table*}

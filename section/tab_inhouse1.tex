@@ -1,16 +1,16 @@
-\begin{table}[h!]
+\begin{table*}[h!]
   \centering
   \scriptsize
   {
   \newcommand{\Yes}[1]{\checkmark{}$_#1$}
   \newcommand{\No}[0]{-}
   \begin{tabular}{lccccccccccc}
-    \toprule     
+    \toprule
     {\bf BugID}                   & KLOC  &  P.L.    & \multicolumn{6}{c}{\# of Static Features}                      &   Complexity  & Buggy C.C.        & \# of Inputs \\
-                           
+
     \cmidrule(lr){4-9}
                                   &       &          &  BB      &  Loop     & A-L    &  LL-L    &  Function  & R.F.          &           &        &  \\
-    \midrule 
+    \midrule
 
     Mozilla\#347306              &  $88$    & C        &   46735  &   1177     &  483    &  136    &  1988  & 35   &  $O(N^{2})$                         &  A-L  & 10000   \\
     Mozilla\#416628              &  $105$   & C        &   46097  &   1116     &  484    &  136    &  1919  &  35  &  $O(N^{2})$                         &  LL-L & 380  \\
@@ -21,7 +21,7 @@
     MySQL\#27287                 &  $995$  & C++  & 88971  & 2535 & 905 & 287 & 11969 & 80                                                          & $O(N^{2})$    & A-L   & 65536            \\
     MySQL\#15811      &  $1127$ & C++  & 17656 & 844 & 237 & 29 & 490 & 5                                                                &  $O(N^{2})$   & A-L   & 16384 \\
     \midrule
-    Apache\#37184     &  $0.092^*$ & Java  & 31 & 5  & 0 & 0 & 7 & 0                                                    & $O(N)$        & Loop & 10000     \\ 
+    Apache\#37184     &  $0.092^*$ & Java  & 31 & 5  & 0 & 0 & 7 & 0                                                    & $O(N)$        & Loop & 10000     \\
     Apache\#29743     &  $0.257^*$  & Java  & 408 & 8 & 0 & 0 & 123 & 0                                                 & $O(N^{2})$    & Loop & 10000 \\
     Apache\#34464     &  $0.16^*$  & Java  & 70 & 6 & 5 & 0  & 13 & 0                                                   & $O(N^{2})$    & A-L  & 50000 \\
     Apache\#47223     &  $0.162^*$ & Java  & 67 & 5 & 4 & 0  & 13 & 0                                                   & $O(N^{2})$    & A-L  & 50000 \\
@@ -74,11 +74,11 @@
    }
   %\nocaptionrule
   \caption{Benchmark Information.
-  \footnotesize{(This table shows information for complexity problems used in our evaluation. 
-   $x^*$: thousands of lines of codes for re-implemented benchmarks; 
-   A-L: array-processing loop; 
-   LL-L: linked-list-processing loop; 
-   R.F.: recursive function; 
+  \footnotesize{(This table shows information for complexity problems used in our evaluation.
+   $x^*$: thousands of lines of codes for re-implemented benchmarks;
+   A-L: array-processing loop;
+   LL-L: linked-list-processing loop;
+   R.F.: recursive function;
    Buggy C.C.: buggy code construct.)}}
   \label{tab:benchmark_info}
-\end{table}
+\end{table*}

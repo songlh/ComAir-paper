@@ -12,14 +12,14 @@ reported by users through bug databases.
 
 
 \subsection{Design}
-To conduct algorithmic profiling~\cite{Aprof1,Aprof2,AlgoProf},
+To conduct algorithmic profiling\cite{Aprof1,Aprof2,AlgoProf},
 we first need to record input \textit{size} and \textit{cost} for different code constructs 
 during multiple executions,
 we then plot records from the same code construct with input size as x-axis and cost as y-axis, 
 and finally, we infer a cost function of the input size by using 
-statistical curve fitting~\cite{curve-fitting} 
-or curving bounding~\cite{curve-bounding}. 
-Code constructs could be loops~\cite{AlgoProf} and functions~\cite{Aprof1,Aprof2}. 
+statistical curve fitting\cite{curve-fitting} 
+or curving bounding\cite{curve-bounding}. 
+Code constructs could be loops\cite{AlgoProf} and functions\cite{Aprof1,Aprof2}. 
 The fundamental design points for algorithmic 
 profiling are to select suitable metrics for input size and cost. 
 
@@ -49,7 +49,7 @@ One way to measure input size for a code construct inside a program
 is to simply use the input size of the whole program. 
 
 \underline{\textit{Read memory size.}}
-Read memory size (RMS) is proposed as input size metric~\cite{Aprof1,Aprof2} . 
+Read memory size (RMS) is proposed as input size metric\cite{Aprof1,Aprof2} . 
 RMS is defined as the number of distinct memory cells 
 whose first access is read. 
 RMS consider both read conducted by a code construct directly 
@@ -83,7 +83,7 @@ in Figure~\ref{fig:mysql27287-line}.
 {\underline{\textit{Data structure size.}}}
 The number of accessed elements of a data 
 structure could also be used to measure 
-input size for a code construct~\cite{AlgoProf}. 
+input size for a code construct\cite{AlgoProf}. 
 Commonly used data structures include linked list and arrays.
 Using data structure size can provide more semantic information for 
 analyzed code construct.
@@ -129,7 +129,7 @@ but we will leverage them when building production-run techniques.
 
 \subsection{Implementation optimizations}
 
-Aprof~\cite{Aprof1, Aprof2} is an algorithmic profiling tool built on Valgrind. 
+Aprof\cite{Aprof1, Aprof2} is an algorithmic profiling tool built on Valgrind. 
 Aprof uses RMS as input metric and executed BBs as cost metric.
 Complexity information will be attributed to functions after profiling. 
 We use LLVM framework to build an in-house algorithmic profiling tool.
