@@ -6,6 +6,7 @@
 \usepackage{amsmath}
 \usepackage{balance}
 \usepackage{booktabs}
+\usepackage{cite}
 \usepackage{fixltx2e}
 \usepackage{graphicx}
 \usepackage{boxedminipage}
@@ -22,12 +23,13 @@
 \usepackage{chngpage}
 \usepackage{listings}
 \usepackage{color}
-\usepackage{natbib}
+\usepackage[square,sort,comma,numbers]{natbib}
 \usepackage{amssymb}% http://ctan.org/pkg/amssymb
 \usepackage{pifont}% http://ctan.org/pkg/pifont
 
 \def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
     T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+
 \begin{document}
 
 \title{Algorithmic Profiling for Real-World Complexity Problems\\
@@ -43,30 +45,6 @@ City, Country \\
 email address}
 \and
 \IEEEauthorblockN{2\textsuperscript{nd} Given Name Surname}
-\IEEEauthorblockA{\textit{dept. name of organization (of Aff.)} \\
-\textit{name of organization (of Aff.)}\\
-City, Country \\
-email address}
-\and
-\IEEEauthorblockN{3\textsuperscript{rd} Given Name Surname}
-\IEEEauthorblockA{\textit{dept. name of organization (of Aff.)} \\
-\textit{name of organization (of Aff.)}\\
-City, Country \\
-email address}
-\and
-\IEEEauthorblockN{4\textsuperscript{th} Given Name Surname}
-\IEEEauthorblockA{\textit{dept. name of organization (of Aff.)} \\
-\textit{name of organization (of Aff.)}\\
-City, Country \\
-email address}
-\and
-\IEEEauthorblockN{5\textsuperscript{th} Given Name Surname}
-\IEEEauthorblockA{\textit{dept. name of organization (of Aff.)} \\
-\textit{name of organization (of Aff.)}\\
-City, Country \\
-email address}
-\and
-\IEEEauthorblockN{6\textsuperscript{th} Given Name Surname}
 \IEEEauthorblockA{\textit{dept. name of organization (of Aff.)} \\
 \textit{name of organization (of Aff.)}\\
 City, Country \\
@@ -126,9 +104,9 @@ component, formatting, style, styling, insert
 %\bibitem{b6} Y. Yorozu, M. Hirano, K. Oka, and Y. Tagawa, ``Electron spectroscopy studies on magneto-optical media and plastic substrate interface,'' IEEE Transl. J. Magn. Japan, vol. 2, pp. 740--741, August 1987 [Digests 9th Annual Conf. Magnetics Japan, p. 301, 1982].
 %\bibitem{b7} M. Young, The Technical Writer's Handbook. Mill Valley, CA: University Science, 1989.
 %\end{thebibliography}
-{
+
 \bibliographystyle{IEEEtran}
-\bibliography{IEEEabrv, perf}
-}
+\bibliography{perf}
+
 
 \end{document}
