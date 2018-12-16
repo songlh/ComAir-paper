@@ -1,12 +1,14 @@
-\documentclass[10pt,conference]{IEEEtran}
-\IEEEoverridecommandlockouts
+%\documentclass[10pt,conference]{IEEEtran}
+%\IEEEoverridecommandlockouts
+\documentclass[sigconf,review, anonymous]{acmart}
+\acmConference[ISSTA 2019]{ACM SIGSOFT International Symposium on Software Testing and Analysis}{15–19 July, 2019}{Beijing, China}
 % The preceding line is only needed to identify funding in the first footnote. If that is unneeded, please comment it out.
 \usepackage{balance}
 \usepackage{alltt}
 \usepackage{amsmath}
 \usepackage{balance}
 \usepackage{booktabs}
-\usepackage{cite}
+%\usepackage{cite}
 \usepackage{fixltx2e}
 \usepackage{graphicx}
 \usepackage{boxedminipage}
@@ -23,13 +25,15 @@
 \usepackage{chngpage}
 \usepackage{listings}
 \usepackage{color}
-\usepackage[square,sort,comma,numbers]{natbib}
+%\usepackage[square,sort,comma,numbers]{natbib}
+\usepackage{natbib}
+\setcitestyle{square,sort,comma,numbers}
 \usepackage{amssymb}% http://ctan.org/pkg/amssymb
 \usepackage{pifont}% http://ctan.org/pkg/pifont
-
-\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
-    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
-
+%
+%\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+%    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+%
 \begin{document}
 
 \title{Algorithmic Profiling for Real-World Complexity Problems\\
@@ -38,18 +42,18 @@
 %\thanks{Identify applicable funding agency here. If none, delete this.}
 }
 
-\author{\IEEEauthorblockN{1\textsuperscript{st} Given Name Surname}
-\IEEEauthorblockA{\textit{dept. name of organization (of Aff.)} \\
-\textit{name of organization (of Aff.)}\\
-City, Country \\
-email address}
-\and
-\IEEEauthorblockN{2\textsuperscript{nd} Given Name Surname}
-\IEEEauthorblockA{\textit{dept. name of organization (of Aff.)} \\
-\textit{name of organization (of Aff.)}\\
-City, Country \\
-email address}
-}
+%\author{\IEEEauthorblockN{1\textsuperscript{st} Given Name Surname}
+%\IEEEauthorblockA{\textit{dept. name of organization (of Aff.)} \\
+%\textit{name of organization (of Aff.)}\\
+%City, Country \\
+%email address}
+%\and
+%\IEEEauthorblockN{2\textsuperscript{nd} Given Name Surname}
+%\IEEEauthorblockA{\textit{dept. name of organization (of Aff.)} \\
+%\textit{name of organization (of Aff.)}\\
+%City, Country \\
+%email address}
+%}
 
 \newcommand*{\Scale}[2][4]{\scalebox{#1}{$#2$}}%
 \newcommand{\Tool}{ComAir\xspace}
@@ -83,9 +87,10 @@ email address}
 \input{section/0_abstract}
 \end{abstract}
 
-\begin{IEEEkeywords}
-component, formatting, style, styling, insert
-\end{IEEEkeywords}
+%\begin{IEEEkeywords}
+%component, formatting, style, styling, insert
+%\end{IEEEkeywords}
+\keywords{component, formatting, style, styling, insert}
 
 \input{section/1_intro}
 \input{section/2_study}
@@ -105,7 +110,9 @@ component, formatting, style, styling, insert
 %\bibitem{b7} M. Young, The Technical Writer's Handbook. Mill Valley, CA: University Science, 1989.
 %\end{thebibliography}
 
-\bibliographystyle{IEEEtran}
+%\bibliographystyle{IEEEtran}
+%\bibliography{perf}
+\bibliographystyle{ACM-Reference-Format}
 \bibliography{perf}
 
 
