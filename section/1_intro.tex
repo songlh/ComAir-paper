@@ -4,36 +4,37 @@
 \subsection{Motivation}
 \label{sec:motiv}
 
-Performance problems\footnote{We will use performance problems and performance bugs exchangeably,
-following previous works in this area\cite{SongOOPSLA2014,ldoctor}.}
-are a type of software implementation mistakes
-and can cause inefficient execution\cite{PerfBug,perf.fse10,SongOOPSLA2014,ldoctor,Alabama}.
-Performance problems cannot be optimized away by state-of-the-art compiler optimizations.
-Due to the complexity of modern software and rapidly changing workloads,
-performance problems widely exist in production-run software,
-annoying end users and wasting energy in the field\cite{PerfBug,SongOOPSLA2014,ldoctor}. 
-Many highly-publicized failures have already been caused by performance problems,
-such as making a website costing millions of dollars useless\cite{ACA-health}.
+As a type of software bug, performance problems~\footnote{We will use performance problems and performance bugs exchangeably,
+following previous works in this area~\cite{SongOOPSLA2014,ldoctor}.}
+are one major source of software's slowness and inefficiency~\cite{PerfBug,perf.fse10,SongOOPSLA2014,ldoctor,Alabama}. 
+Performance problems cannot be optimized away by state-of-the-art compiler optimizations, 
+and they widely widely exist in production-run software,
+annoying end users and causing economic loss in the field~\cite{PerfBug,SongOOPSLA2014,ldoctor}. 
+Several highly-publicized failures have already been caused by performance problems,
+such as making a website costing millions of dollars useless~\cite{ACA-health}.
 Combating performance problems is urgent.
+
 
 Many performance problems are caused by algorithmic inefficiency,
 such as implementing a linear algorithm in an $O(N^2)$ way.
 We refer to these performance problems as complexity problems in our paper.
 Our empirical study on a representative performance-bug
-benchmark set\cite{PerfBug,SongOOPSLA2014} shows that
+benchmark set~\cite{PerfBug,SongOOPSLA2014} shows that
 nearly half of user-perceived performance problems are complexity problems.
-Complexity problems are usually ranked high in a developers' priority list.
-For example, Mozilla developers will immediately try to fix complexity bugs degrading exponentially\cite{mozilla35294}.
+Complexity problems are usually ranked high in developers' priority list.
+For example, Mozilla developers will immediately try to fix 
+complexity bugs degrading exponentially~\cite{mozilla35294}.
 Addressing complexity problems is an important aspect of fighting performance bugs.
 
-
-Algorithmic profiling\cite{Aprof1,Aprof2,AlgoProf} collects profiles from multiple
-runs of the same program and attributes complexity to different code constructs, such as a loop or a function,
+Algorithmic profiling~\cite{Aprof1,Aprof2,AlgoProf} collects profiles from multiple
+executions of the same program and attributes complexity to different code constructs, such as a loop or a function,
 in the form of a \textit{cost} function of \textit{input} size.
 Algorithmic profiling can be used to detect previously unknown complexity problems and
-diagnose performance failures caused by complexity problems.
-Algorithmic profiling is challenging.
-Effective techniques need to satisfy the following three requirements.
+pinpoint the root causes for performance failures caused by complexity problems.
+Algorithmic profiling is an effective method to combat complexity problems. 
+
+
+\if 0
 
 \begin{enumerate}
 
@@ -66,38 +67,39 @@ techniques must not incur any observable slowdown.
 
 \end{enumerate}
 
-Existing techniques do not satisfy the above three requirements and
-cannot conduct algorithmic profiling effectively.
+\fi
+
+{\color{red} Why we need to conduct algorithmic profiling in production runs?}
+It is necessary to conduct algorithmic profiling in production runs, 
+for the following two reasons. 
+First, whether a complexity problem can 
+cause user-perceived performance 
+impact or whether a complexity problem is necessary to be fixed 
+highly depend on workload. 
+A previous empirical study shows that workload keeps changing and 
+developers usually do not have a good understanding of 
+real-world workload~\citep{PerfBug}. 
+Second, exposing a complexity problem needs to 
+execute a piece of code many times. 
+In-house testing is usually guided by code coverage, 
+and it is not effective enough to expose all complexity problems. 
+
+
+No existing techniques can conduct algorithmic profiling effectively and efficiently. 
 Traditional profilers are the tools most widely used to
-diagnose performance failures\cite{gprof,oprofile}.
-Traditional profilers can measure only how much time is spent in each code construct during one single run,
+diagnose performance failures~\cite{gprof,oprofile}.
+Traditional profilers can measure only how much time 
+is spent in each code construct during one single run,
 while failing to connect information from multiple runs
 and failing to provide any indication about how the execution time scales.
-Therefore, traditional profilers fail in both coverage and accuracy.
-To understand asymptotic complexity for a code construct,
-experimental algorithmics\cite{expalg1,expalg2,expalg3} requires developers to
-extract the code construct and analyze it out of the original program.
-Although useful,
-experimental algorithmics techniques fail to consider how the code
-construct interacts with the rest of the whole program and does not provide the desired accuracy.
-Recent techniques on algorithmic profiling\cite{Aprof1,Aprof2,AlgoProf} will incur more than $30\times$ runtime overhead.
-They cannot provide the desired performance and are far from being deployed in production runs.
+Therefore, traditional profilers fail in effectiveness.
+Recent techniques on algorithmic 
+profiling~\cite{Aprof1,Aprof2,AlgoProf} will incur more than $30\times$ runtime overhead.
+They cannot be deployed in production runs and fail in efficiency. 
 
 
-\begin{figure}
-\centering
-\lstset{basicstyle=\ttfamily\fontsize{7}{8}\selectfont,
-     morekeywords={+},keepspaces=true,numbers=left}
-  \mbox{\lstinputlisting[mathescape,boxpos=t]{figure/mysql27287.c}}
-  \vspace{-0.1in}
-\caption{A MySQL performance problem in polynomial complexity.
-\footnotesize{(This figure shows the buggy code fragment for MySQL\#27287.
-   During performance failure runs,
-   the execution time scales polynomially with the size of \texttt{items}.)}}
-\vspace{-0.05in}
-\label{fig:mysql27287}
-\vspace{-0.15in}
-\end{figure}
+
+\input{section/fig_mysql27287}
 
 
 One MySQL complexity problem is shown in Figure~\ref{fig:mysql27287}.
@@ -124,11 +126,12 @@ After applying this patch, the code shown in Figure~\ref{fig:mysql27287} was com
 However, it took developers around 5 months to figure this
 out.\footnote{We count the time from when developers confirmed this is performance bug
 to when the patch was submitted.}
-In-house algorithmic profiling can warn developers about the $O(N^2)$ complexity,
-potentially obscured by the fact that inner and outer loops are not in the same function.
-Production-run algorithmic profiling can provide information about the real-world workload
-processed by this piece of code and its corresponding complexity,
-which are invaluable in diagnosing performance failures caused by this complexity problem.
+Production-run algorithmic profiling 
+can point out the complexity of this piece of code is $O(N^2)$, 
+which is exactly the root cause, 
+and can also provide workload information 
+to confirm the necessity to fix this bug.
+
 
 
 \subsection{Our Contributions}

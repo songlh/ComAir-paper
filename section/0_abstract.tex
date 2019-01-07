@@ -1,24 +1,26 @@
 Complexity problems are a common type of performance problems, 
-and they are caused by algorithmic inefficiency. 
-Algorithmic profiling aims to attribute complexity to a code construct.
+causing by algorithmic inefficiency. 
+Algorithmic profiling aims to automatically attribute execution complexity to a code construct.
 It can detect previously unknown complexity problems and diagnose performance failures 
 caused by complexity problems. 
 Existing algorithmic profiling techniques
 incur more than $30$ times runtime overhead,
-and cannot be deployed in production runs, missing opportunities to understand 
-real-world workloads and how programs scale on the user side. 
+and cannot be deployed in production runs, missing opportunities 
+to detect complexity problems escaping from in-house testing 
+and to understand how programs scale under real-world workloads. 
 
-In this paper, we present a toolchain, \Tool, 
-which can effectively conduct algorithmic profiling. 
+In this paper, we present a tool, \Tool, 
+which can effectively conduct algorithmic profiling under production-run setting. 
 To design \Tool, we first conduct an empirical study on 
-real-world complexity problems from a representative performance-bug benchmark suite. 
-Guided by our study, 
-we then explore different 
-design points of algorithmic profiling.
-Finally, we apply sampling to lower the runtime 
-overhead and enable \Tool to be used in production runs.
+real-world complexity problems.
+Under the guidance of our empirical study, we then apply 
+sampling and a series of compiler optimizations to 
+algorithmic profiling to lower its runtime overhead.
+In the end, we systematically evaluate \Tool using real-world complexity problems. 
 Our experimental results show that \Tool 
-can cover different types of complexity problems, 
-generate accurate profiling results, 
-and incur a very low runtime overhead. 
+can analyze different types of complexity problems, 
+generate accurate profiling results for algorithmic complexity, 
+and incur a negligible slowdown. 
+
+
 
