@@ -1,0 +1,172 @@
+
+\section{Background and Limitations}
+\label{sec:back}
+
+In this section, we give an overview of existing algorithmic profiling techniques.
+We first discuss metrics commonly used to measure input size and execution cost.
+We then present how to implement these techniques through instrumentation 
+and our designed optimizations. 
+Finally, we show the limitations of existing techniques and explain 
+why they are difficult to be extended to production-run setting. 
+
+\subsection{Input and Cost Metrics}
+
+{\color{red} Todo: This part needs to be significantly simplified}
+
+To conduct algorithmic profiling for a given code construct,
+we need to record input size and cost for the code construct in multiple program runs.
+Then we need to plot recorded information with input size as x-axis and cost as y-axis. 
+Finally, we infer complexity for the code construct as a cost function of input size. 
+To conduct algorithmic profiling effectively, 
+the most important thing is to have suitable metrics for input size and cost. 
+
+\underline{\textbf{Input Metric.}}
+The goal of input metric design is to figure out metrics
+holding input size information for different types of code constructs. 
+We cannot rely on developers to manually label or specify input size information, 
+because it is time-consuming and also difficult for complex code constructs.  
+There are several metrics, which can be used to measure input size.
+We discuss them as follows. 
+
+
+Read Memory Size (RMS) is proposed as an input metric for a dynamic instance
+of a code construct~\cite{Aprof1,Aprof2}. 
+RMS is defined as the number of distinct memory cells 
+whose first access is read. 
+RMS considers both reads conducted by a code construct directly 
+and reads conducted by 
+functions called from the code construct. 
+RMS can provide important input information for many complexity problems.  
+
+\begin{figure*}
+\centering
+\subfloat[Inner]{\includegraphics[width=0.22\linewidth]{figure/mysql27287-inner-loop-line}\label{fig:mysql27287-indep}} 
+\subfloat[Outer]{\includegraphics[width=0.22\linewidth]{figure/mysql27287-outer-loop-line}\label{fig:mysql27287-outer}}
+\subfloat[Bottom-up]{\includegraphics[width=0.22\linewidth]{figure/mysql27287-loop-bb-line}\label{fig:mysql27287-merge}} 
+\subfloat[Array]{\includegraphics[width=0.22\linewidth]{figure/mysql27287-loop-array-line}\label{fig:mysql27287-inner-array}} \\ 
+\vspace{-0.1in}
+\caption{How cost scales for MySQL\#27287. 
+\footnotesize{(These figures show how cost scales using RMS or \# of array elements 
+as input metric for different code constructs of MySQL\#27287. 
+The first two figures are analyzed using the top-down method, 
+and the last two are analyzed using the bottom-up method.)}} 
+\label{fig:cost} 
+\vspace{-0.15in}
+\end{figure*} 
+ 
+
+Take MySQL\#27287 as an example.
+RMS for a dynamic instance of
+the buggy loop in Figure~\ref{fig:mysql27287}
+is roughly equal to 2 times the number of \texttt{XML\_NODE}s 
+accessed during the execution, 
+because the \texttt{level} field and the \texttt{type} field of 
+different \texttt{XML\_NODE}s are read in different loop iterations.
+Although variable \texttt{p} and \texttt{level} are also read in each iteration,
+RMS only considers distinct memory cells and 
+only increments its value for the first read on these two variables in the first iteration. 
+The outer loop, not shown in Figure~\ref{fig:mysql27287}, 
+invokes \texttt{xml\_parent\_tag()} for every \texttt{XML\_NODE} contained
+in the same array \texttt{items}.
+If we use the top-down method to analyze the buggy loop
+or the buggy function, 
+execution cost is in linear relationship with RMS, 
+as shown in Figure~\ref{fig:mysql27287-indep}.
+The $O(N^2)$ complexity can be inferred from the side of the outer loop, 
+as shown in Figure~\ref{fig:mysql27287-outer}. 
+If we use the bottom-up method, 
+we can observe the aggregated cost scales 
+polynomially in terms of RMS of the buggy loop 
+or the buggy function, 
+which is shown in Figure~\ref{fig:mysql27287-merge}. 
+
+The number of distinct accessed elements of a data 
+structure could also be used to measure 
+input size for a dynamic instance of a code construct~\cite{AlgoProf}. 
+%As we discussed in Section~\ref{sec:study_impli},
+%array and linked list are the two types of data structures
+%most commonly involved in complexity problems. 
+
+Similar to RMS, there are also, top-down and bottom-up, 
+two methods to analyze 
+multiple DSS records collected for the same code 
+construct in one program run.
+Take MySQL\#27287 in Figure~\ref{fig:mysql27287} as an example.
+If we focus on array \texttt{items},
+DSS for an execution of the inner loop is the number of 
+accessed array elements during the execution.
+If we use the top-down method, the execution cost 
+of the inner loop is in linear relationship with its DSS.
+For the outer loop, its execution cost is in $O(N^2)$ relationship with its DSS,
+since DSS only considers distinct accessed elements.
+If we apply the bottom-up method, 
+we count distinct accessed array elements across all dynamic instances of the inner loop,
+the aggregated execution cost of the inner loop is in $O(N^2)$ relationship with its DSS, 
+as shown in Figure~\ref{fig:mysql27287-inner-array}.   
+
+\underline{\textbf{Cost Metric.}}
+When a code construct is executed, 
+it could consume many different types of resources, 
+such as computation, network bandwidth, storage, and so on.
+In this paper, we focus on how to measure computation cost and 
+leave the measurement for other types of consumed resources for future works. 
+When a code construct is executed, 
+there are many metrics can be used to measure computation 
+cost for a dynamic instance of the code construct. 
+We discuss commonly used ones as follows.
+
+\noindent\textbf{Executed Basic Blocks (BBs)}
+We can count the number of executed BBs for a dynamic instance
+and use this number as computation cost. 
+The assumption to use this metric is that 
+each executed BB will roughly consume the same computation cost. 
+
+\noindent\textbf{Executed Instructions}
+We can use the executed instruction number of a dynamic 
+instance to represent computation cost for the instance. 
+Similar to executed BBs, we assume each instruction 
+roughly takes the same computation cost by using this metric. 
+
+
+\noindent\textbf{{Loop Iterations (LIs)}}
+As we discussed in Section~\ref{sec:study},
+many complexity problems are caused by a loop.
+If we want to measure computation cost for a loop instance,
+we can use the number of loop iterations.
+By using this metric, we assume that computation 
+cost spent in each iteration is roughly the same. 
+
+\noindent\textbf{Recursive Invocations (RIs)}
+As we discussed in Section~\ref{sec:study},
+there are also complexity problems caused by recursive functions.
+If we want to measure computation cost for a dynamic instance \texttt{d}
+of a recursive function \texttt{f}, 
+we can use the number of times when
+\texttt{d} recursively call \texttt{f} directly or indirectly. 
+By using this metric, 
+we assume that except the recursive part, 
+computation spent in other parts is roughly 
+the same across different recursive instances. 
+
+\subsection{Limitations}
+
+{\color{red} Todo: One more limitation and more discussions are needed}
+
+First, existing techniques incur a very large runtime overhead. 
+In our preliminary work, we implement RMS and DSS to collect input size information. 
+For most benchmarks, RMS incurs 50$X$ runtime overhead. 
+DSS collects less information, and for most benchmarks, it incurs 20$X$ runtime overhead. 
+Due to the extremely large overhead, 
+we cannot directly deploy these two techniques in production-run scenario.   
+
+Second, existing techniques do not cooperate well with sampling. 
+Sampling is a widely-used technique to lower runtime overhead 
+and deploy existing techniques to production runs. 
+However, it is very difficult to apply sampling to existing algorithmic profiling techniques. 
+Take MySQL\#27287 in Figure~\ref{code:mysql27287} as an example,
+the $n^2$ complexity can only be observed on the side of the outer loop. 
+Each execution of the outer loop contributes almost all the execution time during performance failure runs. 
+If we directly apply sampling, 
+we may not get a sample of the outer loop and miss the opportunity to 
+identify the $n^2$ complexity, or we record all information during the execution of the outer loop 
+and still have a non-tolerable overhead. 

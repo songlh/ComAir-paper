@@ -7,7 +7,15 @@ complexity problems. Our empirical study is conducted in two steps.
 
 \begin{enumerate}
 
-\item We build a taxonomy for the studied complexity bugs. 
+
+\item 
+We quantitatively compare complexity problems with non-complexity problems
+in a public user-perceived performance bug benchmark suite. 
+We want to understand the popularity of complexity problems 
+and whether or not they are different from non-complexity 
+problems during reporting and diagnosis. 
+
+\item We build a taxonomy for complexity bugs from two sources. 
 For bugs in each category, 
 we study what code constructs conduct the inefficient computation,
 how the user-perceived slowdown is generated, 
@@ -15,24 +23,19 @@ and how to fix these bugs.
 Our studying results can help us 
 make suitable design decisions when building \Tool. 
 
-\item We investigate how these complexity problems are reported by end users
-and how they are diagnosed by developers. 
-This knowledge can help us understand what information is available from the user side
-and help us understand the 
-state of practice for combating complexity bugs.
-
-
 
 \end{enumerate}
 
-\subsection{Methodology}
-\label{sec:meth}
+
+\subsection{Quantitative Comparison}
+\label{sec:compare}
 
 %\input{section/tab_app}
 
+%{\color{red} Todo: now we have two sources}
 We conduct our empirical study based on a public benchmark set of 
-real-world performance bugs\cite{PerfBug,SongOOPSLA2014}. 
-In their first work\cite{PerfBug}, 
+real-world performance bugs~\cite{PerfBug,SongOOPSLA2014}. 
+In their first work~\cite{PerfBug}, 
 the authors collected 110 real-world performance bugs from 5 representative 
 software suites: Apache, Chrome, GCC, Mozilla, and MySQL. 
 %As shown in Figure~\ref{tab:app_bug}, 
@@ -40,7 +43,7 @@ These software suites cover various types of functionalities and are implemented
 in a variety of programming languages, including C/C++, Java, C\#, and JavaScript. 
 All the five studied software suites are large and mature, 
 with millions of lines of code and long development histories. 
-In their following work\cite{SongOOPSLA2014}, 
+In their following work~\cite{SongOOPSLA2014}, 
 the authors further identified 65 user-perceived performance bugs, 
 whose bugs reports contain detailed information 
 about how these bugs are perceived by end users and fixed by developers.  
@@ -54,29 +57,37 @@ caused by {\textit{algorithmic complexity}}.
 Developers usually fix these bugs by applying optimized algorithms to lower complexity
 or to reduce workloads processed by the buggy code fragments. 
 We refer to these performance problems as 
-{\textit{complexity problems}} in the reminder of this paper.
-The number of the studied complexity problems is shown in Table~\ref{tab:study}.
+{\textit{complexity problems}} in the remainder of this paper.
+In total, there are 30 out of 65 user-perceived performance problems 
+caused by algorithmic inefficiency. 
+Complexity problems are one of the major reasons to cause slow execution.
+
 Bugs not belonging to complexity problems are caused by various reasons.
 For example, there are several Mozilla bugs related to GUI, 
 like drawing transparent figures or refreshing web pages too frequently. 
 There are also bugs caused by misusing synchronizations, 
 such as using busy wait or conducting I/O in a critical section. 
 We do not consider these bugs as complexity problems.
+The numbers of complexity bugs and non-complexity bugs are shown in Figure~\ref{tab:compare}.
 
-{\bf{\textit{Caveats.}}}
-In keeping with all previous empirical studies, 
-our findings and conclusions need to be considered together with our methodology.
-All of the studied complexity bugs come from software representative of a variety of uses and development processes. 
-However, there are other types of software not covered in our study, 
-such as distributed systems and software for high performance computation. 
-All studied complexity problems are collected from bug databases.  
-We believe that end users could report perceived complexity problems through other ways.
-We also believe that there could be some complexity problems noticed 
-and fixed by developers through manual inspection or in-house testing, 
-before releasing their software to end users.  
-%However, the field has not found methods to study bugs not tracked by bug databases.
-We believe that the studied bugs can serve as a representative sample
-of complexity problems in the real world. 
+
+\input{section/tab_compare}
+
+
+We compare complexity problems and non-complexity problems from the following aspects:
+why they are introduced, how they are reported, and how they are diagnosed. 
+
+
+\noindent{\color{red} Todo: How they are introduced?} Whether or not complexity problems 
+are more likely to be introduced due to developers’ misunderstanding of workload. 
+
+\noindent{\color{red} Todo: How they are introduced?} Whether or not complexity problems 
+are more likely to be reported with descriptions about how to change input size. 
+
+\noindent{\color{red} Todo: How they are diagnosed?} Whether or not 
+complexity problems are more likely to be diagnosed using profilers.  
+
+
 
 
 
@@ -84,6 +95,12 @@ of complexity problems in the real world.
 \label{sec:tax}
 
 \input{section/tab_study}
+
+
+\noindent{\color{red} Todo: discuss how we collect the other 20 complexity bugs}
+
+\noindent{\color{red} Todo: remember to update all numbers in this section}
+
 
 After categorizing the studied bugs according to their different complexity, 
 we study complexity problems in each category.
@@ -210,28 +227,6 @@ shown in Figure~\ref{fig:mysql27287-time} and Figure~\ref{fig:mozilla477564-time
 
 
 
-
-
-
-
-%To fix the majority (13/18) of performance problems in this category, 
-%developers directly modify the loops whose total loop iterations scale polynomially.  
-%The buggy loop for MySQL\#27287 is shown in Figure~\ref{fig:mysql27287}.
-%The loop searches parent \texttt{XML\_NODE} for function parameter \texttt{nitems}, 
-%which presents array index for another \texttt{XML\_NODE}.
-%All \texttt{XML\_NODE}s are maintained in array \texttt{items}. 
-%The way the loop to conduct the search is to iterate array \texttt{items} 
-%backward from the input and look for the first \texttt{XML\_NODE} 
-%whose level is one less than the input.
-%During performance failure runs, 
-%one \texttt{XML\_NODE} contains tens of thousands of children, 
-%and \texttt{xml\_parent\_tag} is invoked for each of its children. 
-%To fix this bug, MySQL developers add an extra field to each 
-%\texttt{XML\_NODE} to save its parent, 
-%and this field is initialized when a \texttt{XML\_NODE} is created. 
-%After that, the buggy loop is completely removed. 
-
-
 To fix the other complexity problems (5/19) in this category,
 developers reduce data processed by the loops scaling polynomially, 
 instead of changing the loops directly.
@@ -250,13 +245,6 @@ How execution time scales before and after patching for
 Apache\#34464 is shown in Figure~\ref{fig:apache34464-time}.
 
 
-%Take GCC\#12322 as another example.
-%The loop scaling polynomially is part of the functionality that does basic block reordering,
-%and it will perform poorly for basic blocks with too many successors. 
-%The bug-triggering input contains a basic block with thousands of successors. 
-%To fix this, developers simply skip basic blocks with many successors.
-%By does this, some optimization opportunities may be lost, 
-%but the generated codes will still work correctly. 
 
 
 {\underline{\textit{$O(e^N)$: exponential complexity.}}}
@@ -310,67 +298,6 @@ To fix this bug, developers simply disable the optimization
 once they detect the complex control and data dependence.  
 
 
-\subsection{Diagnosis process of complexity problems}
-\label{sec:process}
-
-We also study how complexity problems are reported by users 
-and get diagnosed by developers 
-to better understand state-of-the-art combating process for complexity problems. 
-
-{\underline{\textit{How are complexity problems reported?}}
-As shown in Table~\ref{tab:study},
-for most complexity bugs (24/30), 
-users' reports specify how to change input sizes 
-in order to reproduce the performance scaling problems. 
-As discussed in previous works\cite{SongOOPSLA2014}, 
-all collected user-perceived performance-bug reports
-contain bug-triggering inputs from end users. 
-For most complexity bugs, 
-users also describe how they change input sizes 
-and how performance changes accordingly. 
-For example, when reporting GCC\#32540, 
-the user provides a C file and several measurement results to 
-show that GCC compilation time scales exponentially 
-with the number of \texttt{if} branches in the C file. 
-As another example, when reporting Mozilla\#490742, 
-the user mentions that the length of high, 
-flat CPU usage is related to the number of search engine preferences. 
-
-
-For the other five bugs, users provide one bug-triggering input 
-or describe a set of bug-triggering inputs when they report the complexity problems. 
-For example, when reporting GCC\#27733, 
-the user provides one bad input, which can take GCC 49 minutes to compile. 
-When reporting Mozilla\#231300, the user mentions 
-that clearing the disk cache on a Macintosh system can trigger the bug, 
-regardless of the content of the cached files. 
-
-
-{\underline{\textit{How complexity problems are diagnosed?}}
-We studied how long it takes developers to fix complexity problems. 
-On average, it takes developers 162 days to diagnose a complexity problem. 
-Following the same methodology as the previous work\cite{SongOOPSLA2014},
-we calculate diagnosis time as starting from when a problem 
-was reported to a bug tracking system
-and ending when a correct patch was submitted on the bug tracking system. 
-On average, it takes developers 101 days to diagnose non-complexity bugs in the same performance-bug set. 
-Diagnosing complexity problems takes longer time.
-After separating bugs from different applications, 
-we also observe that developers consistently need more time to diagnose complexity problems across all applications.
-%compared with non-complexity bugs.
-%Among the five applications, 
-%Chrome developers need 4.5 times longer to diagnose complexity problems,
-%which is the maximum increase.
-%MySQL developers spend most similar time to diagnose complexity problems,
-%while the time they spend is still 0.43 times longer. 
-
-As discussed in the previous works\cite{SongOOPSLA2014}, 
-traditional profilers are the only type of diagnosis tools mentioned in bug reports. 
-%when diagnosing the collected user-perceived performance problems. 
-Tradisional profilers are mentioned in 7 out of 30 complexity-bug reports. 
-A similar percentage of bug reports mention traditional profilers
-when comparing complexity bugs with non-complexity bugs. 
-
 \subsection{Implications}
 \label{sec:study_impli}
 
@@ -414,16 +341,8 @@ algorithmic profiling from the point of monitoring data structures,
 array and linked list are the two types of data structures 
 we should start with.
 
-{\underline{\textit{Implication 4}}
-We also seek to understand how complexity problems are introduced. 
-20 out of 30 studied complexity bugs are introduced
-because the developers' workload assumptions are wrong or the workloads changed. 
-This result motivates to monitor workloads and conduct algorithmic profiling in production runs. 
-Workload monitoring tools can warn developers when the workload assumption is wrong.
-Online algorithmic profiling tools can tell developers 
-how each piece of code scales under real-world workloads on the user side.  
 
-{\underline{\textit{Implication 5}}}
+{\underline{\textit{Implication 4}}}
 Our study shows that approximately three-fourths of the studied complexity problems (22/30)
 are caused by repeated executions of a loop or a recursive function. 
 These bugs are categorized as polynomial complexity and exponential complexity in Section~\ref{sec:tax}.
@@ -432,3 +351,19 @@ show that sampling code constructs
 that execute many times in one program run can lower the runtime overhead 
 while preserving the same diagnosis or detection capability. 
 It is promising to apply sampling to design production-run algorithmic profiling techniques. 
+
+
+{\bf{\textit{Threats to Validation.}}}
+In keeping with all previous empirical studies, 
+our findings and conclusions need to be considered together with our methodology.
+All of the studied complexity bugs come from software representative of a variety of uses and development processes. 
+However, there are other types of software not covered in our study, 
+such as distributed systems and software for high performance computation. 
+All studied complexity problems are collected from bug databases.  
+We believe that end users could report perceived complexity problems through other ways.
+We also believe that there could be some complexity problems noticed 
+and fixed by developers through manual inspection or in-house testing, 
+before releasing their software to end users.  
+%However, the field has not found methods to study bugs not tracked by bug databases.
+We believe that the studied bugs can serve as a representative sample
+of complexity problems in the real world. 
