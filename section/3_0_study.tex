@@ -1,0 +1,94 @@
+\section{Understanding Real-World Complexity Problems}
+\label{sec:study}
+
+\input{section/tab_study}
+
+In this section, we report an empirical study on real-world 
+complexity problems. Our empirical study is conducted in two steps.
+
+\begin{enumerate}
+
+
+\item 
+We quantitatively compare complexity problems with non-complexity problems
+in a public performance bug benchmark suite. 
+We want to understand the popularity of complexity problems 
+and whether or not they are different from non-complexity 
+problems during reporting and diagnosis. 
+
+\item We build a taxonomy for complexity bugs. 
+For bugs in each category, 
+we study what code constructs conduct the inefficient computation,
+how the user-perceived slowdown is generated, 
+and how to fix these bugs. 
+Our studying results can guide the design of \Tool.
+
+\end{enumerate}
+
+
+
+\subsection{Quantitative Comparison}
+\label{sec:compare}
+
+We conduct our study in this section based on a public benchmark 
+suite of real-world performance bugs~\cite{PerfBug,SongOOPSLA2014,ldoctor}.
+The benchmark suite contains 65 user-perceived performance bugs 
+collected from  Apache, Chrome, GCC, Mozilla, and MySQL. 
+These software suites cover various types of functionalities and are implemented 
+in different programming languages, including C/C++, Java, C\#, and JavaScript. 
+All the five studied software suites are large and mature, 
+with millions of lines of code and long development histories. 
+All bugs are perceived and report by real-world users, and all of them 
+have large performance impact. 
+
+After carefully reading the bug reports and the associated buggy code fragments,
+we clearly identify \ComBugs performance problems 
+caused by {\textit{algorithmic complexity}}.
+Developers usually fix these bugs by applying optimized algorithms to lower complexity
+or to reduce workloads processed by the buggy code fragments. 
+We refer to these performance problems as 
+{\textit{complexity problems}} in the remainder of this paper.
+In total, there are 30 out of 65 user-perceived performance problems 
+caused by algorithmic inefficiency. 
+Complexity problems are popular and 
+they are indeed one of the major reasons to cause software slowdown.
+
+
+Bugs not belonging to complexity problems are caused by various reasons.
+For example, there are several Mozilla bugs related to GUI, 
+like drawing transparent figures or refreshing web pages too frequently. 
+There are also bugs caused by misusing synchronizations, 
+such as using busy wait or conducting I/O in a critical section. 
+We do not consider these bugs as complexity problems.
+The numbers of complexity bugs and non-complexity bugs are shown in Figure~\ref{tab:study}.
+
+
+We conduct hypothesis t-testing~\cite{ttest} 
+to compare complexity problems and non-complexity 
+problems from the following aspects: why they are introduced, 
+how they are reported, and how they are diagnosed. 
+We use 95\% as our statistical confidence. 
+
+
+Misunderstanding real-world workloads and misusing APIs
+are two major reasons why performance bugs are introduced. 
+Among the 30 complexity bugs, 20 bugs are caused 
+by misunderstanding workloads
+and 8 bugs are caused by misusing APIs. 
+The two numbers for non-complexity bugs are 18 and 7 respectively. 
+There is no significant difference between complexity 
+problems and non-complexity problems. 
+
+
+Sometimes, users may compare performance using inputs with different 
+sizes~\cite{SongOOPSLA2014} or provide a input with repetitive patterns,  
+when reporting performance bugs. 
+For both of these two cases, 
+it is fairly easy to figure out how to change input sizes to observe performance difference. 
+There are 25 complexity bugs falling into one of the two cases, 
+while for non-complexity problems, the number is only 8.
+There is significant difference. 
+
+On average, developers use 162 days to fix a 
+complexity problem and use 103 days to fix a non-complexity problem. 
+There is no significant difference. 
