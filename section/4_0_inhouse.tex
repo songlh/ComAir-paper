@@ -1,0 +1,23 @@
+\section{In-house Algorithmic Profiling}
+\label{sec:in-house}
+
+In this section, we present the design and implementation 
+of \Tool under the in-house setting. 
+We choose RMS as input metric and BB as cost 
+metric for the in-house version of \Tool, 
+since RMS is more general than DSS and BB is a balance 
+between monitoring accuracy and monitoring efficiency, 
+sharing the same design philosophy as Aprof~\cite{Aprof1,Aprof2}.
+Aprof is implemented under Valgrind framework~\cite{valgrind} .
+We will first discuss how we collect RMS and BB under LLVM 
+framework~\cite{llvm} in Section~\ref{sec:inhouse_impl}.
+Aprof simply attributes complexity to each executed function, 
+without providing any postmortem analysis. 
+We will then present how we rank identified super-linear 
+functions in Section~\ref{sec:rank}. 
+
+
+\subsection{Implementation and Optimization}
+\label{sec:inhouse_impl}
+
+
