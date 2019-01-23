@@ -1,45 +1,36 @@
 \subsection{A Taxonomy for Complexity Problems}
 \label{sec:tax}
 
-
-
-
-\noindent{\color{red} Todo: discuss how we collect the other 20 complexity bugs}
-
-\noindent{\color{red} Todo: remember to update all numbers in this section}
-
-
-After categorizing the studied bugs according to their different complexity, 
-we study complexity problems in each category.
-Our study focuses on 
-1) what are root causes\footnote{We refer root causes as code constructs 
+We first categorize complexity problems based on their complexity types,
+and then we study complexity problems in each type from the following three aspects:
+1) what are their root causes\footnote{We refer root causes as code constructs 
 conducting the inefficient computation, 
-following previous works in this area\cite{SongOOPSLA2014,ldoctor}.} 
-of the complexity problems;
-2) how the complexity problems generate user-perceived performance impact;
-3) how developers fix these complexity problems. 
+following previous works in this area\cite{SongOOPSLA2014,ldoctor}.};
+2) how they generate user-perceived slowdown;
+3) how they are fixed by developers. 
 
-{\underline{\textit{$O(N)$: linear complexity.}}} 
+\noindent{\underline{\textit{$O(N)$: linear complexity.}}} 
 As shown in Table~\ref{tab:study}, 
 7 out of \ComBugs studied complexity problems are in linear complexity. 
-All of these problems are caused by a buggy loop, 
-whose average loop iteration number scales in terms of input size $N$.
+All of them are caused by a buggy loop, 
+whose iteration number scales in terms of input size $N$.
 
 Five of them are characterized by buggy loops that contain serialized I/O operations.
 Users could perceive these bugs, 
-even though the average loop iteration numbers are not large.
+even though the loop iteration numbers are not large.
 Patching these 5 bugs involves aggregating I/O operations 
 or completely eliminating unnecessary I/O operations. 
 For example, Mozilla\#490742 is caused by bookmarking 
 tabs using individual database transactions. 
 Even bookmarking 50 tabs can cause a timeout dialog 
-window to pop up in a performance failure run. 
+window to pop up during a performance failure run. 
 To fix this bug, Mozilla developers use one single aggregated transaction 
 to bookmark all tabs.
 As another example, Mozilla\#344059 is due to saving unchanged 
 search engine preferences to SQLite, 
 and it is fixed by saving search 
-engine preferences only when some of them are changed.
+engine preferences
+only when some of them are changed.
 
 For the other three bugs,
 their buggy loops execute many iterations during performance failure runs.
@@ -53,129 +44,58 @@ many table entries are used and the buggy loop must iterate excessively to find 
 To fix this bug, MySQL developers simply separate used entries and free entries,
 and keep them in two separated linked lists. 
 
-To sum up, all of the $O(N)$ complexity problems are caused by a buggy loop. 
-To fix them, developers directly optimize these loops or completely skip these loops. 
 
-
-{\underline{\textit{$O(N^k)$: polynomial complexity (k>1).}}}
+\noindent{\underline{\textit{$O(N^k)$: polynomial complexity (k>1).}}}
 As shown in Table~\ref{tab:study}, 
 more than half of the studied complexity bugs are in polynomial complexity. 
-Similar to the complexity problems in linear complexity,
-the polynomial complexity for each problem is also caused by a buggy loop.
+Similar to the bugs in linear complexity,
+the polynomial complexity is also caused by a buggy loop.
 However, {\bf both} of the loop execution number 
 and the average loop iteration number
 scale as input size $N$.
 
+\input{section/fig_apache34464}
 
-\begin{figure}
-\centering
-\lstset{basicstyle=\ttfamily\fontsize{7}{8}\selectfont,
-     morekeywords={+},keepspaces=true,numbers=left}
-  \mbox{\lstinputlisting[mathescape,boxpos=t]{figure/Mozilla477564.js}}
-  \vspace{-0.1in}
-\caption{A Mozilla complexity problem in $O(N^2)$ complexity.
-\footnotesize{(This figure shows the buggy code fragment for Mozilla\#477564. 
-The execution time scales polynomially with the number of nodes in a linked list.)}}
-\vspace{-0.05in}
-\label{fig:Mozilla477564}
-\vspace{-0.15in}
-\end{figure}
+\input{section/fig_time}
 
-\begin{figure}
-\centering
-\lstset{basicstyle=\ttfamily\fontsize{7}{8}\selectfont,
-     morekeywords={+},keepspaces=true,numbers=left}
-  \mbox{\lstinputlisting[mathescape,boxpos=t]{figure/apache34464.c}}
-  \vspace{-0.1in}
-\caption{An Apache performance problem in $O(N^2)$ complexity and its patch. 
-\footnotesize{(This figure shows the buggy code fragment for Apache\#34464. 
- The execution time scales polynomially with the number of characters read from \texttt{getchar()}.)}}
-%\vspace{-0.05in}
-\label{fig:apache34464}
-\vspace{-0.3in}
-\end{figure}
-
-\begin{figure*}
-\centering
-\subfloat[MySQL\#27287]{\includegraphics[width=0.22\linewidth]{figure/mysql27287-runtime-buggy-fixed-line}\label{fig:mysql27287-time}} 
-\subfloat[Mozilla\#477564]{\includegraphics[width=0.22\linewidth]{figure/mozilla47564-runtime-buggy-fixed-line}\label{fig:mozilla477564-time}}
-\subfloat[Apache\#34464]{\includegraphics[width=0.22\linewidth]{figure/apache34464-runtime-buggy-fixed-line}\label{fig:apache34464-time}} 
-\subfloat[GCC\#27733]{\includegraphics[width=0.22\linewidth]{figure/gcc27733-runtime-buggy-fixed-line}\label{fig:gcc27733-time}} \\ 
-\vspace{-0.1in}
-\caption{How the execution time scales with input size for four complexity problems. 
-\footnotesize{(These figures show how the execution time changes with the change of input size for MySQL\#27287, 
- Apache\#34464, Mozilla\#477564, and GCC\#27733. For each complexity problem, we use 10 distinct inputs.)}} 
- \vspace{-0.05in}
-\label{fig:time} 
-\vspace{-0.15in}
-\end{figure*} 
-
-To fix the majority (14/19) of performance problems in this category,
+To fix the majority (14/19) of bugs in this category,
 developers directly modify the buggy loops, 
 whose total iteration numbers scale polynomially.
 Take MySQL\#27287 as an illustration.
-As we discussed earlier, to fix this bug,
+To fix this bug,
 developers add an extra field to save parent \texttt{XML\_NODE}
 and completely remove the buggy loop shown in Figure~\ref{fig:mysql27287}.
-As another example, the buggy loop for Mozilla\#477564 is shown in Figure~\ref{fig:Mozilla477564}.
-The loop counts how many previous nodes of input \texttt{aNode} 
-having the same \texttt{localName} and \texttt{URI}.
-An outer loop, not shown in the figure, 
-will invoke \texttt{sss\_xph\_generate} for every node in a linked list, 
-so that the complexity is $O(N^2)$ in terms of the number of nodes in the linked list.
-To fix this complexity bug, developers add an extra field to each node to 
-save the counting result. 
-Given a node, 
-its \texttt{count} value is calculated by adding one 
-to the \texttt{count} value of 
-its nearest previous node with the same \texttt{localName} and \texttt{URI}.  
-How the complexity changes after patching for MySQL\#27287 and Mozilla\#477564 are 
-shown in Figure~\ref{fig:mysql27287-time} and Figure~\ref{fig:mozilla477564-time}, respectively. 
+How the execution time changes after patching for MySQL\#27287 is 
+shown in Figure~\ref{fig:mysql27287-time}. 
 
-
-
-To fix the other complexity problems (5/19) in this category,
-developers reduce data processed by the loops scaling polynomially, 
+To fix the other bugs (5/19) in this category,
+developers reduce workloads processed by the loops scaling polynomially, 
 instead of changing the loops directly.
-In the buggy code fragment for Apache\#34464 shown in Figure~\ref{fig:apache34464},
-the \texttt{while} loop on line 5 searches a string \texttt{source}
-for a target sub-string \texttt{target}.
-If the \texttt{while} loop's search is unsuccessful, 
-a new character returned from \texttt{getchar()} on line 8 will be appended to string \texttt{source}, 
-and the loop will search string \texttt{source} again from the beginning. 
+The buggy code fragment of Apache\#34464 is shown in Figure~\ref{fig:apache34464}.
+The \texttt{while} loop at line 5 searches a string \texttt{src}
+for a target sub-string \texttt{tgt}.
+If the search is unsuccessful, 
+a new character returned from \texttt{getchar()} at line 8 will be appended 
+to string \texttt{src}, 
+and the loop will search \texttt{src} again from the beginning. 
 There is an inner loop inside \texttt{indexOf()}, whose total iterations 
-scale polynomially in terms of the number of characters from \texttt{getchar()}. 
-After fixing this bug, the inner loop will only check the most recent \texttt{targetLen} characters.
+scale polynomially in terms of the number of characters returned from \texttt{getchar()}. 
+After fixing this bug, the inner loop will only check the most recent \texttt{tgtLen} characters.
 The developers do not change the inner loop, 
 while reducing the workload it processes.   
 How execution time scales before and after patching for 
-Apache\#34464 is shown in Figure~\ref{fig:apache34464-time}.
+this bug is shown in Figure~\ref{fig:apache34464-time}.
 
 
 
 
-{\underline{\textit{$O(e^N)$: exponential complexity.}}}
+\noindent{\underline{\textit{$O(e^N)$: exponential complexity.}}}
 Four of the studied complexity problems are in exponential complexity. 
 These complexity problems are fixed 
 either by leveraging memoization to reuse previous results 
 or by skipping the computation with exponential complexity for large workloads. 
 
-
-
-\begin{figure}
-\centering
-\lstset{basicstyle=\ttfamily\fontsize{7}{8}\selectfont,
-     morekeywords={+},keepspaces=true,numbers=left}
-  \mbox{\lstinputlisting[mathescape,boxpos=t]{figure/gcc27733.c}}
-  \vspace{-0.1in}
-\caption{A GCC performance problem in exponential complexity. 
- \footnotesize{(During performance failure runs, how many times \texttt{mult\_alg} is invoked scales exponentially
-  with the number of 1s in the binary form of input \texttt{t}.)}}
-\vspace{-0.1in}
-\label{fig:gcc27733}
-\vspace{-0.15in}
-\end{figure}
-
+\input{section/fig_gcc27733}
 
 Three of the studied performance problems are caused by recursive function calls. 
 Taking GCC\#27733 in Figure~\ref{fig:gcc27733} as an example, 
@@ -194,62 +114,42 @@ and this error causes \texttt{t} larger than the maximum unsigned integer to nev
 For large \texttt{t}, \texttt{mult\_alg} is still in exponential complexity. 
 After fixing the type declaration error, 
 memoization is enabled for large \texttt{t}. 
-How the complexity changes after patching for GCC\#27733 is shown in Figure~\ref{fig:gcc27733-time}.
+How the complexity changes after patching for 
+GCC\#27733 is shown in Figure~\ref{fig:gcc27733-time}.
 
-GCC\#32540 is in the exponential complexity category and is caused by an inefficient loop. 
+GCC\#32540 is in exponential complexity and it is caused by an inefficient loop. 
 The loop applies an iterative algorithm to implement a compiler optimization. 
 The bug-triggering input contains very complex control and data dependence,  
-so that the buggy loop scales exponentially in terms of the number 
-of \texttt{if} branches in the input. 
+so that the buggy loop scales exponentially in terms of 
+\texttt{if} branches in the input code. 
 To fix this bug, developers simply disable the optimization 
-once they detect the complex control and data dependence.  
-
-
+once they detect complex control and data dependence.  
+ 
 \subsection{Implications}
 \label{sec:study_impli}
 
-{\underline{\textit{Implication 1}}
-The patches for most of the studied complexity problems (24/30)
-are designed to directly optimize loops or recursive functions that scale poorly.
-Accurately attributing complexity to loops or to functions can provide 
-effective guidance for developers' investigation. 
-Our study also shows that developers need to spend more time to 
-diagnose and fix complexity problems.
-Traditional profilers are the only type of tools 
-mentioned during diagnosing complexity bugs, 
-and traditional profilers can only tell where computation is spent in each run, 
-while they are {\bf unable} to analyze or predict how computation scales across different runs.
-To sum up, automated algorithmic profilers are 
-uniquely needed to effectively combat complexity problems.  
-
-
-{\underline{\textit{Implication 2}}
+\noindent{\underline{\textit{Implication 1.}}
 To effectively profile algorithmic complexity,
-a set of inputs providing similar code coverage with different input sizes is needed. 
-Our study shows that when reporting complexity problems,
-users will describe how to change input sizes 
-while preserving similar functionalities (or code coverage). 
-This means it is fairly easy for developers to get the inputs needed 
-to conduct diagnosis or algorithmic profiling for user-reported complexity problems. 
+a set of inputs providing similar code coverage with different input sizes are needed. 
+As we discussed in Section~\ref{sec:compare},
+for majority (25/30) of complexity problems, 
+it is fairly easy for developers to get these inputs based 
+on users' descriptions
+and provided inputs when they report complexity problems.  
+ 
 
-{\underline{\textit{Implication 3}}}
+\noindent{\underline{\textit{Implication 2.}}}
 We also examine what types of data structures holding inputs processed 
-by buggy loops or recursive functions for the studied complexity problems.
+by buggy loops or recursive functions.
 The most two common types of data structures 
 are array (11/30) and linked list (9/30).
 Other types of data structures are either application-specific or 
 can only cover one or two bugs.
-For example, the buggy recursive function for MySQL\#49047 is to detect deadlocks,
-and the data structure holding inputs is a graph recording information about lock holding and lock requiring. 
-Apache\#29743 is the only bug in our studied bug set 
-whose buggy loop is to process a hash map. 
-If we want to monitor workloads and conduct 
-algorithmic profiling from the point of monitoring data structures, 
-array and linked list are the two types of data structures 
-we should start with.
+This fact inspires us to design effective algorithms 
+for loops (or recursive functions) 
+that process array or linked list during algorithmic profiling. 
 
-
-{\underline{\textit{Implication 4}}}
+\noindent{\underline{\textit{Implication 3.}}}
 Our study shows that approximately three-fourths of the studied complexity problems (22/30)
 are caused by repeated executions of a loop or a recursive function. 
 These bugs are categorized as polynomial complexity and exponential complexity in Section~\ref{sec:tax}.
@@ -259,18 +159,3 @@ that execute many times in one program run can lower the runtime overhead
 while preserving the same diagnosis or detection capability. 
 It is promising to apply sampling to design production-run algorithmic profiling techniques. 
 
-
-{\bf{\textit{Threats to Validation.}}}
-In keeping with all previous empirical studies, 
-our findings and conclusions need to be considered together with our methodology.
-All of the studied complexity bugs come from software representative of a variety of uses and development processes. 
-However, there are other types of software not covered in our study, 
-such as distributed systems and software for high performance computation. 
-All studied complexity problems are collected from bug databases.  
-We believe that end users could report perceived complexity problems through other ways.
-We also believe that there could be some complexity problems noticed 
-and fixed by developers through manual inspection or in-house testing, 
-before releasing their software to end users.  
-%However, the field has not found methods to study bugs not tracked by bug databases.
-We believe that the studied bugs can serve as a representative sample
-of complexity problems in the real world. 

@@ -1,9 +1,9 @@
-//indexOf: check if string source[] contains string target[]
-//sourceLen: the length of string source[]
-//targetLen: the length of string target[]
-+ int i = -1 * targetLen
-- while (indexOf(source, 0, sourceLen, target, targetLen) < 0) {
-+ while(i++ < 0 || indexOf(source, i, sourceLen, target, targetLen) {
+//indexOf: check if string src[] contains string tgt[]
+//srcLen: the length of string src[]
+//tgtLen: the length of string tgt[]
++ int i = -1 * tgtLen
+- while(indexOf(src, 0, srcLen, tgt, tgtLen) < 0) {
++ while(i++ < 0|| indexOf(src, i, srcLen, tgt, tgtLen) {
 	  //append another character; try again
-	  source[sourceLen++] = getchar();
+	  src[srcLen++] = getchar();
   }
