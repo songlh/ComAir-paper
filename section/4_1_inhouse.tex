@@ -1,2 +1,34 @@
 \subsection{Postmortem Analysis}
 \label{sec:rank}
+
+
+As we discussed in Section~\ref{sec:limit}, 
+existing techniques~\cite{Aprof1,Aprof2,AlgoProf} 
+simply attribute complexity to each executed function, 
+without providing any future analysis. 
+Therefore, they fail to identify root-cause functions for 
+performance failures caused by complexity problems. 
+
+To address this problem, we design a ranking algorithm 
+with the goal to identify root-cause functions. 
+Our algorithm follows three intuitions. 
+First, root-cause functions must have the same (or higher) 
+complexity as \texttt{main} function.
+Second, root-cause functions must consume large computation cost.
+Third, since all direct and indirect callers of root-cause functions 
+consume more cost and have the same complexity, 
+we should rank callee higher than its caller, 
+to reduce false positives. 
+
+Our algorithm works as follows. 
+We first filter out functions with complexity lower than \texttt{main} function.
+We then compute caller-callee relationship using static analysis and RMS logs. 
+If function \texttt{A} invokes function \texttt{B}, 
+we consider there is a partial order between \texttt{A} and \texttt{B},
+and \texttt{B} should be ranked higher ($\texttt{B} \leq \texttt{A}$). 
+In the end, we calculate a total order for all executed functions based 
+on their partial orders and use the total order as our ranking list. 
+If two functions are not comparable 
+(neither $\texttt{B} \leq \texttt{A}$ nor $\texttt{B} \leq \texttt{A}$), 
+we rank the one with larger cost higher. 
+

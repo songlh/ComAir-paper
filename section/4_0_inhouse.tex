@@ -37,14 +37,14 @@ update the three global variables:
 When a function is called, 
 we need to increment \texttt{count} and grow \texttt{S}.
 When a function returns, 
-we will dump a log with the timestamp 
-when the function is called and the function's RMS.
-For both memory read and write, we 
-need to update \texttt{ts} 
+we will dump a log with a timestamp 
+representing when the function is call 
+and the function’s RMS.
+For both memory read and write, we need to update \texttt{ts} 
 using the current value of \texttt{count}. 
 For memory read, we also need to refer \texttt{ts} to decide 
-whether to increment RMS for 
-all functions live on \texttt{S}.
+whether to increment RMS for all functions live on \texttt{S}.
+
 
 The first optimization is to reduce the number of 
 instrumentation sites for \texttt{read} and \texttt{write} instructions. 
@@ -75,5 +75,6 @@ edges connecting a pair of split BBs,
 leaving the event number as zero for other edges. 
 After that, applying the algorithm~\cite{event-counting}
 can tell us optimized instrumentation sites. 
+
 
 
