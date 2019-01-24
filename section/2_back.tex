@@ -122,6 +122,7 @@ more advanced techniques are needed to tell developers
 which function is the root cause from profiling results of existing techniques. 
 }
 
+
 Second, existing techniques incur significant runtime overheads. 
 In our evaluation, we implement RMS and DSS to collect input size information. 
 For most benchmarks, RMS incurs 50$X$ runtime overhead. 
@@ -148,3 +149,7 @@ identify the $n^2$ complexity, or we get a sample but have to
 record all 
 information for the sampled executions of the outer loop, 
 which can still  have a non-tolerable overhead. 
+
+
+\commentty{It would be better to add 1-2 sentence to describe
+how our approach addresses each of the three limitations.}
