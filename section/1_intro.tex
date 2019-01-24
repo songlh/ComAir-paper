@@ -1,105 +1,46 @@
 \section{Introduction}
 \label{sec:intro}
 
-\subsection{Motivation}
-\label{sec:motiv}
+%\subsection{Motivation}
+%\label{sec:motiv}
 
-As a type of software bug, performance problems~\footnote{We will use performance problems and performance bugs exchangeably,
+As a type of software bug, performance problems~\footnote{We will use performance problems,
+performance issues,  and performance bugs exchangeably,
 following previous works in this area~\cite{SongOOPSLA2014,ldoctor}.}
 are one major source of software's slowness and inefficiency~\cite{PerfBug,perf.fse10,SongOOPSLA2014,ldoctor,Alabama}. 
-Performance problems cannot be optimized away by state-of-the-art compiler optimizations, 
-and they widely widely exist in production-run software,
-annoying end users and causing economic loss in the field~\cite{PerfBug,SongOOPSLA2014,ldoctor}. 
+%Performance problems cannot be optimized away by state-of-the-art compiler optimizations, 
+Performance problems widely exist in production-run software, leading to
+poor user experience and  even economic loss in the field~\cite{PerfBug,SongOOPSLA2014,ldoctor}. 
 Several highly-publicized failures have already been caused by performance problems,
 such as making a website costing millions of dollars useless~\cite{ACA-health}.
-Combating performance problems is urgent.
+Therefore, combating performance problems is urgent.
 
 
-Many performance problems are caused by algorithmic inefficiency,
-such as implementing a linear algorithm in an $O(N^2)$ way.
-We refer to these performance problems as complexity problems in our paper.
+Many performance bugs are caused by algorithmic inefficiency,
+such as implementing a linear algorithm in an $O(N^2)$ way, 
+which cannot be optimized away by state-of-the-art 
+compiler optimizations. 
+We refer to these performance problems as \emph{complexity problems}  in this paper. 
 Our empirical study on a representative performance-bug
 benchmark set~\cite{PerfBug,SongOOPSLA2014} shows that
-nearly half of user-perceived performance problems are complexity problems.
-Complexity problems are usually ranked high in developers' priority list.
-For example, Mozilla developers will immediately try to fix 
+nearly half of the user-perceived performance problems that
+\emph{occurred in production environment} are complexity problems.
+In addition, complexity problems are usually ranked as high-priority bugs in 
+software development.  For example, Mozilla developers will immediately try to fix 
 complexity bugs degrading exponentially~\cite{mozilla35294}.
-Addressing complexity problems is an important aspect of fighting performance bugs.
-
-Algorithmic profiling~\cite{Aprof1,Aprof2,AlgoProf} collects profiles from multiple
-executions of the same program and attributes complexity to different code constructs, such as a loop or a function,
-in the form of a \textit{cost} function of \textit{input} size.
-Algorithmic profiling can be used to detect previously unknown complexity problems and
-pinpoint the root causes for performance failures caused by complexity problems.
-Algorithmic profiling is an effective method to combat complexity problems. 
+\commentty{Was this bug marked as high-priority? Or, we could say ``it took only ? days/hours
+to initiate the resolution of this bug". }
 
 
-\if 0
-
-\begin{enumerate}
-
-\item \textit{Coverage}. Complexity problems are due to different types of complexity,
-and they are also caused by a large variety of root causes.
-A code construct may take inputs and
-consume computation resources of various types.
-A good algorithmic profiling technique must cover a
-large proportion of the various complexity types, root causes, types of inputs and costs.
-
-
-\item \textit{Accuracy}.
-Given an analyzed code construct,
-algorithmic profiling needs to accurately identify
-how cost scales as input size changes.
-%It is desired to conduct algorithmic profiling under the context of the whole program's execution.
-%Otherwise, missing how the code construct cooperates with other parts will lead to inaccurate results.
-It must consider the entire context of the program's execution.
-The profiling results will be inaccurate if how the code construct interact with other parts of the program is missing.
-
-\item \textit{Performance}.
-A lower runtime overhead can allow developers to run more tests
-under a given time budget during in-house testing.
-Production-run algorithmic profiling can help developers
-understand how their programs scale
-under real-world workloads.
-To be deployed in production runs,
-techniques must not incur any observable slowdown.
-
-
-\end{enumerate}
-
-\fi
-
-{\color{red} Todo: we need to discuss that the current algorithmic profiling techniques do not provide a rank list
-and they are not accurate. }
-
-{\color{red} Why we need to conduct algorithmic profiling in production runs?}
-It is necessary to conduct algorithmic profiling in production runs, 
-for the following two reasons. 
-First, whether a complexity problem can 
-cause user-perceived performance 
-impact or whether a complexity problem is necessary to be fixed 
-highly depend on workload. 
-A previous empirical study shows that workload keeps changing and 
-developers usually do not have a good understanding of 
-real-world workload~\citep{PerfBug}. 
-Second, exposing a complexity problem needs to 
-execute a piece of code many times. 
-In-house testing is usually guided by code coverage, 
-and it is not effective enough to expose all complexity problems. 
-
-
-No existing techniques can conduct algorithmic profiling effectively and efficiently. 
-Traditional profilers are the tools most widely used to
-diagnose performance failures~\cite{gprof,oprofile}.
-Traditional profilers can measure only how much time 
-is spent in each code construct during one single run,
-while failing to connect information from multiple runs
-and failing to provide any indication about how the execution time scales.
-Therefore, traditional profilers fail in effectiveness.
-Recent techniques on algorithmic 
-profiling~\cite{Aprof1,Aprof2,AlgoProf} will incur more than $30\times$ runtime overhead.
-They cannot be deployed in production runs and fail in efficiency. 
-
+Given the above discussion, addressing complexity problems in
+software production run is an important aspect of fighting performance bugs. 
+One commonly used method to diagnose complexity problems
+is through algorithmic profiling~\cite{Aprof1,Aprof2,AlgoProf},
+which collects profiles from multiple
+executions of the same program and attributes complexity to different code constructs, 
+such as a loop or a function, in the form of a \textit{cost} function of \textit{input} size.
+Therefore, algorithmic profiling can potentially be used to detect complexity problems and
+pinpoint the root causes for performance failures caused by complexity problems. 
 
 
 \input{section/fig_mysql27287}
@@ -136,14 +77,176 @@ and can also provide workload information
 to confirm the necessity to fix this bug.
 
 
-\subsection{Our Contributions}
+There has been some research on designing algorithmic profiling 
+to diagnose performance issues~\cite{gprof,oprofile}. 
+However, these techniques
+are not capable of handling production-run complexity problems
+efficiently and effectively due to several reasons. 
+First, many algorithmic profilers~\cite{?} and performance 
+testing tools~\cite{?} are designed for in-house usage and cannot be 
+deployed in production runs due to  heavy overhead. 
+\commentty{Are they indeed in-house profilers?}
+Recent techniques on algorithmic 
+profiling~\cite{Aprof1,Aprof2,AlgoProf} will incur more than $30\times$ runtime overhead.
+Second, in-house profilers often have limited knowledge of real-world workload, which is necessary 
+to determine if a complexity problem can cause user-perceived performance 
+impact. A previous empirical study shows that workload keeps changing and 
+developers usually do not have a good understanding of  real-world workload~\citep{PerfBug}.  
+Third, existing profilers intended for production usage~\cite{?}
+can measure only how much time 
+is spent in each code construct during one single run,
+but fail to synthesize information from multiple runs
+or provide any indication about how the execution time scales.
+\commentty{Please double check the above
+paragraph --- I am not sure I made the correct claims... }
+
+
+\if 0
+
+Algorithmic profiling~\cite{Aprof1,Aprof2,AlgoProf} collects profiles from multiple
+executions of the same program and attributes complexity to different code constructs, such as a loop or a function,
+in the form of a \textit{cost} function of \textit{input} size.
+Algorithmic profiling can be used to detect previously unknown complexity problems and
+pinpoint the root causes for performance failures caused by complexity problems.
+Algorithmic profiling is an effective method to combat complexity problems. 
+
+
+
+
+\begin{enumerate}
+
+\item \textit{Coverage}. Complexity problems are due to different types of complexity,
+and they are also caused by a large variety of root causes.
+A code construct may take inputs and
+consume computation resources of various types.
+A good algorithmic profiling technique must cover a
+large proportion of the various complexity types, root causes, types of inputs and costs.
+
+
+\item \textit{Accuracy}.
+Given an analyzed code construct,
+algorithmic profiling needs to accurately identify
+how cost scales as input size changes.
+%It is desired to conduct algorithmic profiling under the context of the whole program's execution.
+%Otherwise, missing how the code construct cooperates with other parts will lead to inaccurate results.
+It must consider the entire context of the program's execution.
+The profiling results will be inaccurate if how the code construct interact with other parts of the program is missing.
+
+\item \textit{Performance}.
+A lower runtime overhead can allow developers to run more tests
+under a given time budget during in-house testing.
+Production-run algorithmic profiling can help developers
+understand how their programs scale
+under real-world workloads.
+To be deployed in production runs,
+techniques must not incur any observable slowdown.
+
+
+\end{enumerate}
+
+
+
+{\color{red} Todo: we need to discuss that the current algorithmic profiling techniques do not provide a rank list
+and they are not accurate. }
+
+{\color{red} Why we need to conduct algorithmic profiling in production runs?}
+It is necessary to conduct algorithmic profiling in production runs, 
+for the following two reasons. 
+First, whether a complexity problem can 
+cause user-perceived performance 
+impact or whether a complexity problem is necessary to be fixed 
+highly depend on workload. 
+A previous empirical study shows that workload keeps changing and 
+developers usually do not have a good understanding of 
+real-world workload~\citep{PerfBug}. 
+Second, exposing a complexity problem needs to 
+execute a piece of code many times. 
+In-house testing is usually guided by code coverage, 
+and it is not effective enough to expose all complexity problems. 
+
+
+No existing techniques can conduct algorithmic profiling effectively and efficiently. 
+Traditional profilers are the tools most widely used to
+diagnose performance failures~\cite{gprof,oprofile}.
+Traditional profilers can measure only how much time 
+is spent in each code construct during one single run,
+while failing to connect information from multiple runs
+and failing to provide any indication about how the execution time scales.
+Therefore, traditional profilers fail in effectiveness.
+Recent techniques on algorithmic 
+profiling~\cite{Aprof1,Aprof2,AlgoProf} will incur more than $30\times$ runtime overhead.
+They cannot be deployed in production runs and fail in efficiency. 
+
+\fi
+
+
+
+\textbf{Contributions.}
 \label{sec:con}
+%
+The goal of our research is two fold. First, we want to better 
+understand  complexity problems, including 
+their root causes, how user-perceived performance impact 
+in production environment is generated,
+their characterization, and how the bugs in each category are
+fixed.  Toward this end, 
+we conduct an empirical on a  representative
+performance-bug benchmark suite \cite{PerfBug,SongOOPSLA2014},
+containing 65 user-perceived   performance bugs from five
+real-world applications.  We discovered that 
+1) around three-fourths of the studied complexity problems are
+caused by repeated executions of a loop or a recursive function;
+2) for most complexity problems,
+the users describe how to change the input size to reproduce the scaling problem during reporting;
+and 3) complexity problems usually take a longer time to diagnose and fix,
+and more effective tool supports are needed.
+To the best of our knowledge, our work is the first study focusing on complexity problems.
+%Our findings and implications can motivate future research on complexity problems.
+%They have already guided our selection of design points when building the in-house version of \Tool,
+%and inspired us to apply sampling to the production-run version of \Tool.
+
+
+
+Second, guided by the findings from the empirical
+study, we develop \Tool, the first automated tool to effectively and efficiently 
+conduct algorithmic profiling  under production-run setting.
+Given a program under profiling, \Tool first instruments the program
+using a light-weighted instrumentation method. 
+The key idea is to use software-based sampling to conduct algorithmic profiling.
+Given a code construct with multiple dynamic instances in a program run,
+we sample some of the dynamic instances and leverage the mark-and-recapture
+method \citep{mark-recapture} to infer information for all instances.
+\commentty{Not sure I am right...}
+\Tool then collects runtime profiles as the program is running
+in production environment with different inputs.
+Next, \Tool synthesizes the profiles and generates a cost function of input size
+for each code construct to describe its complexity. 
+\commentty{Any novel ideas in this step?}
+Finally, \Tool  reports a ranked list of code constructs in terms of their likelihood
+of containing performance bugs due to complexity problems. \commentty{We may need to define code
+constructs.} 
+
+
+{\color{red} TODO: discuss the ranking list}
+
+\Tool provides several benefits over existing performance profilers:
+1) \Tool supports production-run algorithmic profiling by taking into account
+real-world workload and can thus discover most of the real complexity problems;
+2) \Tool considers multiple runtime profiles and automatically synthesizes them
+into a cost function for each code construct;
+3) \Tool incurs negligible runtime overhead while achieving accurate profiling results;
+4) \Tool  simplifies the task of detecting performance bugs related to complexity
+problems by providing a ranked lists of code constructs in terms of their
+cost functions; 
+5) \commentty{what else?}
+
+\if 0
 
 {\color{red} Todo: what is the usage scenario of \Tool. we have two setting, one is in-house, and the other is production run. }
 In this paper,
-we present a tool, \Tool, to effectively conduct algorithmic profiling 
+we present an automated tool, \Tool, to effectively and efficiently conduct algorithmic profiling 
 under production-run setting.
-\Tool automatically instrument a given monitored program.
+\Tool automatically instruments a given monitored program.
 The instrumented program will be distributed to end users, 
 and runtime information will be collected from user side. 
 \Tool will automatically merge profiles generated by the same code code 
@@ -153,25 +256,6 @@ provide accurate profiling results, and incur a negligible runtime overhead.
 
 We build \Tool through the following two steps.
 
-{\color{red} TODO:}
-We first conduct an empirical study to better understand
-real-world complexity problems.
-All of the studied complexity bugs come from a representative
-performance-bug benchmark suite\cite{PerfBug,SongOOPSLA2014}.
-To the best of our knowledge, our work is the first study focusing on complexity problems.
-We categorize complexity problems into different complexity categories.
-We study root causes,
-how user-perceived performance impact is generated,
-and fix strategies for bugs in each category.
-We also investigate the reporting and diagnosis process of complexity problems.
-Our findings and implications can motivate future research on complexity problems.
-They have already guided our selection of design points when building the in-house version of \Tool,
-and inspired us to apply sampling to the production-run version of \Tool.
-
-
-{\color{red} TODO: discuss the ranking list}
-
-\if 0
 We then systematically investigate different design points during algorithmic profiling
 in order to build the in-house version of \Tool.
 We explore two types of input metrics,
@@ -191,33 +275,43 @@ that cause the perceived performance failures.
 \fi
 
 
-To build the production-run version of \Tool,
-we apply software-based sampling to algorithmic profiling.
-Given a code construct with multiple dynamic instances in a program run,
-we sample some of the dynamic instances and leverage the mark-and-recapture
-method\citep{mark-recapture} to infer information for all instances.
-Our evaluation shows that
+We envision that \Tool can be used in at least two scenarios. 
+First, \Tool can be deployed on user end to conduct production-run performance
+profiling. The results (i.e., a ranked list of code constructs with their cost functions)
+are returned to developers, which can help to localize performance 
+bugs and understand 
+which code constructs have the most performance impact on the system.
+Second, \Tool can be configured as an in-house testing tools used by 
+developers and testers. \commentty{how to make it as a testing tool.}
+Third, ... \commentty{more usage scenarios?}
+
+
+To evaluate \Tool, we apply the approach to ? popular benchmarks and real-world 
+C/C++ programs with both known and previously unknown complexity 
+problems.  Our results show that  \Tool effectively identifies complexity
+problems.  Within \Tool, we show that 
 sampling allows us to significantly lower the runtime overhead.
+Specifically, \Tool  lowered the runtime overhead to less than
+$5\%$ for $34$ out of $38$ benchmarks,
+without sacrificing the profiling capability and the profiling latency.
 The evaluation also shows that sampling does not hurt the profiling capability
 and does not require to profile more program runs,
 not increasing profiling latency, since
 the majority of complexity problems are caused by
 repeated executions of a loop or a recursive function, as shown by our empirical study.
+Compared to ... \commentty{Need to rewrite the this paragraph based 
+on the results.}
 
 
+In summary, we make the following contributions:
 
-Specifically, we make the following contributions:
-
-\begin{enumerate}
+\begin{itemize}
 
 \item We conduct the first empirical study on real-world complexity problems.
-We have several important findings and implications, including
-1) around three-fourths of the studied complexity problems are
-caused by repeated executions of a loop or a recursive function;
-2) for most complexity problems,
-the users describe how to change the input size to reproduce the scaling problem during reporting;
-and 3) complexity problems usually take a longer time to diagnose and fix,
-and more effective tool supports are needed.
+The study provides several important findings and implications that can
+help developers better understand complexity problems and design tools
+to handle them. 
+
 
 \if 0
 \item We design and implement the in-house version of \Tool through
@@ -227,10 +321,16 @@ caused by different types of complexity problems and attribute complexity inform
 
 \fi
 
-\item We design the production-run version of \Tool by applying
-software-based sampling and a statistical estimation method.
-Experimental results show that we can lower the runtime overhead to less than
-$5\%$ for $34$ out of $38$ benchmarks,
-without sacrificing the profiling capability and the profiling latency.
+\item We develop   \Tool, the first performance profiling tool that is intended to be used
+in production environment to effectively detect performance
+issues caused by different types of complexity problems and attribute the 
+problems to specific code constructs with negligible
+overhead.  
+\Tool can also be configured as an in-house testing tool. 
 
-\end{enumerate}
+\item We implement \Tool and conduct an empirical study to demonstrate 
+its effectiveness and efficiency in detecting complexity problems. 
+
+
+
+\end{itemize}
