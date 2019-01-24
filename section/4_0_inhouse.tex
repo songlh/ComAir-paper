@@ -20,4 +20,60 @@ functions in Section~\ref{sec:rank}.
 \subsection{Implementation and Optimization}
 \label{sec:inhouse_impl}
 
+We briefly overview the algorithm 
+designed in previous works~\cite{Aprof1,Aprof2} 
+before discussing our two designed optimizations. 
+
+To count RMS for every function call instance, 
+three global variables need to be instrumented:
+\texttt{count}, representing current timestamp 
+and incremented by one after each function call,
+\texttt{ts}, a hash table containing the latest accessing timestamp 
+for each memory cell,
+and \texttt{S}, a shadow stack maintaining all active functions. 
+We need to monitor four types of instructions to 
+update the three global variables:
+\texttt{call}, \texttt{return}, \texttt{read}, and \texttt{write}.
+When a function is called, 
+we need to increment \texttt{count} and grow \texttt{S}.
+When a function returns, 
+we will dump a log with the timestamp 
+when the function is called and the function's RMS.
+For both memory read and write, we 
+need to update \texttt{ts} 
+using the current value of \texttt{count}. 
+For memory read, we also need to refer \texttt{ts} to decide 
+whether to increment RMS for 
+all functions live on \texttt{S}.
+
+The first optimization is to reduce the number of 
+instrumentation sites for \texttt{read} and \texttt{write} instructions. 
+If write on a memory cell happens earlier, 
+following read on the same memory cell will not increase RMS.
+For both memory read and write, 
+we need to update \texttt{ts} using the current 
+value of \texttt{count} and \texttt{count} is only incremented after function call. 
+Therefore, given two consecutive memory accesses on the same location,
+if there is no function calls in between, 
+we don't need to instrument the second one. 
+We rely on dominance analysis to implement this optimization. 
+We focus on stack memory cells that hold scalar variables 
+and only have read and write as uses 
+(i.e., not having ``address of'' as uses), 
+so that alias analysis is avoided. 
+
+The second optimization is to efficiently count executed BBs.
+Instead of incrementing a global counter in every BB,
+we apply an algorithm, which was originally designed to efficiently 
+count edge events through selectively instrumenting counter update sites 
+on CFG~\cite{event-counting}.
+The algorithm has already been proved to conduct path 
+profiling efficiently~\cite{path-profiling,peter-ase}.  
+Since the original algorithm is design to count edge events, 
+we split each BB into two and label the event number to be one for 
+edges connecting a pair of split BBs, 
+leaving the event number as zero for other edges. 
+After that, applying the algorithm~\cite{event-counting}
+can tell us optimized instrumentation sites. 
+
 
