@@ -29,7 +29,7 @@ In addition, complexity problems are usually ranked as high-priority bugs in
 software development.  For example, Mozilla developers will immediately try to fix 
 complexity bugs degrading exponentially~\cite{mozilla35294}.
 \commentty{Was this bug marked as high-priority? Or, we could say ``it took only ? days/hours
-to initiate the resolution of this bug". }
+to respond"? }
 
 
 Given the above discussion, addressing complexity problems in
@@ -48,11 +48,11 @@ pinpoint the root causes for performance failures caused by complexity problems.
 
 One MySQL complexity problem is shown in Figure~\ref{fig:mysql27287}.
 The loop searches parent \texttt{XML\_NODE} for function parameter \texttt{nitems},
-which presents an array index for another \texttt{XML\_NODE}.
-All \texttt{XML\_NODE}s are maintained in array \texttt{items}.
-The loop searches by iterating array \texttt{items}
-backward from the input and looking for the first \texttt{XML\_NODE}
-whose level is one less than the input.
+%which presents an array index for another \texttt{XML\_NODE}.
+which is used as an array index. 
+All \texttt{XML\_NODE}s are maintained in the array \texttt{items}.
+The loop iterates through the array \texttt{items}
+backwardly and searches for the first \texttt{XML\_NODE} (Lines 7--11).
 This piece of code looks innocent.
 However, there is an outer loop not shown in the figure.
 The outer loop will keep calling \texttt{xml\_parent\_tag} using
@@ -63,6 +63,8 @@ since an \texttt{XML\_NODE} usually does not have too many children.
 However, during performance failure runs,
 an \texttt{XML\_NODE} contains tens of thousands of children,
 and this leads significant showdown perceived by the end users.
+\commentty{To make the example more readable, can we add ``+", ``-" to indicate
+where the bug was and how it was fixed? }
 
 To fix this bug, the developers added an extra field to each \texttt{XML\_NODE} to save its parent,
 and this field is initialized when an \texttt{XML\_NODE} is created.
@@ -299,7 +301,7 @@ and does not require to profile more program runs,
 not increasing profiling latency, since
 the majority of complexity problems are caused by
 repeated executions of a loop or a recursive function, as shown by our empirical study.
-Compared to ... \commentty{Need to rewrite the this paragraph based 
+Compared to ... \commentty{Need to update the this paragraph based 
 on the results.}
 
 
