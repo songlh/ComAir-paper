@@ -1,13 +1,19 @@
-\subsection{A Taxonomy for Complexity Problems}
+\subsection{A Taxonomy of Complexity Problems}
 \label{sec:tax}
 
-We first categorize complexity problems based on their complexity types,
-and then we study complexity problems in each type from the following three aspects:
+
+
+We categorize complexity problems based on their complexity types.
+We then study complexity problems in each type from the following three aspects:
 1) what are their root causes\footnote{We refer root causes as code constructs 
 conducting the inefficient computation, 
 following previous works in this area\cite{SongOOPSLA2014,ldoctor}.};
 2) how they generate user-perceived slowdown;
 3) how they are fixed by developers. 
+Table~\ref{tab:study} shows the results. 
+
+\commentty{Can we add the three aspects for each category in Table 1?
+Currently, it is difficult to map the findings to the implications in Section 3.3.}
 
 \noindent{\underline{\textit{$O(N)$: linear complexity.}}} 
 As shown in Table~\ref{tab:study}, 
@@ -127,6 +133,9 @@ once they detect complex control and data dependence.
  
 \subsection{Implications}
 \label{sec:study_impli}
+
+We summarize the implications from our study, which can guide
+the design and implementation of \Tool.
 
 \noindent{\underline{\textit{Implication 1.}}
 To effectively profile algorithmic complexity,
