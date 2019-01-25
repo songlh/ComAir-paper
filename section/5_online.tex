@@ -22,16 +22,17 @@ to conduct algorithmic profiling.
 We design the production-run version 
 of \Tool following three principles. 
 
-First, \textit{study-guided design}.
-We leverage our empirical study results 
+\noindent\underline{Study-guided design}.
+We leverage the results of our empirical study in Section~\ref{sec:back},
 to select profiling targets and suitable input metrics.
-As discussed in Section~\ref{sec:back}, 
+One finding of our study is that
 all complexity problems are 
 caused either by a loop or a recursive function. 
 Therefore, the production-run version of \Tool chooses loops 
 and recursive functions as profiling targets, 
 and it instruments distinct loops or recursive functions to create multiple
 versions of a monitored program. 
+
 Another important finding of our study
 is that the most two commonly involved 
 data structures in complexity problems 
@@ -39,24 +40,28 @@ are array and linked list.
 Therefore, if a loop is to process an array 
 or a linked list, we use DSS as its input metric.
 Otherwise, we use RMS. 
-Intuitively, DSS requires to record less dynamic information, 
-and replacing RMS with DSS whenever it is possible 
-can lower runtime overhead. 
+The difference between DSS and RMS is that 
+we only need to instrument \texttt{read} instructions 
+accessing elements 
+in an array or a linked list for DSS, 
+without instrument \texttt{write} instructions.
+Therefore, DSS requires to 
+record less dynamic information. 
 
-Second, \textit{approximation}.
+\noindent\underline{Approximation}.
 Accurately recording dynamic information for input and cost metrics
 may incur a large runtime overhead.
 Therefore, we propose two approximation mechanisms. 
 First, if a loop is to process an array, 
-we only record the addresses for the first 
-and last accessed elements.
+we only record the addresses of the first 
+and the last accessed elements.
 We calculate the difference between the two addresses, 
 and use it as DSS.
 Second, instead of using executed BBs, 
 we use LIs as cost metric for loops 
 and use RIs for recursive functions. 
 
-Third, \textit{sampling}.
+\noindent\underline{Sampling}.
 Previous works~\cite{liblit03,liblit05,CCI,SongOOPSLA2014,ldoctor}
 demonstrate that sampling can greatly 
 reduce overhead for dynamic techniques,
@@ -73,146 +78,94 @@ based on collected samples.
 
 \subsection{Detailed Implementation}
 
+\noindent{\underline{How to identify an array-processing loop?}}
+Given a loop, we analyze all pointer usage inside the loop. 
+If a pointer is deferenced in every iteration of a loop, 
+and its value is also increased or decreased by 
+an integer number in every iteration,
+we consider the pointer points to array elements and 
+the loop is an array-processing loop.  
+For example, as shown in Figure~\ref{fig:mysql27287}, 
+\texttt{p} points to array elements. 
+It is deferenced in every iteration of the loop 
+in Figure~\ref{fig:mysql27287},
+and the pointer value is decreased by one in every loop iteration. 
+
+\noindent{\underline{How to identify a linked-list-processing loop?}}
+We also analyze all pointer usage inside each loop, 
+by checking whether a pointer satisfies the following three conditions.
+First, its base type is a \texttt{struct}.
+Second, it is deferenced in every iteration of a loop.
+Third, it is updated in every iteration with a new value 
+from one field of the \texttt{struct} it points to.
+If a pointer satisfies the three conditions, 
+we consider it points to elements in a linked list.
+We also consider the loop which deferences the pointer and 
+updates the pointer's value as  
+a linked-list-processing loop. 
 
 
+\noindent{\underline{How to do sampling?}}
+How we do sampling is similar to what is described in previous works 
+on statistical debugging~\cite{liblit03,liblit05,CCI,SongOOPSLA2014,ldoctor}.
+Given a loop\footnote{We handle a recursive function 
+in the same way as we handle a loop.} to be monitored, 
+we clone the loop.
+We instrument the cloned loop to trace memory read and write for RMS, 
+or trace memory read accessing data structure elements for DSS.
+To keep things simple, 
+for each memory access, we record its memory address 
+and whether it is a read or write directly to log, 
+without maintaining any global data structure. 
+We dump extra delimiters to log before each execution of the cloned loop 
+to differentiate information collected 
+from different samples.
 
-
-
-
-
-
-
-
-\subsection{Technical Design}
-As we discussed in Section~\ref{sec:study}, 
-the majority of complexity problems studied are caused 
-by repeated executions of a loop or a recursive function. 
-Previous works show that sampling code constructs that are executed 
-multiple times in one program run can lower the runtime overhead, 
-while still being able to collect enough runtime information 
-without hurting diagnosis latency\cite{SongOOPSLA2014,ldoctor}. 
-Inspired by our study and the earlier works, 
-we apply sampling to efficiently profile loops 
-and recursive functions with multiple executions. 
-
-\noindent\textbf{Input Metric}
-If the specified code construct is an array-processing loop 
-or a linked-list-processing loop,
-we will use DSS as the input metric. 
-Otherwise, we will use RMS+ as the input metric. 
-
-As we discussed in Section~\ref{sec:inhouse}, 
-there are two methods, top-down and bottom-up, 
-to analyze RMS+ and DSS records collected 
-for multiple dynamic instances of a code construct in one program run. 
-We leverage the top-down method for the in-house version of \Tool. 
-However, the top-down method is not suitable for sampling. 
-The reason is as follows.
-Assume we have a code construct \texttt{c} to monitor. 
-It is inside a loop \texttt{l} and is executed multiple times in one program run.
-There are fewer dynamic instances of \texttt{l}
-than dynamic instances of \texttt{c}.
-If we apply the top-down method, 
-we need to sample dynamic instances of \texttt{l}, 
-and it is very likely that we will miss these instances. 
-For each dynamic instance of \texttt{l}, 
-there will be more computation, 
-compared with an instance of \texttt{c}.
-More overhead will be incurred to collect 
-information for dynamic instances of \texttt{l}.
-Therefore, we apply the bottom-up method 
-in the production-run version of \Tool.
-We sample instances of \texttt{c} to record 
-distinct memory cells contributing RMS+ 
-or distinct elements in an array or a linked list.
-We use the sampled information to infer RMS+ 
-or DSS for all instances of \texttt{c} in one program run.
-
-
-The sampling method is similar to that described in previous works on statistical 
-debugging\cite{liblit03,liblit05,CCI,SongOOPSLA2014,ldoctor}.
-We make a cloned version of the monitored code construct.
-We instrument the cloned version to record information for RMS+ or DSS. 
-We dump the recorded information to log 
-whenever the cloned version finishes execution. 
-We add extra delimiters to log to differentiate information collected from different instances.
-Before each execution of the monitored code construct, 
+Before each execution of a monitored loop, 
 we choose between the cloned version and the original version. 
 How many times the cloned version is executed 
 depends on a tunable sampling rate. 
 To make the choice between the two versions,
 we add a global counter to the monitored program. 
-If the counter value is larger than $0$, 
-we choose the original version and decrease the counter value by $1$.
-If the counter value is equal to $0$,
+If the counter value is larger than zero, 
+we choose the original version and decrease the counter value by one.
+If the counter value is equal to zero,
 we choose the cloned version and reset the counter value to 
 a random number, 
-whose expectation is equal to the inverse of the sampling rate.  
+whose expectation is 
+equal to the inverse of the sampling rate.  
 
+We design two sampling policies. 
+For the first one, we sample loop executions independently from each other.
+For the second one, we sample a pair of consecutive loop executions, 
+with the intuition that two consecutive 
+executions may share more information.
 
-We leverage the mark-and-recapture method\citep{mark-recapture} to 
-estimate RMS+ or DSS for all dynamic instances of a code construct 
-based on the collected samples. 
+\noindent{\underline{How to infer all information?}}
+We leverage the mark-and-recapture method~\cite{mark-recapture} to 
+estimate RMS or DSS for all execution of a monitored loop 
+based on the sampled execution. 
 Mark-and-recapture is a commonly used statistical method 
 for estimating the size of an animal population. 
 In this method, some of the animals are captured, marked, and released. 
-Then, another group of the animials are captured.
+Then, another group of the animals are captured.
 The size of the whole animal population is estimated 
 based on the ratio of marked animals in the second captured sample.  
 
-
-Each sample of a monitored code construct is a set of memory cells, 
-which contribute RMS+ or represent distinct elements in an array or a linked list. 
-In one program run, we assume that we collect a sequence of $m$ samples. 
-Given the $i$th sample, $M_i$ represents the 
+To utilize the mark-and-recapture method, 
+we first process our log to calculate a set of memory cells, 
+which contribute RMS
+or DSS for each sample. 
+We then estimate the whole RMS or DSS using the following formula.
+We assume we collect a sequence of $m$ samples for a monitored loop 
+in one program run.
+Given the $i$th sample, we use $M_i$ to represent the 
 total number of distinct memory cells in the previous $i-1$ samples, 
 $C_i$ represents the number of distinct memory cells in the $i$th sample,
 and $R_i$ represents the number of distinct memory cells in 
 the $i$th sample that also appeared in one of the previous $i-1$ samples.
-The total number of distinct memory cells for all dynamic instances 
-of the monitored code construct can be estimated as:
-
-
-%\begin{equation} \label{eq:mark}
-%$$p_v(S_v(a)) = 1 - \prod\limits_{u \in S_v(a)}(1 - p_{u,v})$$
-%N = \frac{\sum\limits_{i=1}^m M_i*C_i}{\sum\limits_{i=1}^m R_i}
-%\end{equation}
+The estimated RMS or DSS of  the monitored loop is:
 
 \begin{equation} \label{eq:mark}
 N = \sum\limits_{i=1}^m M_i*C_i\Big/\sum\limits_{i=1}^m R_i
 \end{equation}
-
-\noindent\textbf{Cost Metric}
-The production-run version of \Tool focuses on recursive functions or loops.
-If the monitored code construct is a recursive function,
-we use RIs as the cost metric.
-If the monitored code construct is a loop, 
-we use LIs as the cost metric. 
-We do not apply sampling when collecting these two metrics. 
-As we discussed in Section~\ref{sec:inhouse},
-these two metrics will incur a smaller overhead compared with BBs, 
-and they can still provide accurate profiling results.  
-
-
-\subsection{Implementation}
-
-{\color{red} Todo: How to implement RMS and DSS}
-
-\subsection{Static Optimizations}
-
-\noindent{\color{red} Todo: How to efficiently count BB}
-
-\noindent{\color{red} Todo: The optimization for array}
-
-\noindent{\color{red} Todo: more loop-invariant address outside of the loop}
-
-\noindent{\color{red} Todo: remove unnecessary read/write instrumentation}
-
-
-
-
-
-
-
-
-
