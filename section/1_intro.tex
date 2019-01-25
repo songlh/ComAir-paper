@@ -30,10 +30,13 @@ software development.  For example, Mozilla developers will immediately try to f
 complexity bugs degrading exponentially~\cite{mozilla35294}.
 \commentty{Was this bug marked as high-priority? Or, we could say ``it took only ? days/hours
 to respond"? }
+\commentlh{In the cited bug report, one developer asked what is the performance impact 
+for the reported bug. He gave out several options. If any is true, he would fix the bug soon. 
+One option is ``degrades exponentially with the number of lines'' }
 
 
 Given the above discussion, addressing complexity problems in
-software production run is an important aspect of fighting performance bugs. 
+software production runs is an important aspect of fighting performance bugs. 
 One commonly used method to diagnose complexity problems
 is through algorithmic profiling~\cite{Aprof1,Aprof2,AlgoProf},
 which collects profiles from multiple
@@ -52,7 +55,8 @@ The loop searches parent \texttt{XML\_NODE} for function parameter \texttt{nitem
 which is used as an array index. 
 All \texttt{XML\_NODE}s are maintained in the array \texttt{items}.
 The loop iterates through the array \texttt{items}
-backwardly and searches for the first \texttt{XML\_NODE} (Lines 7--11).
+backwardly and searches for the first \texttt{XML\_NODE} 
+\commentlh{with \texttt{level} one less than the \texttt{XML\_NODE} indexed by \texttt{nitems}?} (Lines 7--11).
 This piece of code looks innocent.
 However, there is an outer loop not shown in the figure.
 The outer loop will keep calling \texttt{xml\_parent\_tag} using
@@ -65,6 +69,7 @@ an \texttt{XML\_NODE} contains tens of thousands of children,
 and this leads significant showdown perceived by the end users.
 \commentty{To make the example more readable, can we add ``+", ``-" to indicate
 where the bug was and how it was fixed? }
+\commentlh{I will address this later.}
 
 To fix this bug, the developers added an extra field to each \texttt{XML\_NODE} to save its parent,
 and this field is initialized when an \texttt{XML\_NODE} is created.

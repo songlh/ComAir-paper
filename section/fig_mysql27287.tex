@@ -1,14 +1,19 @@
 \begin{figure}
 \centering
-\lstset{basicstyle=\ttfamily\fontsize{7}{8}\selectfont,
+\scriptsize
+\lstset{basicstyle=\ttfamily\selectfont,
      morekeywords={+},keepspaces=true,numbers=left}
   \mbox{\lstinputlisting[mathescape,boxpos=t]{figure/mysql27287.c}}
   \vspace{-0.1in}
-\caption{A MySQL performance problem in polynomial complexity.
-\footnotesize{(This figure shows the buggy code fragment for MySQL\#27287.
-   During performance failure runs,
-   the execution time scales polynomially with the size of \texttt{items}.)}}
-\vspace{-0.05in}
-\label{fig:mysql27287}
-\vspace{-0.15in}
+  \mycaption{fig:mysql27287}
+  {A MySQL performance problem in polynomial complexity.}
+  {During performance failure runs, 
+  the execution time scales polynomially with the size of \texttt{items}.}
+%\caption{A MySQL performance problem in polynomial complexity.
+%\footnotesize{(This figure shows the buggy code fragment for MySQL\#27287.
+%   During performance failure runs,
+%   the execution time scales polynomially with the size of \texttt{items}.)}}
+%\vspace{-0.05in}
+%\label{fig:mysql27287}
+%\vspace{-0.15in}
 \end{figure}
