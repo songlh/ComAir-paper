@@ -1,44 +1,86 @@
-%\newpage
-\section{\Tool Design}
+\section{Online Algorithmic Profiling}
 \label{sec:online}
 
+In this section, we present technical details 
+for the production-run version of \Tool, 
+including the high-level design choices
+and several optimization policies. 
 
-{\color{red} Todo: change the design principle}
-In this section, we discuss our design and 
-implementation for the production-run version of \Tool. 
-For production-run usage, profiles are collected from the user side.
-It is very important to keep the runtime overhead low, since
-end users cannot tolerate any observable performance slowdown.
-To achieve this requirement,
-our design follows several principles. 
+We envision \Tool to be used in the following way 
+under the production-run setting.
+Given a monitored program, \Tool creates multiple versions of it, 
+and for each version \Tool only instruments a small piece of code. 
+All different versions are distributed to different end users. 
+Since there is a huge amount of end users, 
+we anticipate that enough profiles can still be collected 
+for each version 
+to conduct algorithmic profiling. 
+ 
+\subsection{High-level Design}
+\label{sec:high}
 
-First, \textit{study guided}. 
-The design of the production-run version of \Tool
-is guided by the empirical study in Section~\ref{sec:study}.
-We focus on the majority of complexity problems, 
-caused either by repeated executions of a loop ($N^k$)
-or a recursive function ($2^N$).
-We focus on common types of data structures, which are array and linked list.
+We design the production-run version 
+of \Tool following three principles. 
 
-Second, \textit{focused checking}.
-When applying the production-run version of \Tool, 
-we expect developers will specify a suspicious loop or a suspicious recursive function
-to be monitored. 
-\Tool will automatically instrument the specified code construct 
-to collect runtime information from the user side in a low overhead. 
-The profiling results can help developers better understand the complexity of the code construct 
-and its processed workloads in the real world.
-\Tool can be used together with performance failure 
-diagnosis tools\cite{SongOOPSLA2014} 
-or traditional profilers to
-focus on suspicious code constructs leading 
-to user-perceived performance failures.
+First, \textit{study-guided design}.
+We leverage our empirical study results 
+to select profiling targets and suitable input metrics.
+As discussed in Section~\ref{sec:back}, 
+all complexity problems are 
+caused either by a loop or a recursive function. 
+Therefore, the production-run version of \Tool chooses loops 
+and recursive functions as profiling targets, 
+and it instruments distinct loops or recursive functions to create multiple
+versions of a monitored program. 
+Another important finding of our study
+is that the most two commonly involved 
+data structures in complexity problems 
+are array and linked list.
+Therefore, if a loop is to process an array 
+or a linked list, we use DSS as its input metric.
+Otherwise, we use RMS. 
+Intuitively, DSS requires to record less dynamic information, 
+and replacing RMS with DSS whenever it is possible 
+can lower runtime overhead. 
+
+Second, \textit{approximation}.
+Accurately recording dynamic information for input and cost metrics
+may incur a large runtime overhead.
+Therefore, we propose two approximation mechanisms. 
+First, if a loop is to process an array, 
+we only record the addresses for the first 
+and last accessed elements.
+We calculate the difference between the two addresses, 
+and use it as DSS.
+Second, instead of using executed BBs, 
+we use LIs as cost metric for loops 
+and use RIs for recursive functions. 
 
 Third, \textit{sampling}.
-Instead of recording all dynamic information, 
-we apply sampling and record only part of the information. 
-We infer information for the whole execution based on the collected samples. 
-Sampling can effectively lower the runtime overhead. 
+Previous works~\cite{liblit03,liblit05,CCI,SongOOPSLA2014,ldoctor}
+demonstrate that sampling can greatly 
+reduce overhead for dynamic techniques,
+while still preserving their desired 
+detection and diagnosis capability. 
+These previous work motivate us to apply sampling to algorithmic profiling. 
+Our study in Section~\ref{sec:back} shows that 
+the majority of complexity problems are caused by repeated execution of a loop
+or a recursive function. 
+This result inspires us to sample some execution of 
+a loop or a recursive function,
+and infer information for all execution, 
+based on collected samples.
+
+\subsection{Detailed Implementation}
+
+
+
+
+
+
+
+
+
 
 
 \subsection{Technical Design}
