@@ -1,0 +1,45 @@
+\subsection{In-house Algorithmic Profiling}
+\label{sec:in-house}
+
+\commentty{need to discuss the usage scenario 
+of in-house profiling, e.g., what kinds of inputs are used.}
+
+In in-house profiling, we choose RMS as input metric 
+and BB as cost  metric. \commentty{Why is DSS discarded
+for in-house?} 
+ %
+ %In this section, we present the design and implementation 
+%of \Tool under the in-house setting. 
+%We choose RMS as input metric and BB as cost 
+%metric for the in-house version of \Tool, 
+%since RMS is more general than DSS and BB is a balance 
+%between monitoring accuracy and monitoring efficiency, 
+The in-house version of \Tool is configured by enabling
+only the second instrumentation optimization method (i.e.,
+optimizing instrumentation sites) presented 
+in the production-run version. This is because we wish 
+to obtain more accurate results while overhead is less of 
+a concern.  
+
+The main advantage of the in-house version of \Tool 
+over existing profilers (e.g., Aprof~\cite{Aprof1,Aprof2}) is that 
+\Tool provides a ranked list of code constructs to
+help localizing complexity problems while 
+existing tools simply attribute complexity to each executed function, 
+without providing any postmortem analysis. 
+
+
+%The in-house version of \Tool shares similar 
+%design philosophy with Aprof~\cite{Aprof1,Aprof2}.
+%Aprof is implemented under Valgrind framework~\cite{valgrind} .
+%We will first discuss how we collect RMS and BB under LLVM 
+%framework~\cite{llvm} in Section~\ref{sec:inhouse_impl}.
+%Aprof simply attributes complexity to each executed function, 
+%without providing any postmortem analysis. 
+%We will then present how we rank identified super-linear 
+%functions in Section~\ref{sec:rank}. 
+
+\commentty{Shall we have a new section discussing implementation, e.g., what tools and
+platforms used to implement \Tool?}
+
+

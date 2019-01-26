@@ -1,0 +1,326 @@
+\section{\Tool Design and Implementation}
+\label{sec:online}
+
+%In this section, we present technical details 
+%for the production-run version of \Tool, 
+%including the high-level design choices
+%and several optimization policies. 
+
+Guided by the findings of empirical study in Section~\ref{sec:back},
+we design and implement \Tool, a performance 
+profiler to detect complexity problems. \Tool
+can be used in both production environment 
+and in-house development. We first describe
+the production-run version of \Tool. 
+The key benefits of \Tool include its \emph{low runtime} overhead and  capability of \emph{ranking 
+and localizing complexity problems in specific code constructs}. 
+We then describe how to use \Tool as an in-house testing tool. 
+
+The design of \Tool used in production environment 
+follows two steps. First, given a program under profile,
+\Tool instruments the program and
+distribute it to end users to collect runtime profiles
+under different user inputs (e.g., workload). 
+To minimize runtime overhead, we design and implement
+several advanced instrumentation methods in \Tool. 
+In the second step, \Tool computes cost functions for
+different code constructs based on the execution profiles
+and then reports a ranked list of code constructs in
+terms of their likelihood of containing performance bugs due to
+complexity problems.  We next describe details of the two steps. 
+
+
+\subsection{Using Light-Weighted Instrumentation to Collect
+Execution Profiles}
+
+To obtain execution profiles, we need to select suitable \emph{profiling targets} (i.e.,
+code constructs), \emph{input metrics}, and \emph{cost metrics}. 
+One finding in our empirical~\ref{sec:back} is that  all complexity problems are 
+caused either by a loop or a recursive function. 
+Therefore, the production-run version of \Tool chooses loops 
+and recursive functions as profiling targets, 
+and it instruments distinct loops or recursive functions. 
+As for input metrics, our study found that  most two commonly involved 
+data structures in complexity problems 
+are array and linked list. Therefore, if a loop is to process an array 
+or a linked list, we use data structure size (DSS) as its input metric. Otherwise, we use Read Memory Size (RMS). 
+The difference between DSS and RMS is that 
+we only need to instrument \texttt{read} instructions  accessing elements 
+in an array or a linked list for DSS,  without instrument \texttt{write} instructions.
+Therefore, DSS requires to record less dynamic information. 
+The cost metric used in \Tool is executed basic blocks (Section~\ref{subsec:pre}).
+
+As discussed in Section~\ref{subsec:existing}, existing algorithmic
+often incur significant overhead and thus cannot be used in production
+environment. To address this issue, \Tool proposes several 
+methods to enable practical online instrumentation, including 1) 
+minimizing instrumented code at each user's end; 2) optimizing instrumentation sites;
+3) approximation; and 4) sampling. 
+
+
+\subsubsection{Creating Multiple Instrumentation Versions}
+
+\Tool creates multiple versions of program under profiles, 
+and for each version \Tool only instruments a small number of 
+profiling targets. 
+All different versions are distributed to different end users. 
+Since there is a huge amount of end users, 
+we anticipate that enough profiles can still be collected 
+for each version to conduct algorithmic profiling. 
+
+To select profiling targets, \commentty{How to determine
+which code targets to instrument in each version?}
+
+
+\subsubsection{Optimizing Instrumentation Sites}
+
+%We briefly overview the algorithm 
+%designed in previous works~\cite{Aprof1,Aprof2} 
+%before discussing our two designed optimizations. 
+
+To measure RMS (i.e., the input metric), we need to instrument
+the  \texttt{read} and \texttt{write} instructions in every 
+code construct (or profiling target). \commentty{not sure if I'm correct.}
+This may cause significant overhead. Therefore, 
+we propose a method to reduce the number of 
+instrumentation sites for \texttt{read} and \texttt{write} instructions. 
+
+Specifically, to compute RMS for every function call instance, 
+three global variables need to be instrumented:
+\texttt{count}, representing current timestamp 
+and incremented by one after each function call,
+\texttt{ts}, a hash table containing the latest accessing timestamp 
+for each memory cell,
+and \texttt{S}, a shadow stack maintaining all active functions. 
+We need to monitor four types of instructions to 
+update the three global variables:
+\texttt{call}, \texttt{return}, \texttt{read}, and \texttt{write}.
+When a function is called, 
+we need to increment \texttt{count} and grow \texttt{S}.
+When a function returns, 
+we will dump a log with a timestamp 
+representing when the function is call 
+and the function's RMS.
+For both memory read and write, we need to update \texttt{ts} 
+using the current value of \texttt{count}. 
+For memory read, we also need to refer \texttt{ts} to decide 
+whether to increment RMS for all functions live on \texttt{S}.
+
+In order to reduce the number of \texttt{read} and \texttt{write} instructions
+to be instrumented, our approach works as follows. 
+If a write on a memory cell happens earlier, 
+following read on the same memory cell will not increase RMS.
+\commentty{Why?}
+For both memory read and write, 
+we need to update \texttt{ts} using the current 
+value of \texttt{count} and \texttt{count} is only incremented after function call. 
+\commentty{Why?}
+Therefore, given two consecutive memory accesses on the same location,
+if there is no function calls in between, 
+we do not need to instrument the second one. 
+We rely on dominance analysis to implement this optimization. 
+\commentty{May need to briefly explain dominance analysis. }
+We focus on stack memory cells that hold scalar variables 
+and only have read and write as uses 
+(i.e., not having ``address of'' as uses), 
+so that alias analysis is avoided. 
+
+In addition to reducing the number of instrumentation sites,
+we propose a method to optimize the instrumentation sites.
+\commentty{optimization in what way?} 
+Specifically, when counting the executed basic blocks (BBs)
+to compute cost metric, 
+instead of incrementing a global counter in every BB,
+we employ an algorithm \commentty{does the algorithm
+have a name?}, which was originally designed to efficiently 
+count edge events through selectively instrumenting counter update sites 
+on control flow graphs (CFGs)~\cite{event-counting}.
+The algorithm has already been proved to conduct path 
+profiling efficiently~\cite{path-profiling,peter-ase}.  
+Since the original algorithm is design to count edge events, 
+we split each BB into two and label the event number to be one for 
+edges connecting a pair of split BBs, 
+leaving the event number as zero for other edges. 
+After that, applying the algorithm~\cite{event-counting}
+can tell us optimized instrumentation sites. 
+
+
+\subsubsection{Approximation}
+
+\commentty{Approximation of what? I think we should
+make the title more complete.}
+
+Accurately recording dynamic information for input and cost metrics
+for each code construct
+may incur a large runtime overhead.
+Therefore, we propose two approximation mechanisms. 
+First, if a loop is to process an array, 
+we only record the addresses of the first 
+and the last accessed elements. 
+\commentty{Why?}
+We calculate the difference between the two addresses and use it as DSS input metric. 
+Second, instead of using executed BBs, 
+we use LIs as cost metric for loops 
+and use RIs for recursive functions. 
+\commentty{what are LIs and RIs? what are their benefits?} 
+
+
+One challenge is to \emph{identify array-processing loops}. 
+%
+%\noindent{\underline{How to identify an array-processing loop?}}
+To address this, given a loop, we analyze all pointer usage inside the loop. 
+If a pointer is deferenced in every iteration of a loop, 
+and its value is also increased or decreased by 
+an integer number in every iteration,
+we consider the pointer points to array elements and 
+the loop is an array-processing loop.  
+For example, as shown in Figure~\ref{fig:mysql27287}, 
+\texttt{p} points to array elements. 
+It is deferenced in every iteration of the loop 
+in Figure~\ref{fig:mysql27287},
+and the pointer value is decreased by one in every loop iteration. 
+
+\commentty{Why do we need to handle linked-list-processing loops?
+In the first paragraph, only array-processing loop is mentioned.}
+Another challenge is to \emph{identify linked-list-processing loops}.
+%\noindent{\underline{How to identify a linked-list-processing loop?}}
+To address this, we also analyze all pointer usage inside each loop, 
+by checking whether a pointer satisfies the following three conditions.
+First, its base type is a \texttt{struct}.
+Second, it is deferenced in every iteration of a loop.
+Third, it is updated in every iteration with a new value 
+from one field of the \texttt{struct} it points to.
+If a pointer satisfies the three conditions, 
+we consider it points to elements in a linked list.
+We also consider the loop which deferences the pointer and 
+updates the pointer's value as  
+a linked-list-processing loop. 
+
+
+
+\subsubsection{Sampling}
+
+\commentty{Again, sampling what?}
+
+Previous work~\cite{liblit03,liblit05,CCI,SongOOPSLA2014,ldoctor}
+demonstrate that sampling can greatly 
+reduce overhead for dynamic techniques,
+while still preserving their desired 
+detection and diagnosis capability. 
+This motivates us to apply sampling to algorithmic profiling. 
+Our study in Section~\ref{sec:back} shows that 
+the majority of complexity problems are caused by repeated execution of a loop
+or a recursive function. 
+This result inspires us to sample some execution of 
+a loop or a recursive function,
+and infer information for all executions, 
+based on collected samples.
+\commentty{infer information for what?}
+
+
+%\noindent{\underline{How to do sampling?}}
+How we do sampling is similar to what is described in previous works 
+on statistical debugging~\cite{liblit03,liblit05,CCI,SongOOPSLA2014,ldoctor}.
+Given a loop\footnote{We handle a recursive function 
+in the same way as we handle a loop.} to be monitored, 
+we clone the loop.
+We instrument the cloned loop to trace memory read and write for RMS, 
+or trace memory read accessing data structure elements for DSS.
+To keep things simple, 
+for each memory access, we record its memory address 
+and whether it is a read or write directly to log, 
+without maintaining any global data structure. 
+We dump extra delimiters to log before each execution of the cloned loop 
+to differentiate information collected 
+from different samples.
+
+Before each execution of a monitored loop, 
+we choose between the cloned version and the original version. 
+How many times the cloned version is executed 
+depends on a tunable sampling rate. 
+To make the choice between the two versions,
+we add a global counter to the monitored program. 
+If the counter value is larger than zero, 
+we choose the original version and decrease the counter value by one.
+If the counter value is equal to zero,
+we choose the cloned version and reset the counter value to 
+a random number, 
+whose expectation is 
+equal to the inverse of the sampling rate.  
+
+We design two sampling policies. 
+For the first one, we sample loop executions independently from each other.
+For the second one, we sample a pair of consecutive loop executions, 
+with the intuition that two consecutive 
+executions may share more information.
+
+
+After sampling the executions, \Tool next \emph{infers information
+from all of the executions} to \commentty{infer the information to do what?}.  
+ %
+ To do this, we leverage the mark-and-recapture method~\cite{mark-recapture} to 
+estimate RMS or DSS for all execution of a monitored loop 
+based on the sampled execution. 
+Mark-and-recapture is a commonly used statistical method 
+for estimating the size of an animal population. 
+In this method, some of the animals are captured, marked, and released. 
+Then, another group of the animals are captured.
+The size of the whole animal population is estimated 
+based on the ratio of marked animals in the second captured sample.  
+
+To utilize the mark-and-recapture method, 
+we first process our log to calculate a set of memory cells, 
+which contribute RMS
+or DSS for each sample. 
+We then estimate the whole RMS or DSS using the following formula.
+We assume we collect a sequence of $m$ samples for a monitored loop 
+in one program run.
+Given the $i$th sample, we use $M_i$ to represent the 
+total number of distinct memory cells in the previous $i-1$ samples, 
+$C_i$ represents the number of distinct memory cells in the $i$th sample,
+and $R_i$ represents the number of distinct memory cells in 
+the $i$th sample that also appeared in one of the previous $i-1$ samples.
+The estimated RMS or DSS of  the monitored loop is:
+
+\begin{equation} \label{eq:mark}
+N = \sum\limits_{i=1}^m M_i*C_i\Big/\sum\limits_{i=1}^m R_i
+\end{equation}
+
+\subsection{Ranking Complexity Problems}
+
+After the profiles are collected, \Tool computes
+the cost function for each unique code construct
+(i.e., profile target) using the standard approach
+in Section~\ref{subsec:pre}. 
+ 
+As we discussed in Section~\ref{subsec:existing}, 
+existing techniques~\cite{Aprof1,Aprof2,AlgoProf} 
+simply attribute complexity to each executed function, 
+without providing any future analysis. 
+Therefore, they fail to identify root-cause functions for 
+performance failures caused by complexity problems. 
+
+To address this problem, we design a ranking algorithm 
+with the goal to identify root-cause functions. 
+Our algorithm follows three intuitions. 
+First, root-cause functions must have the same (or higher) 
+complexity as \texttt{main} function.
+Second, root-cause functions must consume large computation cost.
+Third, since all direct and indirect callers of root-cause functions 
+consume more cost and have the same complexity, 
+we should rank callee higher than its caller, 
+to reduce false positives. 
+
+Our algorithm works as follows. 
+We first filter out functions with complexity lower than \texttt{main} function.
+We then compute caller-callee relationship using static analysis and RMS logs. 
+If function \texttt{A} invokes function \texttt{B}, 
+we consider there is a partial order between \texttt{A} and \texttt{B},
+and \texttt{B} should be ranked higher ($\texttt{B} \leq \texttt{A}$). 
+In the end, we calculate a total order for all executed functions based 
+on their partial orders and use the total order as our ranking list. 
+If two functions are not comparable 
+(neither $\texttt{A} \leq \texttt{B}$ nor $\texttt{B} \leq \texttt{A}$), 
+we rank the one with larger cost higher. 
+\commentty{This is difficult to understand --- I suggest we add an example}
+
