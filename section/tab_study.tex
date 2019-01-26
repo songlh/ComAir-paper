@@ -19,6 +19,16 @@
 \ \ {$O(N^k)$ ($k>1$):}                						&   3       &    3       &   5    &    6         &   2      &  19\\
 \ \ {$O(e^N)$:}                       							&   0       &    0       &   3    &    0         &   1      &   4\\
 \hline
+\multicolumn{7}{|l|}{\bf Root Cause:} \\
+\ \ {{One-level Loop:}}                 			&   1       &    0       &   0    &    4         &   2      &   7 \\
+\ \ {{Nested Loops:}}                   			&   3       &    3       &   6    &    6         &   2      &   20 \\
+\ \ {{Recursive Function:}}             			&   0       &    0       &   2    &    0         &   1      &   3 \\
+\hline
+\multicolumn{7}{|l|}{\bf How performance impact is generated:} \\
+\ \ {{I/O involved:}}                 				&   1       &    0       &   0    &    3         &   1      &   5 \\
+\ \ {{I/O not involved:}}                   		&   3       &    3       &   8    &    7         &   4      &   25 \\
+\hline
+
 \multicolumn{7}{|l|}{\bf Fixing Strategies:}\\
 \ \ {{Optimize Buggy Code:}}              								&  3        &    3       &   4    &    9         &   5      &  24 \\
 \ \ {Skip Workloads:}              									&  1        &    0       &   4    &    1         &   0      &   6\\
@@ -30,7 +40,7 @@
 \vspace{0.1in}
 \mycaption{tab:study}
 {Empirical Studies in Section~\ref{sec:study}.}
-{\color{red}{Todo: we have 7-10 more bugs. should we include them?}}
+{\color{red} changed}
 %\caption{Categorization for Section~\ref{sec:study}.
 %\footnotesize{(This table shows how complexity problems distribute among different complexity categories, how developers fix studied complexity problems,
 % and whether or not how to change input size is specified during reporting.)}}

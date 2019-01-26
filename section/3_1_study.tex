@@ -15,6 +15,8 @@ Table~\ref{tab:study} shows the results.
 \commentty{Can we add the three aspects for each category in Table 1?
 Currently, it is difficult to map the findings to the implications in Section 3.3.}
 
+\commentlh{Added.}
+
 \noindent{\underline{\textit{$O(N)$: linear complexity.}}} 
 As shown in Table~\ref{tab:study}, 
 7 out of \ComBugs studied complexity problems are in linear complexity. 
@@ -60,9 +62,9 @@ However, {\bf both} of the loop execution number
 and the average loop iteration number
 scale as input size $N$.
 
-\input{section/fig_apache34464}
-
 \input{section/fig_time}
+
+\input{section/fig_apache34464}
 
 To fix the majority (14/19) of bugs in this category,
 developers directly modify the buggy loops, 
@@ -156,10 +158,10 @@ Other types of data structures are either application-specific or
 can only cover one or two bugs.
 This fact inspires us to design effective algorithms 
 for loops (or recursive functions) 
-that process array or linked list during algorithmic profiling. 
+that process an array or a linked list during algorithmic profiling. 
 
 \noindent{\underline{\textit{Implication 3.}}}
-Our study shows that approximately three-fourths of the studied complexity problems (22/30)
+Our study shows that approximately three-fourths of the studied complexity problems (23/30)
 are caused by repeated executions of a loop or a recursive function. 
 These bugs are categorized as polynomial complexity and exponential complexity in Section~\ref{sec:tax}.
 Previous works~\cite{SongOOPSLA2014,ldoctor} 
