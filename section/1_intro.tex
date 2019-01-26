@@ -87,13 +87,12 @@ to confirm the necessity to fix this bug.
 %There has been some research on designing algorithmic profiling 
 %to diagnose performance issues~\cite{gprof,oprofile}. 
 %However, these techniques
-{\color{red} Existing techniques} 
+Existing techniques
 are not capable of handling production-run complexity problems
 efficiently and effectively due to several reasons. 
 First, many algorithmic profilers~\cite{Aprof1,Aprof2,AlgoProf} and performance 
 testing tools~\cite{Alabama,PerfBlower} are designed for in-house usage and cannot be 
 deployed in production runs due to heavy overhead. 
-\commentty{Are they indeed in-house profilers?} \commentlh{Yes.}
 Recent techniques on algorithmic 
 profiling~\cite{Aprof1,Aprof2,AlgoProf} will incur more than $30\times$ runtime overhead.
 Second, in-house profilers often {\color{red} provide} limited knowledge of real-world workload, which is necessary 
@@ -105,8 +104,6 @@ can measure only how much time
 is spent in each code construct during one single run,
 but fail to synthesize information from multiple runs
 or provide any indication about how the execution time scales.
-\commentty{Please double check the above
-paragraph --- I am not sure I made the correct claims... } \commentlh{done.}
 
 
 \noindent\textbf{Contributions.}
@@ -149,13 +146,14 @@ method \citep{mark-recapture} to infer information for all instances.
 \commentty{Not sure I am right...} \commentlh{It is right.}
 \Tool then collects runtime profiles as the program is running
 in production environment with different inputs.
+\commentty{Better define what inputs are...}
 Next, \Tool synthesizes the profiles and generates a cost function of input size
 for each code construct to describe its complexity. 
 \commentty{Any novel ideas in this step?}
 Finally, \Tool  reports a ranked list of code constructs in terms of their likelihood
 of containing performance bugs due to complexity problems. \commentty{We may need to define code
 constructs.} 
-\commenthy{We don't have ranking list for production-run setting, and we only have it under in-house setting.}
+\commentlh{We don't have ranking list for production-run setting, and we only have it under in-house setting.}
 
 
 %{\color{red} TODO: discuss the ranking list}

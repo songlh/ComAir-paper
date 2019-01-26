@@ -9,11 +9,15 @@ limitations.
 \commentty{I re-organized this section. Feel free to revert it if it does not make sense.}
 
 \subsection{Preliminaries}
+\label{subsec:pre}
 
 To conduct algorithmic profiling for a given code construct,
 we first need to record input and cost information in multiple program runs. 
 We then plot the recorded information with input size as x-axis and cost as y-axis.
 In the end, we infer complexity for the code construct as a cost function of input size. 
+\commentty{To help reviewers better understand algorithmic profiling,
+we can rephrase the example of Figure 1 to illustrate algorithmic profiling and
+show  how the cost function looks like.}
 To conduct algorithmic profiling effectively, 
 we need to define suitable metrics for input and cost. 
 
@@ -23,13 +27,65 @@ we need to define suitable metrics for input and cost.
 I feel this part should be aligned with ``Cost Metric"
 below.}
 
+Read Memory Size (RMS)~\citep{Aprof1,Aprof2}  and Data Structure Size (DSS)~\citep{AlgoProf} 
+are two commonly used input metrics. 
+RMS is measured as the the number of distinct memory cells 
+whose first access is read. Both reads executed by the code 
+construct directly and  reads executed by the callees from 
+the code construct are considered. 
+
+%Aprof \citep{Aprof1} uses Read Memory Size (RMS) as an input metric. 
+%Given a dynamic instance of a code construct,
+%Aprof records its RMS as the number of distinct memory cells 
+%whose first access is read. 
+%Both reads executed by the code construct directly and 
+%reads executed by the callees from the code construct are considered. 
+%In their follow-up work~\cite{Aprof2}, 
+%RMS is extended  to handle inputs from library calls 
+%and from different threads. 
+
+Take MySQL\#27287 (Figure~\ref{fig:mysql27287}) as an example, 
+during an execution of the buggy loop, the number of accesses
+computed by RMS is approximately 
+two times as the number of actual accesses. 
+\commentty{I rephrased the above sentence, but am not sure if I messed it up.}
+This is because different \texttt{XML\_NODE}s' \texttt{level} and \texttt{type} 
+fields are read in different loop iterations. 
+Although variable \texttt{p} and \texttt{level} are also read in each iteration,
+RMS only considers distinct memory cells and 
+only increments its value for the first read on these 
+two variables in the first iteration. 
+For the outer loop, which is not shown in Figure~\ref{fig:mysql27287}, 
+its RMS is approximately equal to the size of \texttt{items}, 
+because the outer loop invokes \texttt{xml\_parent\_tag()} for every
+\texttt{XML\_NODE} in the \texttt{items} and RMS only 
+counts distinct memory cells. 
+
+
+Data Structure Size (DSS) is measured as
+the number of distinct accessed elements of a data structure.  
+%
+%AlgoProf~\citep{AlgoProf} uses data structure size (DSS) 
+%as input size for each dynamic instance of a code construct.
+%DSS is measured as the number of distinct accessed elements of a data structure.  
+In Figure~\ref{fig:mysql27287}, if we focus on array \texttt{items},
+in one execution of the inner loop, the input size computed by DSS 
+is equal to the number of accessed array elements. 
+As for the outer loop, the input size computed by DSS  is
+equal to the size of  \texttt{items}, because
+it invokes \texttt{xml\_parent\_tag()} for every element in \texttt{items}.
+
+
 \noindent{\underline{Cost Metric.}}
 When a code construct is executed,
 it could consume many different types of resources, 
 such as CPU cycles, network bandwidth, storage, and so on.
 In this paper, focus on CPU cycles (or computation cost) 
 and leave the measurement for other types of 
-consumed resources for future works. 
+consumed resources for future work.
+\commentty{Any justification why CPU cycles is more
+beneficial or commonly used? We could add some
+citations.} 
 
 Computation cost can be measured 
 as the number of executed basic blocks (BBs)~\cite{Aprof1,Aprof2}.
@@ -48,56 +104,11 @@ roughly consumes the same computation cost.
 
 
 \subsection{Limitations in Existing Techniques}
+\label{subsec:existing}
 
+\commentty{If space not permitted, we can merge
+this subsection with introduction.}
 
-%\noindent{\underline{Input Metric.}}
-
-There exist two algorithmic  profiling tools that are
-probably most related to our approach.
-
-Aprof \citep{Aprof1} uses Read Memory Size (RMS) as an input metric. 
-Given a dynamic instance of a code construct,
-Aprof records its RMS as the number of distinct memory cells 
-whose first access is read. 
-Both reads executed by the code construct directly and 
-reads executed by the callees from the code construct are considered. 
-In their follow-up work~\cite{Aprof2}, 
-RMS is extended  to handle inputs from library calls 
-and from different threads. 
-
-Take MySQL\#27287 (Figure~\ref{fig:mysql27287}) as an example, 
-during an execution of the buggy loop, the number of accesses
-computed by RMS (or DRMS) is approximately 
-two times as the number of actual accesses. 
-\commentty{I rephrased the above sentence, but am not sure if I messed it up.}
-This is because 
-different \texttt{XML\_NODE}s' \texttt{level} and \texttt{type} 
-fields are read in different loop iterations. 
-Although variable \texttt{p} and \texttt{level} are also read in each iteration,
-RMS only considers distinct memory cells and 
-only increments its value for the first read on these 
-two variables in the first iteration. 
-For the outer loop, which is not shown in Figure~\ref{fig:mysql27287}, 
-its RMS is approximately equal to the size of \texttt{items}, 
-because the outer loop invokes \texttt{xml\_parent\_tag()} for every
-\texttt{XML\_NODE} in the \texttt{items} and RMS only 
-counts distinct memory cells. 
-\commentty{But what does the example tell us? What is the drawback of
-RMS (or DRMS)? What is the complexity computed by RMS (or DRMS)?}
-
-AlgoProf~\citep{AlgoProf} uses data structure size (DSS) 
-as input size for each dynamic instance of a code construct.
-DSS is measured as the number of distinct accessed elements of a data structure.  
-In Figure~\ref{fig:mysql27287}, if we focus on array \texttt{items},
-in one execution of the inner loop, the input size computed by DSS 
-is equal to the number of accessed array elements. 
-As for the outer loop, the input size computed by DSS  is
-equal to the size of  \texttt{items}, because
-it invokes \texttt{xml\_parent\_tag()} for every element in \texttt{items}.
-\commentty{Again, what is the problem with AlgoProf?}
-
-
-\noindent{\underline{Limitations.}}
 %
 There are at least three limitations in existing algorithmic profiling techniques. 
 %
@@ -108,7 +119,7 @@ while cannot provide more information about
 which code construct is the root cause 
 for a performance slowdown obtained from multiple 
 execution profiles. 
-\commentty{not sure if handling multiple profiles is a problem.}
+\commentty{Please double check the above sentence.}
 For example, after applying Aprof~\cite{Aprof1,Aprof2} 
 to the performance bug in Figure~\ref{fig:mysql27287}, 
 there are {\color{red} XXX} functions identified 
