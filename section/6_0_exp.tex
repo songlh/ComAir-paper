@@ -1,0 +1,100 @@
+\section{Evaluation of \Tool}
+\label{sec:eva}
+
+\subsection{Methodology}
+
+\noindent{\textbf{Implementation and Experimental Platform.}}
+We implement \Tool using LLVM-5.0.0~\cite{llvm}. 
+All our experiments are conducted on a machine, 
+with Intel Xeon(R) 4110 CPU and Linux 3.10.0 kernel.
+
+
+\noindent{\textbf{Benchmarks.}}
+We collect evaluated complexity problems from two sources. 
+
+The first one is our studied complexity problems in Section~\ref{sec:study}.
+We successfully reproduce 17 of them. 
+Among them, six are extracted from original Java or JS programs, 
+and we re-implement them using C/C++.
+The reason is that our current implementation of \Tool can only work on C/C++ programs.
+One is extracted from a very old version of Mozilla Firefox. 
+We fail to build the original software, 
+due to some missing dependent libraries. 
+Our re-implementation is based on our thorough understanding of these complexity problems.
+In our re-implementation, we maintain their original algorithms, 
+data structures and caller-callee relationships. 
+For other bugs in our study, 
+we fail to use them in our experiments, because they depend on special hardware 
+or software, which is not available to us. 
+We fail to re-implement them, because their data structures are too complex. 
+
+The second source is from Toddler project~\cite{Alabama}. 
+Toddler is a dynamic technique that can detect inefficient loops in Java programs.
+In total, developers confirmed 21 bugs detected by Toddler. 
+All of them are re-implemented in C/C++ 
+in following-up work~\cite{ldoctor}.
+We use all the 21 re-implemented bugs in our evaluation.  
+
+In total, we evaluate \Tool on 38 benchmarks, 
+including 10 real bugs and 28 re-implemented bugs.
+All benchmark information is shown in Table~\ref{tab:benchmark_info}. 
+Our evaluated real bugs are all large, and seven of them 
+are more than 1 million lines of code.
+Our evaluated re-implemented bugs are in small to middle sizes, 
+ranging from 91 to 1094 lines of code. 
+The majority of bugs used in our experiments are in $O(N^2)$ complexity. 
+We also two benchmarks in $O(2^N)$ complexity, 
+and {\color{red}{XXX}} benchmarks in O(N) complexity.
+
+\noindent{\bf Experimental Settings.}
+For each benchmark, we conduct algorithmic profiling on 10 program 
+runs with distinct inputs, following the practice 
+in previous works~\cite{joy.asplos13,SongOOPSLA2014}.
+For all benchmarks used in our experiments, 
+their bug reports contain at least one bug-triggering input. 
+For 14 bugs, 
+the users explicitly explained how to change input sizes 
+to reproduce the described scaling problems 
+when they reported these bugs. 
+We follow the users' descriptions to generate new inputs. 
+For the other benchmarks, it is not difficult to figure out 
+how to generate new inputs based on the bad inputs in the bug reports,
+since the bad inputs contain repetitive patterns. 
+For example, when reporting GCC\#46401,
+ the user provided a C file, 
+containing an expression with thousands of strings as operands. 
+We change the number of strings to generate new inputs. 
+For each benchmark, we choose the input sizes of the 10 inputs 
+to be an arithmetic sequence with the largest input 
+as the input from the bug report and the 
+smallest input size that is $1/10$ 
+of the largest input.
+
+After collecting a set of (input, cost) pairs for a code construct, 
+we first use the maximum cost to aggregate pairs with the same input size into one,
+because we want to infer the worst-case complexity.
+{\color{red} Todo: how do we infer cost function?}
+
+\noindent{\bf Research Questions to Answer.} 
+Our experiments are designed to evaluate whether \Tool 
+can provide the desired profiling capability, accuracy and performance. 
+Specifically, we aim to answer the following three questions:
+
+\begin{itemize}
+
+\item {\bf RQ1.} We apply sampling and other 
+approximation policies to design the production-run version of \Tool. 
+Will the production-run version still provide the same algorithmic 
+profiling results as the in-house version? 
+
+\item {\bf RQ2.} We design a ranking policy. 
+Will it be able to rank the root-cause function higher among all suspicious functions?
+
+\item {\bf RQ3.} What is the runtime overhead of the in-house and 
+production-run versions of \Tool. Can the the production-run version really be able to deployed in production runs?
+
+
+
+\end{itemize}
+
+\input{section/tab_inhouse}
