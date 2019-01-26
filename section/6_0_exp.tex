@@ -1,44 +1,102 @@
 \section{Evaluation of \Tool}
 \label{sec:eva}
 
-\subsection{Methodology}
 
-\noindent{\textbf{Implementation and Experimental Platform.}}
+Our experiments aim to evaluate whether \Tool 
+can provide the desired profiling capability, accuracy and performance. 
+Specifically, we answer the following three research questions:
+
+
+\vspace*{3pt}
+\noindent
+ {\bf RQ1:} 
+How effective is \Tool at identifying complexity problems
+in both production and in-house environments?
+
+\vspace*{3pt}
+\noindent
+{\bf RQ2:}
+How does the production-run version of \Tool 
+compare with the in-house version in terms of
+cost-effectiveness?
+
+\vspace*{3pt}
+\noindent
+{\bf RQ3:}
+Can the production-run version of \Tool be deployed
+in production environment?
+
+
+
+%\item {\bf RQ1:} 
+%We apply sampling and other 
+%approximation policies to design the production-run version of \Tool. 
+%Will the production-run version still provide the same algorithmic 
+%profiling results as the in-house version? 
+
+%\item {\bf RQ2.} We design a ranking policy. 
+%Will it be able to rank the root-cause function higher among all suspicious functions?
+
+%\item {\bf RQ3.} What is the runtime overhead of the in-house and 
+%production-run versions of \Tool. Can the the production-run version really be able to deployed in production runs?
+
+
+\vspace*{2pt}
+
+
+The first research question allows us to evaluate whether \Tool is effective 
+at detecting real-world complexity problems. 
+The second research question investigate whether the instrumentation methods 
+used in the production-run version of \Tool incurs low cost while remaining
+accuracy in detecting complexity problems. 
+The third research question explores whether the overhead generated 
+by \Tool is negligible enough for being used in production environment.
+
+
+
+\subsection{Experimental Setup}
+
+%\noindent{\textbf{Implementation and Experimental Platform.}}
 We implement \Tool using LLVM-5.0.0~\cite{llvm}. 
-All our experiments are conducted on a machine, 
-with Intel Xeon(R) 4110 CPU and Linux 3.10.0 kernel.
+All our experiments are conducted o  a Linux machine, 
+with Intel Xeon(R) 4110 CPU and 3.10.0 kernel.
 
+\commentty{Can we mention \Tool and datasets 
+are publicly  available?}
 
-\noindent{\textbf{Benchmarks.}}
+\subsubsection{Benchmarks}
+
 We collect evaluated complexity problems from two sources. 
-
-The first one is our studied complexity problems in Section~\ref{sec:study}.
-We successfully reproduce 17 of them. 
-Among them, six are extracted from original Java or JS programs, 
+%
+The first one is
+from a public performance-bug benchmark 
+suite~\cite{PerfBug,SongOOPSLA2014,ldoctor}, which is
+studied in Section~\ref{sec:study}.
+We used 17 programs because the others cannot be successfully
+reproduced, because they depend on special hardware 
+or software, which is not available to us. 
+%
+Among the 17 reproduced programs, six are from
+original Java or JS programs, 
 and we re-implement them using C/C++.
-The reason is that our current implementation of \Tool can only work on C/C++ programs.
-One is extracted from a very old version of Mozilla Firefox. 
-We fail to build the original software, 
-due to some missing dependent libraries. 
+The reason is that our current implementation of \Tool 
+supports on C/C++ programs.
+%One program is from a old version of Mozilla Firefox. 
+%We fail to build the original software, 
+%due to some missing dependent libraries. 
 Our re-implementation is based on our thorough understanding of these complexity problems.
 In our re-implementation, we maintain their original algorithms, 
 data structures and caller-callee relationships. 
-For other bugs in our study, 
-we fail to use them in our experiments, because they depend on special hardware 
-or software, which is not available to us. 
-We fail to re-implement them, because their data structures are too complex. 
 
-The second source is from Toddler project~\cite{Alabama}. 
+The second source is from Toddler~\cite{Alabama} and LDoctor~\cite{ldoctor}. 
 Toddler is a dynamic technique that can detect inefficient loops in Java programs.
 In total, developers confirmed 21 bugs detected by Toddler. 
-All of them are re-implemented in C/C++ 
-in following-up work~\cite{ldoctor}.
-We use all the 21 re-implemented bugs in our evaluation.  
+These bugs were later re-implemented in C/C++ by LDoctor. 
+Thus, we use all  21 bugs from LDoctor in our evaluation.  
 
-In total, we evaluate \Tool on 38 benchmarks, 
-including 10 real bugs and 28 re-implemented bugs.
+In total, we evaluate \Tool on 38 benchmark programs. 
 All benchmark information is shown in Table~\ref{tab:benchmark_info}. 
-Our evaluated real bugs are all large, and seven of them 
+Our evaluated original bugs are all large, and seven of them 
 are more than 1 million lines of code.
 Our evaluated re-implemented bugs are in small to middle sizes, 
 ranging from 91 to 1094 lines of code. 
@@ -46,12 +104,17 @@ The majority of bugs used in our experiments are in $O(N^2)$ complexity.
 We also two benchmarks in $O(2^N)$ complexity, 
 and {\color{red}{XXX}} benchmarks in O(N) complexity.
 
-\noindent{\bf Experimental Settings.}
-For each benchmark, we conduct algorithmic profiling on 10 program 
-runs with distinct inputs, following the practice 
-in previous works~\cite{joy.asplos13,SongOOPSLA2014}.
-For all benchmarks used in our experiments, 
-their bug reports contain at least one bug-triggering input. 
+\subsubsection{Production-run and In-house Inputs}
+
+\commentty{We'd better clarify what  inputs
+were used and how they were generated. SE people 
+are very picky about this kind of thing.}
+
+For production-run version of \Tool, the inputs
+are from real users. To obtain the inputs, 
+\commentty{how to obtain the inputs?}
+%For all benchmarks used in our experiment, 
+%their bug reports contain at least one bug-triggering input. 
 For 14 bugs, 
 the users explicitly explained how to change input sizes 
 to reproduce the described scaling problems 
@@ -70,31 +133,62 @@ as the input from the bug report and the
 smallest input size that is $1/10$ 
 of the largest input.
 
+\commentty{How were inputs generated for the in-house version?}
+
+\subsubsection{Experimental Settings}
+
+For each benchmark, we conduct algorithmic profiling on 10 program 
+runs with inputs on both production-run and in-house versions
+of \Tool, following the practice 
+in previous work~\cite{joy.asplos13,SongOOPSLA2014}.
+%
 After collecting a set of (input, cost) pairs for a code construct, 
 we first use the maximum cost to aggregate pairs with the same input size into one,
 because we want to infer the worst-case complexity.
 {\color{red} Todo: how do we infer cost function?}
 
-\noindent{\bf Research Questions to Answer.} 
-Our experiments are designed to evaluate whether \Tool 
-can provide the desired profiling capability, accuracy and performance. 
-Specifically, we aim to answer the following three questions:
-
-\begin{itemize}
-
-\item {\bf RQ1.} We apply sampling and other 
-approximation policies to design the production-run version of \Tool. 
-Will the production-run version still provide the same algorithmic 
-profiling results as the in-house version? 
-
-\item {\bf RQ2.} We design a ranking policy. 
-Will it be able to rank the root-cause function higher among all suspicious functions?
-
-\item {\bf RQ3.} What is the runtime overhead of the in-house and 
-production-run versions of \Tool. Can the the production-run version really be able to deployed in production runs?
-
-
-
-\end{itemize}
-
 \input{section/tab_inhouse}
+
+
+\commentty{
+Besides reporting the position of the rank, we should
+report the percentage to show how ``easy" the problem
+can be found: 
+
+To answer RQ1 (i.e., the effectiveness of  \Tool in identifying
+complexity problems), we measure the rank number (position) of code
+constructs contain complexity problems. We also use the rank number
+to compute the percentage of code constructs
+that need to be examined to find a performance bug in the program.
+This ranking strategy has been widely  adopted by existing fault localization 
+techniques~\cite{Jones05,Cleve05}.
+}
+
+
+
+
+\subsection{Limitations and Threats to Validity}
+
+\commentty{Consider adding a section
+on limitations and threats to validity after the results. People would want to see under what conditions
+\Tool works and does not work.}
+
+The primary threat to external validity 
+for this study involves the representativeness 
+of our benchmark programs and inputs used
+to compute cost functions.
+Other benchmarks and inputs may exhibit different 
+behaviors and cost-benefit tradeoffs.
+However, we do reduce this threat to some extent by
+using several varieties of well studied open source subjects 
+for our study, and inputs generated by practical approaches.
+
+The primary threat to internal validity for this study
+is possible faults in the implementation of our approach
+and in the tools that we use to perform evaluation.
+We controlled for this threat by extensively testing
+our tools and verifying their results against a smaller
+program for which we can manually determine the correct results.
+
+Where construct validity is concerned, ...
+
