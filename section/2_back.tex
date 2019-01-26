@@ -6,9 +6,6 @@ In this section, we present preliminaries of
 algorithmic profiling and discuss existing techniques and their
 limitations. 
 
-\commentty{I re-organized this section. Feel free to revert it if it does not make sense.}
-\commentlh{The re-organizing looks good to me.}
-
 \subsection{Preliminaries}
 \label{subsec:pre}
 
@@ -25,17 +22,13 @@ we need to define suitable metrics for input and cost.
 
 \noindent{\underline{Input Metric.}}
 %
-\commentty{Can we define input metric in general? 
-I feel this part should be aligned with ``Cost Metric"
-below.}
-
-\commentlh{Inputs for a code construct can be viewed at difficult stack layers.
-For example, from OS layer, a code construct can take 
+Inputs for a code construct can be viewed at different stack layers.
+For example, from the OS layer, a code construct can take 
 inputs through memory read, 
 so that accessed memory cells can be used to measure inputs.
-From application layer, a code construct can take inputs 
+From the application layer, a code construct can take inputs 
 from other components of the same 
-program through internal data structures. }
+program through internal data structures. 
 
 Read Memory Size (RMS)~\citep{Aprof1,Aprof2}  and Data Structure Size (DSS)~\citep{AlgoProf} 
 are two commonly used input metrics. 
@@ -91,12 +84,10 @@ When a code construct is executed,
 it could consume many different types of resources, 
 such as CPU cycles, network bandwidth, storage, and so on.
 In this paper, focus on CPU cycles (or computation cost), 
-\commentlh{since computation cost is most correlated with user-perceived slowdown.} 
+since computation cost is most correlated with user-perceived slowdown~\cite{add cites}.
+\commentty{any references?}
 We leave the measurement for other types of 
 consumed resources for future work.
-\commentty{Any justification why CPU cycles is more
-beneficial or commonly used? We could add some
-citations.} 
 
 Computation cost can be measured 
 as the number of executed basic blocks (BBs)~\cite{Aprof1,Aprof2}.
@@ -117,8 +108,8 @@ roughly consumes the same computation cost.
 \subsection{Limitations in Existing Techniques}
 \label{subsec:existing}
 
-\commentty{If space not permitted, we can merge
-this subsection with introduction.}
+%\commentty{If space not permitted, we can merge
+%this subsection with introduction.}
 
 %
 There are at least three limitations in existing algorithmic profiling techniques. 
@@ -128,19 +119,17 @@ attribute complexity to every executed code construct
 in single executions, 
 while cannot provide more information about 
 which code construct is the root cause 
-for a performance slowdown \commentlh{recorded by} multiple 
+for a performance slowdown recorded by multiple 
 execution profiles. 
-\commentty{Please double check the above sentence.}
 For example, after applying Aprof~\cite{Aprof1,Aprof2} 
 to the performance bug in Figure~\ref{fig:mysql27287}, 
 there are {\color{red} XXX} functions identified 
 as having super-linear complexity. 
 If we simply rank reported functions using their costs, 
-\texttt{main} function will always be ranked as No.1,
-\commentlh{because callees' cost is aggregated to their callers, 
-while code constructs conducting computation in high complexity 
-are buried inside call chains.}\commentty{Why is \texttt{main} ranked at first? 
-What is the expected root cause?}
+\texttt{main} function will always be ranked as No.1. 
+This is because callees' cost is aggregated to their callers, 
+while code constructs involving computation in high complexity 
+are buried inside call chains.
 Therefore, \emph{
 more advanced techniques are needed to tell developers 
 which function is the root cause from profiling results of existing techniques. 
@@ -148,14 +137,15 @@ which function is the root cause from profiling results of existing techniques.
 
 
 Second, existing techniques incur significant runtime overheads. 
-\commentlh{They simply record all direct information to calculate the metrics, 
-failing to consider programs' structures and missing opportunities to optimize performance.}
+They simply record all direct information to calculate the metrics, 
+failing to consider programs' structures and missing opportunities to optimize performance.
 In our evaluation, we implement RMS and DSS to collect input size information. 
 For most benchmarks, RMS incurs 50$X$ runtime overhead. 
 DSS collects less information, and for most benchmarks, it incurs 20$X$ runtime overhead. 
-\commentty{Why do they incur large overheads? What are the underlying limitations?}
-\emph{Due to the extremely large overhead, 
-we cannot deploy these two techniques in production-run scenario. }
+\commentty{Do you mean Aprof? Aren't RMS and DSS general input metrics?}
+%\commentty{Why do they incur large overheads? What are the underlying limitations?}
+%\emph{Due to the extremely large overhead, 
+%we cannot deploy these two techniques in production-run scenario. }
 
 
 Third, one option to mitigate runtime overhead is using
