@@ -177,20 +177,17 @@ Accurately recording dynamic information for input and cost metrics
 for each code construct
 may incur a large runtime overhead.
 Therefore, we propose two approximation mechanisms. 
-First, if a loop is to process an array, 
-we only record the addresses of the first 
-and the last accessed elements. 
-\commentty{Why?}
-We calculate the difference between the two addresses and use it as DSS input metric. 
-Second, instead of using executed BBs, 
-we use LIs as cost metric for loops 
-and use RIs for recursive functions. 
-\commentty{what are LIs and RIs? what are their benefits?} 
+\commentlh{
+First, if a profiled code construct is a loop and 
+it is to process an array or a linked list,
+we use the DSS as input metric.
+Second, if a profiled code construct is a loop or a recursive function,
+we use loop iterations (LIs) and recursive invocations (RIs) 
+as cost metrics respectively. 
+}
 
-
-One challenge is to \emph{identify array-processing loops}. 
-%
-%\noindent{\underline{How to identify an array-processing loop?}}
+To apply the first approximation, we are facing two challenges. 
+The first one is to \emph{identify array-processing loops}.
 To address this, given a loop, we analyze all pointer usage inside the loop. 
 If a pointer is deferenced in every iteration of a loop, 
 and its value is also increased or decreased by 
@@ -202,26 +199,38 @@ For example, as shown in Figure~\ref{fig:mysql27287},
 It is deferenced in every iteration of the loop 
 in Figure~\ref{fig:mysql27287},
 and the pointer value is decreased by one in every loop iteration. 
+\commentlh{
+For an array-processing loop, 
+instead of recording all addresses of 
+accessed array elements,
+we only record the addresses 
+of the first and the last accessed elements. 
+We calculate the address difference and use it as DSS.
+The reason is that array is organized as a 
+consecutive memory, and the address difference 
+between the first and last accessed elements is roughly in linear 
+relationship with the number of accessed elements and DSS. 
+}
+
 
 \commentty{Why do we need to handle linked-list-processing loops?
 In the first paragraph, only array-processing loop is mentioned.}
-Another challenge is to \emph{identify linked-list-processing loops}.
+\commentlh{I have changed the first paragraph in this subsection.}
+The second challenge is to \emph{identify linked-list-processing loops}.
 %\noindent{\underline{How to identify a linked-list-processing loop?}}
-To address this, we also analyze all pointer usage inside each loop, 
+To address this, we also analyze all pointer usage inside a loop under profile, 
 by checking whether a pointer satisfies the following three conditions.
 First, its base type is a \texttt{struct}.
-Second, it is deferenced in every iteration of a loop.
+Second, it is deferenced in every iteration of the loop.
 Third, it is updated in every iteration with a new value 
 from one field of the \texttt{struct} it points to.
 If a pointer satisfies the three conditions, 
 we consider it points to elements in a linked list.
-We also consider the loop which deferences the pointer and 
-updates the pointer's value as  
-a linked-list-processing loop. 
+We also consider the loop is a linked-list-processing loop. 
 
 
 
-\subsubsection{Sampling}
+\subsubsection{Sampling Dynamic Instances of Profiling Targets}
 
 \commentty{Again, sampling what?}
 
@@ -234,30 +243,23 @@ This motivates us to apply sampling to algorithmic profiling.
 Our study in Section~\ref{sec:back} shows that 
 the majority of complexity problems are caused by repeated execution of a loop
 or a recursive function. 
-This result inspires us to sample some execution of 
-a loop or a recursive function,
-and infer information for all executions, 
-based on collected samples.
+\commentlh{
+This result inspires us to sample some dynamic instances of 
+a loop or a recursive function in a program run to 
+record input sizes and cost for sampled instances,
+and infer input sizes and cost for the sum of all instances.}
 \commentty{infer information for what?}
 
-
-%\noindent{\underline{How to do sampling?}}
 How we do sampling is similar to what is described in previous works 
 on statistical debugging~\cite{liblit03,liblit05,CCI,SongOOPSLA2014,ldoctor}.
-Given a loop\footnote{We handle a recursive function 
-in the same way as we handle a loop.} to be monitored, 
-we clone the loop.
-We instrument the cloned loop to trace memory read and write for RMS, 
-or trace memory read accessing data structure elements for DSS.
-To keep things simple, 
-for each memory access, we record its memory address 
-and whether it is a read or write directly to log, 
-without maintaining any global data structure. 
-We dump extra delimiters to log before each execution of the cloned loop 
-to differentiate information collected 
-from different samples.
+Given a code construct to be profiled, 
+we clone the code construct.
+We instrument the cloned version to record information for input size and cost.
+We also dump extra delimiters to log before each 
+execution of the clone code construct
+to differentiate information collected from different instances. 
 
-Before each execution of a monitored loop, 
+Before each execution of a code construct under profiling, 
 we choose between the cloned version and the original version. 
 How many times the cloned version is executed 
 depends on a tunable sampling rate. 
@@ -270,6 +272,7 @@ we choose the cloned version and reset the counter value to
 a random number, 
 whose expectation is 
 equal to the inverse of the sampling rate.  
+
 
 We design two sampling policies. 
 For the first one, we sample loop executions independently from each other.
