@@ -17,50 +17,50 @@
     \midrule
 
     Mozilla\#347306       &  $88$       & C     &   $O(N^{2})$   &  Array L.       &  1$_{33}$  &  79{\bf X}    &   & \Yes{{0.99}}   & \Yes{{0.99}}  &  2.34\%     \\
-    Mozilla\#416628       &  $105$      & C     &   $O(N^{2})$   &  Linked List L. &    &     &  &  &  &    \\
-    Mozilla\#490742       &  $0.157^*$  & JS    &   $O(N)$       &  Array L.       &    &     &  &  &  &       \\
-    Mozilla\#35294        &  $0.195^*$  & C++   &   $O(N^{2})$   &  Array L.       &    &     &  &  &  &    \\
-    Mozilla\#477564       &  $0.116^*$  & JS    &   $O(N^{2})$   &  Linked List L. &    &     &  &  &  &        \\
+    Mozilla\#416628       &  $105$      & C     &   $O(N^{2})$   &  Linked List L. &  1$_{33}$  &     &  &  &  &    \\
+    Mozilla\#490742       &  $0.157^*$  & JS    &   $O(N)$       &  Array L.       &  1$_{2}$  &     &  &  &  &       \\
+    Mozilla\#35294        &  $0.195^*$  & C++   &   $O(N^{2})$   &  Array L.       &  1$_{2}$  &     &  &  &  &    \\
+    Mozilla\#477564       &  $0.116^*$  & JS    &   $O(N^{2})$   &  Linked List L. &  1$_{2}$  &     &  &  &  &        \\
     \midrule
     MySQL\#27287          &  $995$      & C++   & $O(N^{2})$     &  Array L.       &  &  &  &  &  &      \\
     MySQL\#15811          &  $1127$     & C++   & $O(N^{2})$     &  Array L.       &  &  &  &  &  &    \\
     \midrule
     Apache\#37184     &  $0.092^*$  & Java  & $O(N)$ & L.                          &  &  & &  &   &     \\
-    Apache\#29743     &  $0.257^*$  & Java  & $O(N^{2})$ & L.                      &  &  &  &  &  &  \\
-    Apache\#34464     &  $0.16^*$   & Java  & $O(N^{2})$ & Array L.                &  &  &  &  &   &    \\
+    Apache\#29743     &  $0.257^*$  & Java  & $O(N^{2})$ & L.                      &  1$_{8}$  &  &  &  &  &  \\
+    Apache\#34464     &  $0.16^*$   & Java  & $O(N^{2})$ & Array L.                &  1$_{2}$  &  &  &  &   &    \\
     Apache\#47223     &  $0.162^*$  & Java  & $O(N^{2})$ & Array L.                &  &  &  &  &  &   \\
     \midrule
     GCC\#46401        &  $5521$  & C  & $O(N^{2})$ & Linked List L.                &  &  &  &  &  &   \\
-    GCC\#1687         &  $2099$  & C  & $O(2^{N})$ & Recursive F.                  &  &  &  &  &  &   \\
+    GCC\#1687         &  $2099$  & C  & $O(2^{N})$ & Recursive F.                  &  1$_{16}$  &  &  &  &  &   \\
     GCC\#27733        &  $3217$  & C  & $O(2^{N})$ & Recursive F.                  &  &  &  &  &  &  \\
-    GCC\#8805         &  $2538$  & C  & $O(N^{2})$ & Linked List L.                &  &  &  &  &  &   \\
+    GCC\#8805         &  $2538$  & C  & $O(N^{2})$ & Linked List L.                &  x$_{x}$  &  &  &  &  &   \\
     GCC\#21430        &  $3844$  & C  & $O(N^{2})$ & Linked List L.                &  &  &  &  &  &    \\
     GCC\#12322        &  $2341$  & C  & $O(N^{2})$ & Linked List L.                &  &  &  &  &  & \\
     \midrule
     \midrule
-    Apache\#53622     & $1.094^*$  & Java  & $O(N^{2})$ & Array L.                 &  &  &  &  &  &      \\
-    Apache\#53637     & $0.937^*$  & Java  & $O(N^{2})$ & Array L.                 &  &  &  &  &  &   \\
-    Apache\#53803     & $0.421^*$  & Java  & $O(N^{2})$ & Array L.                 &  &  &  &  &  &      \\
-    Apache\#53821     & $0.417^*$  & Java  & $O(N^{2})$ & Array L.                &  &  &  &  &  &       \\
-    Apache\#53822     & $0.417^*$  & Java  & $O(N^{2})$ & Array L.                &  &  &  &  &  &       \\
+    Apache\#53622     & $1.094^*$  & Java  & $O(N^{2})$ & Array L.                 &  1$_{2}$  &  &  & \Yes{{0.99}} & \Yes{{0.99}} &      \\
+    Apache\#53637     & $0.937^*$  & Java  & $O(N^{2})$ & Array L.                 &  1$_{2}$  &  &  & \Yes{{0.99}} & \Yes{{0.99}} &   \\
+    Apache\#53803     & $0.421^*$  & Java  & $O(N^{2})$ & Array L.                 &  1$_{2}$  &  &  & \Yes{{1.00}} & \Yes{{0.99}} &      \\
+    Apache\#53821     & $0.417^*$  & Java  & $O(N^{2})$ & Array L.                &  1$_{2}$  &  &  & \Yes{{1.00}} & \Yes{{0.99}} &       \\
+    Apache\#53822     & $0.417^*$  & Java  & $O(N^{2})$ & Array L.                &  1$_{2}$  &  &  & \Yes{{0.99}} & \Yes{{1.00}} &       \\
     \midrule
-    Collections\#406      & $0.253^*$  & Java & $O(N^{2})$ & Array L. &  &  &  &  &  &        \\
-    Collections\#407      & $0.766^*$  & Java & $O(N^{2})$ & Array L. &  &  &  &  &  &    \\
-    Collections\#408      & $0.742^*$  & Java & $O(N^{2})$ & Array L. &  &  &  &  &  &     \\
-    Collections\#409      & $0.781^*$  & Java & $O(N^{2})$ & Array L. &  &  &  &  &  &      \\
-    Collections\#410      & $0.769^*$  & Java  & $O(N^{2})$ & Array L. &  &  &  &  &  &    \\
-    Collections\#412      & $0.284^*$  & Java & $O(N^{2})$ & Array L.  &  &  &  &  &  &     \\
-    Collections\#413      & $0.923^*$  & Java & $O(N^{2})$ & Linked List L. &  &  &  &  &  &    \\
-    Collections\#425      & $0.758^*$  & Java & $O(N^{2})$ & Array L. &  &  &  &  &  &     \\
-    Collections\#426      & $0.783^*$  & Java & $O(N^{2})$ & Array L. &  &  &  &  &  &    \\
-    Collections\#427      & $0.756^*$  & Java  & $O(N^{2})$ & Array L. &  &  &  &  &  &   \\
-    Collections\#429-0    & $0.668^*$  & Java & $O(N^{2})$ & L. &  &  &  &  &  &       \\
-    Collections\#429-1    & $0.536^*$  & Java & $O(N^{2})$ & L. &  &  &  &  &  &     \\
-    Collections\#429-2    & $0.416^*$  & Java  & $O(N^{2})$ & L. &  &  &  &  &  &  \\
-    Collections\#434      & $0.336^*$  & Java & $O(N^{2})$ & Linked List L. &  &  &  &  &  &     \\
+    Collections\#406      & $0.253^*$  & Java & $O(N^{2})$ & Array L. &  1$_{2}$  &  &  & \Yes{{1.00}} & \Yes{{0.99}} &        \\
+    Collections\#407      & $0.766^*$  & Java & $O(N^{2})$ & Array L. &  1$_{4}$  &  &  & \Yes{{0.99}} & \Yes{{1.00}} &    \\
+    Collections\#408      & $0.742^*$  & Java & $O(N^{2})$ & Array L. &  1$_{5}$  &  &  & \Yes{{1.00}} & \Yes{{1.00}} &     \\
+    Collections\#409      & $0.781^*$  & Java & $O(N^{2})$ & Array L. &  1$_{2}$  &  &  & \Yes{{0.99}} & \Yes{{1.00}} &      \\
+    Collections\#410      & $0.769^*$  & Java  & $O(N^{2})$ & Array L. &  1$_{2}$  &  &  & \Yes{{0.99}} & \Yes{{1.00}} &    \\
+    Collections\#412      & $0.284^*$  & Java & $O(N^{2})$ & Array L.  &  1$_{2}$  &  &  & \Yes{{1.00}} & \Yes{{1.00}} &     \\
+    Collections\#413      & $0.923^*$  & Java & $O(N^{2})$ & Linked List L. &  1$_{3}$  &  &  & \Yes{{1.00}} & \Yes{{0.99}} &    \\
+    Collections\#425      & $0.758^*$  & Java & $O(N^{2})$ & Array L. &  x$_{x}$  &  &  &  &  &     \\
+    Collections\#426      & $0.783^*$  & Java & $O(N^{2})$ & Array L. &  1$_{6}$  &  &  & \Yes{{1.00}} & \Yes{{1.00}} &    \\
+    Collections\#427      & $0.756^*$  & Java  & $O(N^{2})$ & Array L. &  1$_{5}$  &  &  & \Yes{{1.00}} & \Yes{{1.00}} &   \\
+    Collections\#429-0    & $0.668^*$  & Java & $O(N^{2})$ & L. &  x$_{x}$  &  &  &  &  &       \\
+    Collections\#429-1    & $0.536^*$  & Java & $O(N^{2})$ & L. &  x$_{x}$  &  &  &  &  &     \\
+    Collections\#429-2    & $0.416^*$  & Java  & $O(N^{2})$ & L. &  1$_{2}$  &  &  &  &  &  \\
+    Collections\#434      & $0.336^*$  & Java & $O(N^{2})$ & Linked List L. &  1$_{2}$  &  &  & \Yes{{0.99}} & \Yes{{1.00}} &     \\
     \midrule
-    Groovy\#5739-0        & $0.745^*$  & Java  & $O(N^{2})$ & Linked List L. &  &  &  &  &  &   \\
-    Groovy\#5739-1        & $0.756^*$  & Java  &$O(N^{2})$  & Array L. &  &  &  &  &  &  \\
+    Groovy\#5739-0        & $0.745^*$  & Java  & $O(N^{2})$ & Linked List L. &  1$_{5}$  &  &  & \Yes{{0.99}} & \Yes{{1.00}} &   \\
+    Groovy\#5739-1        & $0.756^*$  & Java  &$O(N^{2})$  & Array L. &  1$_{5}$  &  &  & \Yes{{0.99}} & \Yes{{1.00}} &  \\
     \bottomrule
    \end{tabular}
    }
