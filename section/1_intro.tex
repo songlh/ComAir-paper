@@ -28,11 +28,11 @@ nearly half of the user-perceived performance problems that
 In addition, complexity problems are usually ranked as high-priority bugs in 
 software development.  For example, Mozilla developers will immediately try to fix 
 complexity bugs degrading exponentially~\cite{mozilla35294}.
-\commentty{Was this bug marked as high-priority? Or, we could say ``it took only ? days/hours
-to respond"? }
-\commentlh{In the cited bug report, one developer asked what is the performance impact 
-for the reported bug. He gave out several options. If any is true, he would fix the bug soon. 
-One option is ``degrades exponentially with the number of lines'' }
+%\commentty{Was this bug marked as high-priority? Or, we could say ``it took only ? days/hours
+%to respond"? }
+%\commentlh{In the cited bug report, one developer asked what is the performance impact 
+%for the reported bug. He gave out several options. If any is true, he would fix the bug soon. 
+%One option is ``degrades exponentially with the number of lines'' }
 
 
 Given the above discussion, addressing complexity problems in
@@ -92,10 +92,10 @@ are not capable of handling production-run complexity problems
 efficiently and effectively due to several reasons. 
 First, many algorithmic profilers~\cite{Aprof1,Aprof2,AlgoProf} and performance 
 testing tools~\cite{Alabama,PerfBlower} are designed for in-house usage and cannot be 
-deployed in production runs due to heavy overhead. 
+deployed in production environment due to heavy overhead. 
 Recent techniques on algorithmic 
-profiling~\cite{Aprof1,Aprof2,AlgoProf} will incur more than $30\times$ runtime overhead.
-Second, in-house profilers often {\color{red} provide} limited knowledge of real-world workload, which is necessary 
+profiling~\cite{Aprof1,Aprof2,AlgoProf} can incur more than $30\times$ runtime overhead.
+Second, in-house profilers often  provide limited knowledge of real-world workload, which is necessary 
 to determine if a complexity problem can cause user-perceived performance 
 impact. A previous empirical study shows that workload keeps changing and 
 developers usually do not have a good understanding of real-world workload~\citep{PerfBug}.  
@@ -106,14 +106,14 @@ but fail to synthesize information from multiple runs
 or provide any indication about how the execution time scales.
 
 
-\noindent\textbf{Contributions.}
-\label{sec:con}
+%\noindent\textbf{Contributions.}
+%\label{sec:con}
 %
 The goal of our research is two fold. First, we want to better 
 understand  complexity problems, including 
 their root causes, how user-perceived performance impact 
 in production environment is generated,
-their characterization \commentlh{characteristics? I am not sure}, 
+their categories, 
 and how the bugs in each category are
 fixed.  Toward this end, 
 we conduct an empirical on a representative
@@ -125,8 +125,9 @@ caused by repeated executions of a loop or a recursive function;
 2) for most complexity problems,
 the users describe how to change the input size to reproduce the scaling problem during reporting;
 and 3) complexity problems usually take a longer time to diagnose and fix,
-and more effective tool supports are needed. \commentlh{We need another one to replace 3). 
-Hypothesis testing shows that there is no significant difference.}
+and more effective tool supports are needed. 
+%\commentlh{We need another one to replace 3). 
+%Hypothesis testing shows that there is no significant difference.}
 To the best of our knowledge, our work is the first study focusing on complexity problems.
 %Our findings and implications can motivate future research on complexity problems.
 %They have already guided our selection of design points when building the in-house version of \Tool,
@@ -143,7 +144,7 @@ The key idea is to use software-based sampling to conduct algorithmic profiling.
 Given a code construct with multiple dynamic instances in a program run,
 we sample some of the dynamic instances and leverage the mark-and-recapture
 method \citep{mark-recapture} to infer information for all instances.
-\commentty{Not sure I am right...} \commentlh{It is right.}
+\commentty{Infer what information?}
 \Tool then collects runtime profiles as the program is running
 in production environment with different inputs.
 \commentty{Better define what inputs are...}
@@ -161,15 +162,15 @@ constructs.}
 \Tool provides several benefits over existing performance profilers:
 1) \Tool supports production-run algorithmic profiling by taking into account
 real-world workload and can thus discover most of the real complexity problems;
-2) \Tool considers multiple runtime profiles and automatically synthesizes them
-into a cost function for each code construct; 
-\commentlh{we may need to remove this one, 
-since existing techniques can also provide this functionality.}
-3) \Tool incurs negligible runtime overhead while achieving accurate profiling results;
-4) \Tool  simplifies the task of detecting performance bugs related to complexity
+%2) \Tool considers multiple runtime profiles and automatically synthesizes them
+%into a cost function for each code construct; 
+%\commentlh{we may need to remove this one, 
+%since existing techniques can also provide this functionality.}
+2) \Tool incurs negligible runtime overhead while achieving accurate profiling results;
+3) \Tool  simplifies the task of detecting performance bugs related to complexity
 problems by providing a ranked lists of code constructs in terms of their
 cost functions; 
-5) \commentty{what else?} \commentlh{provide information about real-world workloads 
+4) \commentty{what else?} \commentlh{provide information about real-world workloads 
 and improve developers' understanding?}
 
 

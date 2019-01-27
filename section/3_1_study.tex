@@ -12,11 +12,6 @@ following previous works in this area\cite{SongOOPSLA2014,ldoctor}.};
 3) how they are fixed by developers. 
 Table~\ref{tab:study} shows the results. 
 
-\commentty{Can we add the three aspects for each category in Table 1?
-Currently, it is difficult to map the findings to the implications in Section 3.3.}
-
-\commentlh{Added.}
-
 \noindent{\underline{\textit{$O(N)$: linear complexity.}}} 
 As shown in Table~\ref{tab:study}, 
 7 out of \ComBugs studied complexity problems are in linear complexity. 
@@ -141,33 +136,38 @@ the design and implementation of \Tool.
 
 \noindent{\underline{\textit{Implication 1.}}
 To effectively profile algorithmic complexity,
-a set of inputs providing similar code coverage with different input sizes are needed. 
-As we discussed in Section~\ref{sec:compare},
+\emph{a set of inputs providing similar code coverage with different input sizes are needed}. 
+As we discussed in Section~\ref{sec:compare} (last paragraph),
 for majority (25/30) of complexity problems, 
 it is fairly easy for developers to get these inputs based 
 on users' descriptions
 and provided inputs when they report complexity problems.  
 
- 
 \noindent{\underline{\textit{Implication 2.}}}
+Our study shows that approximately three-fourths of the studied complexity problems (23/30)
+are caused by repeated executions of a loop or a recursive function. 
+This finding suggests that algorithmic profiling should \emph{focus 
+on code constructs involving loops and recursive functions}.
+%These bugs are categorized as polynomial complexity and exponential complexity in Section~\ref{sec:tax}.
+Previous work~\cite{SongOOPSLA2014,ldoctor} 
+shows that sampling code constructs 
+that execute many times in one program run can lower the runtime overhead 
+while preserving the same diagnosis or detection capability. 
+It is promising to  \emph{apply sampling 
+to design production-run algorithmic profiling techniques}. 
+ 
+\noindent{\underline{\textit{Implication 3.}}}
 We also examine what types of data structures holding inputs processed 
 by buggy loops or recursive functions.
 The most two common types of data structures 
 are array (11/30) and linked list (9/30).
 Other types of data structures are either application-specific or 
 can only cover one or two bugs.
-This fact inspires us to design effective algorithms 
+This fact inspires us to \emph{design effective algorithms 
 for loops (or recursive functions) 
-that process an array or a linked list during algorithmic profiling. 
+that process an array or a linked list during algorithmic profiling}. 
 
-\noindent{\underline{\textit{Implication 3.}}}
-Our study shows that approximately three-fourths of the studied complexity problems (23/30)
-are caused by repeated executions of a loop or a recursive function. 
-These bugs are categorized as polynomial complexity and exponential complexity in Section~\ref{sec:tax}.
-Previous works~\cite{SongOOPSLA2014,ldoctor} 
-show that sampling code constructs 
-that execute many times in one program run can lower the runtime overhead 
-while preserving the same diagnosis or detection capability. 
-It is promising to apply sampling 
-to design production-run algorithmic profiling techniques. 
+
+
+
 
