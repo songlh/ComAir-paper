@@ -7,7 +7,7 @@
 %and several optimization policies. 
 
 Guided by the findings of empirical study in Section~\ref{sec:back},
-we design and implement \Tool, a performance \commentlh{algorithmic?}
+we design and implement \Tool, a performance algorithmic
 profiler to detect complexity problems. \Tool
 can be used in both production environment 
 and in-house development. We first describe
@@ -37,15 +37,17 @@ for Algorithmic Profling}
 To obtain execution profiles, we need to select suitable 
 \emph{profiling targets} (i.e.,
 code constructs), \emph{input metrics}, and \emph{cost metrics}. 
-\commentlh{
 \Tool supports code constructs in any granularity. 
-However, one finding in our empirical study is 
+However, one finding (Implication 2) in our empirical study is 
 that all complexity problems are 
 caused either by a loop or a recursive function. 
-Therefore, we recommend code constructs that related 
+\commentty{Is ``ALL  complexity problems..." true? This is inconsistent
+with the data from implication 2.}
+Therefore, we consider code constructs  related 
 to loops and recursive functions as profiling targets. 
 Distinct code constructs are instrumented by the production-run
-version of \Tool to create different program versions.}
+version of \Tool to create different program versions distributed
+to end users.
 As for input metrics, our study found that most two commonly involved 
 data structures in complexity problems 
 are array and linked list. Therefore, if a loop is chosen as a profiling target 
@@ -55,25 +57,28 @@ Otherwise, we use Read Memory Size (RMS),
 since RMS is more generic as we discussed in Section~\ref{sec:back}. 
 The difference between DSS and RMS is that 
 we only need to instrument \texttt{read} instructions accessing elements 
-in an array or a linked list for DSS,  without instrument \texttt{write} instructions.
-Therefore, DSS requires to record less dynamic information. 
+in an array or a linked list with DSS,  without instrument \texttt{write} instructions.
+Therefore, DSS requires recording less dynamic information. 
 The cost metric used in \Tool is executed basic 
-blocks (BBs), 
-\commentlh{
-and we have two approximating metrics 
-for loops and recursive functions respectively.  
-}
+blocks (BBs) as discussed in Section~\ref{subsec:pre}. 
+%\commentlh{
+%and we have two approximating metrics 
+%for loops and recursive functions respectively.  
+%}
 
 
 As discussed in Section~\ref{subsec:existing}, 
 existing algorithmic profiling techniques
 often incur significant overhead and thus cannot be used in production
 environment. To address this issue, \Tool proposes several 
-methods to enable practical online instrumentation, including 1) 
+methods to \emph{enable practical online instrumentation, which 
+constitute the key novelty of \Tool over existing algorithmic profiling tools}.
+These methods include 1) 
 minimizing instrumented code at each user's end; 
 2) optimizing instrumentation sites;
-3) approximation; and 4) sampling. 
-
+3) approximation of input and cost metrics;
+and 4) sampling profiling targets. 
+We next discuss these methods in detail.
 
 
 \subsubsection{Creating Multiple Instrumentation Versions}
@@ -86,8 +91,9 @@ Since there is a huge amount of end users,
 we anticipate that enough profiles can still be collected 
 for each version to conduct algorithmic profiling. 
 
-To select profiling targets, \commentty{How to determine
-which code targets to instrument in each version?}
+To select profiling targets, 
+%\commentty{How to determine
+%which code targets to instrument in each version?}
 \commentlh{we are largely guided by our empirical 
 study in Section~\ref{sec:tax}.
 Since all complexity problems involve a 
@@ -98,7 +104,10 @@ or indirectly as profiling targets.
 We ignore loops whose iteration numbers are constant,
 since the execution of these loops does not scale with input 
 and cannot cause complexity problems.} 
-
+\commentty{The question is how to select profiling
+targets for different versions? I assume you do not 
+instrument ALL loops or recursive functions
+for every version.}
 
 
 
@@ -109,27 +118,29 @@ and cannot cause complexity problems.}
 %designed in previous works~\cite{Aprof1,Aprof2} 
 %before discussing our two designed optimizations. 
 
-To measure RMS (i.e., the input metric), we need to instrument 
-and the \texttt{read} and \texttt{write} instructions in every 
-code construct (or profiling target). \commentty{not sure if I'm correct.}
-\commentlh{correct.}
-\commentlh{
+We propose two instrumentation optimization strategies for obtaining
+input and cost metrics, respectively. 
+
+\noindent{\underline{\textit{Input metric.}}
+%
+To measure RMS (i.e., the input metric), we need to instrument  
+ \texttt{read} and \texttt{write} instructions in every 
+code construct (or profiling target). 
 Different from the algorithm described 
-in previous works~\cite{Aprof1,Aprof2},
+in previous work~\cite{Aprof1,Aprof2},
 we do not maintain any global data structure,
-since we want to simplify online monitoring functionalities 
+since we want to simplify online monitoring  
 and reduce runtime overhead.
 Instead, we trace memory addresses 
 for \texttt{read} and \texttt{write} instructions 
 and we analyze tracing log offline to calculate RMS. 
-}
 
 In order to reduce the number of \texttt{read} 
 and \texttt{write} instructions
 to be instrumented, our approach works as follows. 
 If a write on a memory cell happens earlier, 
 following read on the same memory cell will not increase RMS,
-\commentlh{since RMS only count memory cells whose first access is read.
+since RMS only count memory cells whose first access is read.
 Similarly, if a read on a memory cell happens earlier,
 following read on the same memory cell will not increase RMS either,
 since RMS only considers distinct memory cells. 
@@ -137,54 +148,47 @@ Therefore, given two consecutive memory accesses on the same location,
 we do not need to instrument the second one. 
 We design an intra-procedural analysis, based on dominator analysis,
 which can tell us when an instruction is executed 
-whether another instruction has to be executed in advance.}
+whether another instruction has to be executed in advance.
 We focus on stack memory cells that hold scalar variables 
 and only have read and write as uses 
 (i.e., not having ``address of'' as uses), 
 so that alias analysis is avoided. 
 
 
-\commentlh{
+\noindent{\underline{\textit{Cost metric.}}
 When counting the executed basic blocks (BBs) to compute cost metric,
 a naive way is to instrument every basic block to increment a counter by one.
 To reduce the number of instrumentation 
 sites that update the counter,
-we propose a method to selectively 
-instrument part of basic blocks.}
-\commentty{optimization in what way?} 
-we employ an algorithm \commentty{does the algorithm
-have a name?}, \commentlh{no}
-which was originally designed to efficiently 
-count edge events through selectively instrumenting counter update sites 
-on control flow graphs (CFGs)~\cite{event-counting}.
-The algorithm has already been proved to conduct path 
+we design an algorithm to selectively 
+instrument part of basic blocks.
+Our algorithm leverages the previous
+work on counting edge events through selectively 
+instrumenting counter update sites  on control flow graphs (CFGs)~\cite{event-counting},
+which has been proved to conduct path 
 profiling efficiently~\cite{path-profiling,peter-ase}.  
-Since the original algorithm is design to count edge events, 
-we split each BB into two and label the event number to be one for 
+However, the original algorithm cannot be
+directly adapted in our case because it is designed
+to count edge events.  Instead, \Tool splits 
+each BB into two and label the event number to be one for 
 edges connecting a pair of split BBs, 
 leaving the event number as zero for other edges. 
 After that, applying the algorithm~\cite{event-counting}
-can tell us optimized instrumentation \commentlh{policy 
-about where to update the couter and how to update the counter.} 
+can inform \Tool  where to update the counter and how to update the counter.
 
 
 \subsubsection{Approximation of Input and Cost Metrics}
-
-\commentty{Approximation of what? I think we should
-make the title more complete.}
 
 Accurately recording dynamic information for input and cost metrics
 for each code construct
 may incur a large runtime overhead.
 Therefore, we propose two approximation mechanisms. 
-\commentlh{
 First, if a profiled code construct is a loop and 
 it is to process an array or a linked list,
 we use the DSS as input metric.
 Second, if a profiled code construct is a loop or a recursive function,
 we use loop iterations (LIs) and recursive invocations (RIs) 
 as cost metrics respectively. 
-}
 
 To apply the first approximation, we are facing two challenges. 
 The first one is to \emph{identify array-processing loops}.
@@ -199,7 +203,6 @@ For example, as shown in Figure~\ref{fig:mysql27287},
 It is deferenced in every iteration of the loop 
 in Figure~\ref{fig:mysql27287},
 and the pointer value is decreased by one in every loop iteration. 
-\commentlh{
 For an array-processing loop, 
 instead of recording all addresses of 
 accessed array elements,
@@ -210,12 +213,12 @@ The reason is that array is organized as a
 consecutive memory, and the address difference 
 between the first and last accessed elements is roughly in linear 
 relationship with the number of accessed elements and DSS. 
-}
 
 
-\commentty{Why do we need to handle linked-list-processing loops?
-In the first paragraph, only array-processing loop is mentioned.}
-\commentlh{I have changed the first paragraph in this subsection.}
+
+%\commentty{Why do we need to handle linked-list-processing loops?
+%In the first paragraph, only array-processing loop is mentioned.}
+%\commentlh{I have changed the first paragraph in this subsection.}
 The second challenge is to \emph{identify linked-list-processing loops}.
 %\noindent{\underline{How to identify a linked-list-processing loop?}}
 To address this, we also analyze all pointer usage inside a loop under profile, 
@@ -232,7 +235,7 @@ We also consider the loop is a linked-list-processing loop.
 
 \subsubsection{Sampling Dynamic Instances of Profiling Targets}
 
-\commentty{Again, sampling what?}
+%\commentty{Again, sampling what?}
 
 Previous work~\cite{liblit03,liblit05,CCI,SongOOPSLA2014,ldoctor}
 demonstrate that sampling can greatly 
@@ -243,12 +246,10 @@ This motivates us to apply sampling to algorithmic profiling.
 Our study in Section~\ref{sec:back} shows that 
 the majority of complexity problems are caused by repeated execution of a loop
 or a recursive function. 
-\commentlh{
-This result inspires us to sample some dynamic instances of 
+This finding inspires us to sample some dynamic instances of 
 a profiling target in one program run to 
 record their input sizes and costs,
-and infer the whole input size and cost for all instances in the same run.}
-\commentty{infer information for what?}
+and infer the whole input size and cost for all instances in the same run.
 
 
 How we do sampling is similar to what is described in previous works 
@@ -285,10 +286,8 @@ instances may share more information.
 
 After sampling, \Tool next \emph{infers input and cost information
 for all instances of the same code construct.} 
-\commentty{infer the information to do what?}.  
-\commentlh{
 Cost can be simply inferred by multiplying recorded cost values with sampling rate.
-To infer the whole input size for all instances, }
+To infer the whole input size for all instances, 
 we leverage the mark-and-recapture method~\cite{mark-recapture} 
 Mark-and-recapture is a commonly used statistical method 
 for estimating the size of an animal population. 
@@ -330,6 +329,8 @@ simply attribute complexity to each function,
 without providing any future analysis. 
 Therefore, they fail to identify root-cause functions for 
 performance failures caused by complexity problems. 
+\commentty{Does \Tool rank functions or code constructs?
+We have been measuring costs for code constructs...}
 
 To address this problem, we design a ranking algorithm 
 with the goal to identify root-cause functions\footnote{We consider a loop 
@@ -346,10 +347,18 @@ to reduce false positives.
 Our algorithm works as follows. 
 We first filter out functions with complexity lower than \texttt{main} function.
 We then compute caller-callee relationship using static analysis and tracing logs. 
+\commentty{How are tracing logs utilized?}
 If there is direct or indirect caller-callee relationship 
 between function \texttt{A}
 and function \texttt{B}, we will rank \texttt{B} higher than \texttt{A}.
 If there is not caller-callee relationship,
 we rank the one with larger cost higher.
+\commentty{How to rank two functions with different complexities? What
+about linear complexity?}
+
+\commentty{If we have time, section 4.2 can be expanded, since
+we claim it as one of our contributions. The current version is a bit short. 
+Use a concrete example might help, e.g., ``suppose there four code constructs
+with different cost functions...".  }
 
 
