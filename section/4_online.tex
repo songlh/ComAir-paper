@@ -245,10 +245,11 @@ the majority of complexity problems are caused by repeated execution of a loop
 or a recursive function. 
 \commentlh{
 This result inspires us to sample some dynamic instances of 
-a loop or a recursive function in a program run to 
-record input sizes and cost for sampled instances,
-and infer input sizes and cost for the sum of all instances.}
+a profiling target in one program run to 
+record their input sizes and costs,
+and infer the whole input size and cost for all instances in the same run.}
 \commentty{infer information for what?}
+
 
 How we do sampling is similar to what is described in previous works 
 on statistical debugging~\cite{liblit03,liblit05,CCI,SongOOPSLA2014,ldoctor}.
@@ -256,8 +257,9 @@ Given a code construct to be profiled,
 we clone the code construct.
 We instrument the cloned version to record information for input size and cost.
 We also dump extra delimiters to log before each 
-execution of the clone code construct
+execution of the cloned version
 to differentiate information collected from different instances. 
+
 
 Before each execution of a code construct under profiling, 
 we choose between the cloned version and the original version. 
@@ -273,40 +275,42 @@ a random number,
 whose expectation is 
 equal to the inverse of the sampling rate.  
 
-
 We design two sampling policies. 
-For the first one, we sample loop executions independently from each other.
-For the second one, we sample a pair of consecutive loop executions, 
+For the first one, we sample dynamic instances of a code construct 
+independently from each other.
+For the second one, we sample a pair of consecutive dynamic instances, 
 with the intuition that two consecutive 
-executions may share more information.
+instances may share more information.
 
 
-After sampling the executions, \Tool next \emph{infers information
-from all of the executions} to \commentty{infer the information to do what?}.  
- %
- To do this, we leverage the mark-and-recapture method~\cite{mark-recapture} to 
-estimate RMS or DSS for all execution of a monitored loop 
-based on the sampled execution. 
+After sampling, \Tool next \emph{infers input and cost information
+for all instances of the same code construct.} 
+\commentty{infer the information to do what?}.  
+\commentlh{
+Cost can be simply inferred by multiplying recorded cost values with sampling rate.
+To infer the whole input size for all instances, }
+we leverage the mark-and-recapture method~\cite{mark-recapture} 
 Mark-and-recapture is a commonly used statistical method 
 for estimating the size of an animal population. 
 In this method, some of the animals are captured, marked, and released. 
 Then, another group of the animals are captured.
 The size of the whole animal population is estimated 
-based on the ratio of marked animals in the second captured sample.  
+based on the ratio of marked animals in the second captured sample. 
+ 
 
 To utilize the mark-and-recapture method, 
 we first process our log to calculate a set of memory cells, 
 which contribute RMS
-or DSS for each sample. 
-We then estimate the whole RMS or DSS using the following formula.
-We assume we collect a sequence of $m$ samples for a monitored loop 
+or DSS for each sampled dynamic instances. 
+We then estimate the whole RMS or DSS for all instances using the following formula.
+We assume we collect a sequence of $m$ samples for a profiled code construct 
 in one program run.
 Given the $i$th sample, we use $M_i$ to represent the 
 total number of distinct memory cells in the previous $i-1$ samples, 
 $C_i$ represents the number of distinct memory cells in the $i$th sample,
 and $R_i$ represents the number of distinct memory cells in 
 the $i$th sample that also appeared in one of the previous $i-1$ samples.
-The estimated RMS or DSS of  the monitored loop is:
+The estimated RMS or DSS of the profiled code construct is:
 
 \begin{equation} \label{eq:mark}
 N = \sum\limits_{i=1}^m M_i*C_i\Big/\sum\limits_{i=1}^m R_i
