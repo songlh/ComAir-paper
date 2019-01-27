@@ -7,17 +7,18 @@
 %and several optimization policies. 
 
 Guided by the findings of empirical study in Section~\ref{sec:back},
-we design and implement \Tool, a performance 
+we design and implement \Tool, a performance \commentlh{algorithmic?}
 profiler to detect complexity problems. \Tool
 can be used in both production environment 
 and in-house development. We first describe
 the production-run version of \Tool. 
-The key benefits of \Tool include its \emph{low runtime} overhead and  capability of \emph{ranking 
+The key benefits of \Tool include its \emph{low runtime} 
+overhead and capability of \emph{ranking 
 and localizing complexity problems in specific code constructs}. 
 We then describe how to use \Tool as an in-house testing tool. 
 
 The design of \Tool used in production environment 
-follows two steps. First, given a program under profile,
+follows two steps. First, given a program under profiling,
 \Tool instruments the program and
 distribute it to end users to collect runtime profiles
 under different user inputs (e.g., workload). 
@@ -33,34 +34,51 @@ complexity problems.  We next describe details of the two steps.
 \subsection{Using Light-Weighted Instrumentation 
 for Algorithmic Profling}
 
-To obtain execution profiles, we need to select suitable \emph{profiling targets} (i.e.,
+To obtain execution profiles, we need to select suitable 
+\emph{profiling targets} (i.e.,
 code constructs), \emph{input metrics}, and \emph{cost metrics}. 
-One finding in our empirical~\ref{sec:back} is that  all complexity problems are 
+\commentlh{
+\Tool supports code constructs in any granularity. 
+However, one finding in our empirical study is 
+that all complexity problems are 
 caused either by a loop or a recursive function. 
-Therefore, the production-run version of \Tool chooses loops 
-and recursive functions as profiling targets, 
-and it instruments distinct loops or recursive functions. 
-As for input metrics, our study found that  most two commonly involved 
+Therefore, we recommend code constructs that related 
+to loops and recursive functions as profiling targets. 
+Distinct code constructs are instrumented by the production-run
+version of \Tool to create different program versions.}
+As for input metrics, our study found that most two commonly involved 
 data structures in complexity problems 
-are array and linked list. Therefore, if a loop is to process an array 
-or a linked list, we use data structure size (DSS) as its input metric. Otherwise, we use Read Memory Size (RMS). 
+are array and linked list. Therefore, if a loop is chosen as a profiling target 
+and it is to process an array 
+or a linked list, we use data structure size (DSS) as its input metric. 
+Otherwise, we use Read Memory Size (RMS), 
+since RMS is more generic as we discussed in Section~\ref{sec:back}. 
 The difference between DSS and RMS is that 
-we only need to instrument \texttt{read} instructions  accessing elements 
+we only need to instrument \texttt{read} instructions accessing elements 
 in an array or a linked list for DSS,  without instrument \texttt{write} instructions.
 Therefore, DSS requires to record less dynamic information. 
-The cost metric used in \Tool is executed basic blocks (Section~\ref{subsec:pre}).
+The cost metric used in \Tool is executed basic 
+blocks (BBs), 
+\commentlh{
+and we have two approximating metrics 
+for loops and recursive functions respectively.  
+}
 
-As discussed in Section~\ref{subsec:existing}, existing algorithmic
+
+As discussed in Section~\ref{subsec:existing}, 
+existing algorithmic profiling techniques
 often incur significant overhead and thus cannot be used in production
 environment. To address this issue, \Tool proposes several 
 methods to enable practical online instrumentation, including 1) 
-minimizing instrumented code at each user's end; 2) optimizing instrumentation sites;
+minimizing instrumented code at each user's end; 
+2) optimizing instrumentation sites;
 3) approximation; and 4) sampling. 
+
 
 
 \subsubsection{Creating Multiple Instrumentation Versions}
 
-\Tool creates multiple versions of program under profiles, 
+\Tool creates multiple versions of program under profiling, 
 and for each version \Tool only instruments a small number of 
 profiling targets. 
 All different versions are distributed to different end users. 
@@ -70,6 +88,19 @@ for each version to conduct algorithmic profiling.
 
 To select profiling targets, \commentty{How to determine
 which code targets to instrument in each version?}
+\commentlh{we are largely guided by our empirical 
+study in Section~\ref{sec:tax}.
+Since all complexity problems involve a 
+loop or a recursive function, 
+we choose loops, recursive functions, functions containing loops,
+and functions invoked inside a loop directly 
+or indirectly as profiling targets. 
+We ignore loops whose iteration numbers are constant,
+since the execution of these loops does not scale with input 
+and cannot cause complexity problems.} 
+
+
+
 
 
 \subsubsection{Optimizing Instrumentation Sites}
@@ -78,61 +109,52 @@ which code targets to instrument in each version?}
 %designed in previous works~\cite{Aprof1,Aprof2} 
 %before discussing our two designed optimizations. 
 
-To measure RMS (i.e., the input metric), we need to instrument
-the  \texttt{read} and \texttt{write} instructions in every 
+To measure RMS (i.e., the input metric), we need to instrument 
+and the \texttt{read} and \texttt{write} instructions in every 
 code construct (or profiling target). \commentty{not sure if I'm correct.}
-This may cause significant overhead. Therefore, 
-we propose a method to reduce the number of 
-instrumentation sites for \texttt{read} and \texttt{write} instructions. 
+\commentlh{correct.}
+\commentlh{
+Different from the algorithm described 
+in previous works~\cite{Aprof1,Aprof2},
+we do not maintain any global data structure,
+since we want to simplify online monitoring functionalities 
+and reduce runtime overhead.
+Instead, we trace memory addresses 
+for \texttt{read} and \texttt{write} instructions 
+and we analyze tracing log offline to calculate RMS. 
+}
 
-Specifically, to compute RMS for every function call instance, 
-three global variables need to be instrumented:
-\texttt{count}, representing current timestamp 
-and incremented by one after each function call,
-\texttt{ts}, a hash table containing the latest accessing timestamp 
-for each memory cell,
-and \texttt{S}, a shadow stack maintaining all active functions. 
-We need to monitor four types of instructions to 
-update the three global variables:
-\texttt{call}, \texttt{return}, \texttt{read}, and \texttt{write}.
-When a function is called, 
-we need to increment \texttt{count} and grow \texttt{S}.
-When a function returns, 
-we will dump a log with a timestamp 
-representing when the function is call 
-and the function's RMS.
-For both memory read and write, we need to update \texttt{ts} 
-using the current value of \texttt{count}. 
-For memory read, we also need to refer \texttt{ts} to decide 
-whether to increment RMS for all functions live on \texttt{S}.
-
-In order to reduce the number of \texttt{read} and \texttt{write} instructions
+In order to reduce the number of \texttt{read} 
+and \texttt{write} instructions
 to be instrumented, our approach works as follows. 
 If a write on a memory cell happens earlier, 
-following read on the same memory cell will not increase RMS.
-\commentty{Why?}
-For both memory read and write, 
-we need to update \texttt{ts} using the current 
-value of \texttt{count} and \texttt{count} is only incremented after function call. 
-\commentty{Why?}
+following read on the same memory cell will not increase RMS,
+\commentlh{since RMS only count memory cells whose first access is read.
+Similarly, if a read on a memory cell happens earlier,
+following read on the same memory cell will not increase RMS either,
+since RMS only considers distinct memory cells. 
 Therefore, given two consecutive memory accesses on the same location,
-if there is no function calls in between, 
 we do not need to instrument the second one. 
-We rely on dominance analysis to implement this optimization. 
-\commentty{May need to briefly explain dominance analysis. }
+We design an intra-procedural analysis, based on dominator analysis,
+which can tell us when an instruction is executed 
+whether another instruction has to be executed in advance.}
 We focus on stack memory cells that hold scalar variables 
 and only have read and write as uses 
 (i.e., not having ``address of'' as uses), 
 so that alias analysis is avoided. 
 
-In addition to reducing the number of instrumentation sites,
-we propose a method to optimize the instrumentation sites.
+
+\commentlh{
+When counting the executed basic blocks (BBs) to compute cost metric,
+a naive way is to instrument every basic block to increment a counter by one.
+To reduce the number of instrumentation 
+sites that update the counter,
+we propose a method to selectively 
+instrument part of basic blocks.}
 \commentty{optimization in what way?} 
-Specifically, when counting the executed basic blocks (BBs)
-to compute cost metric, 
-instead of incrementing a global counter in every BB,
 we employ an algorithm \commentty{does the algorithm
-have a name?}, which was originally designed to efficiently 
+have a name?}, \commentlh{no}
+which was originally designed to efficiently 
 count edge events through selectively instrumenting counter update sites 
 on control flow graphs (CFGs)~\cite{event-counting}.
 The algorithm has already been proved to conduct path 
@@ -142,10 +164,11 @@ we split each BB into two and label the event number to be one for
 edges connecting a pair of split BBs, 
 leaving the event number as zero for other edges. 
 After that, applying the algorithm~\cite{event-counting}
-can tell us optimized instrumentation sites. 
+can tell us optimized instrumentation \commentlh{policy 
+about where to update the couter and how to update the counter.} 
 
 
-\subsubsection{Approximation}
+\subsubsection{Approximation of Input and Cost Metrics}
 
 \commentty{Approximation of what? I think we should
 make the title more complete.}
