@@ -253,7 +253,7 @@ reduce overhead for dynamic techniques,
 while still preserving their desired 
 detection and diagnosis capability. 
 This motivates us to apply sampling to algorithmic profiling. 
-Our study in Section~\ref{sec:back} shows that 
+Our study in Section~\ref{sec:study} shows that 
 the majority of complexity problems are caused by repeated execution of a loop
 or a recursive function. 
 This finding inspires us to sample some dynamic instances of 
@@ -298,7 +298,7 @@ After sampling, \Tool next \emph{infers input and cost information
 for all instances of the same code construct.} 
 Cost can be simply inferred by multiplying recorded cost values with sampling rate.
 To infer the whole input size for all instances, 
-we leverage the mark-and-recapture method~\cite{mark-recapture} 
+we leverage the mark-and-recapture method~\cite{mark-recapture}. 
 Mark-and-recapture is a commonly used statistical method 
 for estimating the size of an animal population. 
 In this method, some of the animals are captured, marked, and released. 
@@ -310,7 +310,7 @@ based on the ratio of marked animals in the second captured sample.
 To utilize the mark-and-recapture method, 
 we first process our log to calculate a set of memory cells, 
 which contribute RMS
-or DSS for each sampled dynamic instances. 
+or DSS for each sampled dynamic instance. 
 We then estimate the whole RMS or DSS for all instances using the following formula.
 We assume we collect a sequence of $m$ samples for a profiled code construct 
 in one program run.
