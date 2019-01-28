@@ -6,8 +6,8 @@
 %including the high-level design choices
 %and several optimization policies. 
 
-Guided by the findings of empirical study in Section~\ref{sec:back},
-we design and implement \Tool, a performance algorithmic
+Guided by the findings of empirical study in Section~\ref{sec:study},
+we design and implement \Tool, an algorithmic
 profiler to detect complexity problems. \Tool
 can be used in both production environment 
 and in-house development. We first describe
@@ -42,7 +42,9 @@ However, one finding (Implication 2) in our empirical study is
 that all complexity problems are 
 caused either by a loop or a recursive function. 
 \commentty{Is ``ALL  complexity problems..." true? This is inconsistent
-with the data from implication 2.}
+with the data from implication 2.} 
+\commentlh{All are caused by loops or recursive functions. 7 are caused by one-level loop, 
+so that implication 2 does not count them as repeated execution of a loop. }
 Therefore, we consider code constructs  related 
 to loops and recursive functions as profiling targets. 
 Distinct code constructs are instrumented by the production-run
@@ -94,7 +96,7 @@ for each version to conduct algorithmic profiling.
 To select profiling targets, 
 %\commentty{How to determine
 %which code targets to instrument in each version?}
-\commentlh{we are largely guided by our empirical 
+we are largely guided by our empirical 
 study in Section~\ref{sec:tax}.
 Since all complexity problems involve a 
 loop or a recursive function, 
@@ -103,7 +105,14 @@ and functions invoked inside a loop directly
 or indirectly as profiling targets. 
 We ignore loops whose iteration numbers are constant,
 since the execution of these loops does not scale with input 
-and cannot cause complexity problems.} 
+and cannot cause complexity problems.
+\commentlh{
+For each program version, we only instrument a small set of profiling targets.
+Given a instrumented profiling target,
+its direct and indirect callees are also instrumented. 
+Therefore, we will not put code constructs with caller-callee 
+relationship in the same set. 
+} 
 \commentty{The question is how to select profiling
 targets for different versions? I assume you do not 
 instrument ALL loops or recursive functions
@@ -122,18 +131,18 @@ We propose two instrumentation optimization strategies for obtaining
 input and cost metrics, respectively. 
 
 \noindent{\underline{\textit{Input metric.}}
-%
 To measure RMS (i.e., the input metric), we need to instrument  
- \texttt{read} and \texttt{write} instructions in every 
+ \texttt{read} and \texttt{write} instructions in a 
 code construct (or profiling target). 
 Different from the algorithm described 
 in previous work~\cite{Aprof1,Aprof2},
 we do not maintain any global data structure,
 since we want to simplify online monitoring  
 and reduce runtime overhead.
-Instead, we trace memory addresses 
-for \texttt{read} and \texttt{write} instructions 
-and we analyze tracing log offline to calculate RMS. 
+Instead, we trace \texttt{read} and \texttt{write} 
+instructions to record instructions' id and accessed addresses.
+We then analyze tracing log offline to calculate RMS. 
+
 
 In order to reduce the number of \texttt{read} 
 and \texttt{write} instructions
@@ -162,6 +171,7 @@ To reduce the number of instrumentation
 sites that update the counter,
 we design an algorithm to selectively 
 instrument part of basic blocks.
+
 Our algorithm leverages the previous
 work on counting edge events through selectively 
 instrumenting counter update sites  on control flow graphs (CFGs)~\cite{event-counting},
@@ -181,7 +191,7 @@ can inform \Tool  where to update the counter and how to update the counter.
 
 Accurately recording dynamic information for input and cost metrics
 for each code construct
-may incur a large runtime overhead.
+may still incur a large runtime overhead.
 Therefore, we propose two approximation mechanisms. 
 First, if a profiled code construct is a loop and 
 it is to process an array or a linked list,
