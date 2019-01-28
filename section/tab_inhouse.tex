@@ -16,26 +16,26 @@
     {\bf BugID}    & {\bf KLOC} & {\bf P. L.} & {\bf Complexity} & {\bf Buggy C. C.} & {\bf Ranking} & {\bf Input Fitting} & {\bf Cost Fitting} & {\bf Overhead} & {\bf Ranking} & {\bf Max Overhead} & {\bf Min Overhead} \\
     \midrule
 
-    Mozilla\#347306       &  $88$       & C     &   $O(N^{2})$   &  Array L.       & & \Yes{{0.99}}   & \Yes{{0.99}}  &  2.34\%  &  1$_{33}$  &  79{\bf X}   &        \\
-    Mozilla\#416628       &  $105$      & C     &   $O(N^{2})$   &  Linked List L. & &                &               &  3.78\%  &  1$_{33}$  &  79{\bf X}   &    \\
-    Mozilla\#490742       &  $0.157^*$  & JS    &   $O(N)$       &  Array L.       & &  &  &     0.22\% &  1$_{2}$   &  54\%   &    \\
-    Mozilla\#35294        &  $0.195^*$  & C++   &   $O(N^{2})$   &  Array L.       & &  &  &     0.13\%   &  1$_{2}$   &  98{\bf X}  &   \\
-    Mozilla\#477564       &  $0.116^*$  & JS    &   $O(N^{2})$   &  Linked List L. & &  &  &     2.96\% &  1$_{2}$   &  129{\bf X}   &     \\
+    Mozilla\#347306       &  $88$       & C     &   $O(N^{2})$   &  Array L.       & & \Yes{{0.99}}   & \Yes{{1.00}}  &  2.34\%  &  1$_{33}$  &  79{\bf X}   &        \\
+    Mozilla\#416628       &  $105$      & C     &   $O(N^{2})$   &  Linked List L. & & \Yes{{0.99}}   & \Yes{{1.00}}  &  3.78\%  &  1$_{33}$  &  79{\bf X}   &    \\
+    Mozilla\#490742       &  $0.157^*$  & JS    &   $O(N)$       &  Array L.       & & \Yes{{1.00}}   & \Yes{{1.00}}  &  0.22\%  &  1$_{2}$   &  54\%   &    \\
+    Mozilla\#35294        &  $0.195^*$  & C++   &   $O(N^{2})$   &  Array L.       & & \Yes{{0.99}}   & \Yes{{0.99}}  &  0.13\%  &  1$_{2}$   &  98{\bf X}  &   \\
+    Mozilla\#477564       &  $0.116^*$  & JS    &   $O(N^{2})$   &  Linked List L. & & \Yes{{0.99}}   & \Yes{{0.99}}  &  2.96\%  &  1$_{2}$   &  129{\bf X}   &     \\
     \midrule
-    MySQL\#27287          &  $995$      & C++   & $O(N^{2})$     &  Array L.       &  &  &  &    &  1$_{28}$  &  &    \\
-    MySQL\#15811          &  $1127$     & C++   & $O(N^{2})$     &  Array L.       &  &  &  &    &  1$_{40}$  &  &   \\
+    MySQL\#27287          &  $995$      & C++   & $O(N^{2})$     &  Array L.       &  &  &  &    &  0$_{28}$  &  &    \\
+    MySQL\#15811          &  $1127$     & C++   & $O(N^{2})$     &  Array L.       &  &  &  &    &  0$_{40}$  &  &   \\
     \midrule
-    Apache\#37184     &  $0.092^*$  & Java  & $O(N)$ & L.                          &  &  1$_{2}$   &  2.9\% &&  &   &   3.30\%    \\
+    Apache\#37184     &  $0.092^*$  & Java  & $O(N)$ & L.                          &  & \Yes{{0.99}}    & \Yes{{0.99}}  &  2.9\%   & 1$_{2}$ &  3.30\% &      \\
     Apache\#29743     &  $0.257^*$  & Java  & $O(N^{2})$ & L.                      &  &  &  &    &  1$_{8}$   &   &\\
-    Apache\#34464     &  $0.16^*$   & Java  & $O(N^{2})$ & Array L.                &  &  &   &  0.19\%&  1$_{2}$   &  39{\bf X} &   \\
+    Apache\#34464     &  $0.16^*$   & Java  & $O(N^{2})$ & Array L.                &  & \Yes{{1.00}} & \Yes{{1.00}} &  0.19\%&  1$_{2}$   &  39{\bf X} &   \\
     Apache\#47223     &  $0.162^*$  & Java  & $O(N^{2})$ & Array L.                &  &  &  &  4.15\% &            &  81{\bf X} &  \\
     \midrule
-    GCC\#46401        &  $5521$  & C  & $O(N^{2})$ & Linked List L.                &  &   &  & 0.38\% &            &  33{\bf X} &    \\
-    GCC\#1687         &  $2099$  & C  & $O(2^{N})$ & Recursive F.                  &  &  &  &  4.58\% &  1$_{16}$  &  96{\bf X} &   \\
+    GCC\#46401        &  $5521$  & C  & $O(N^{2})$ & Linked List L.                &  & \Yes{{0.978}}  & \Yes{{0.854}} & 0.38\% &            &  33{\bf X} &    \\
+    GCC\#1687         &  $2099$  & C  & $O(2^{N})$ & Recursive F.                  &  & \Yes{{0.975}}&  \Yes{{0.242}}&  4.58\% &  1$_{16}$  &  96{\bf X} &   \\
     GCC\#27733        &  $3217$  & C  & $O(2^{N})$ & Recursive F.                  &  &  &   & 4.35\%&             &  49{\bf X} &  \\
-    GCC\#8805         &  $2538$  & C  & $O(N^{2})$ & Linked List L.                &  &  &  &  3.28\%  &      &  48{\bf X} &  \\
+    GCC\#8805         &  $2538$  & C  & $O(N^{2})$ & Linked List L.                &  & \Yes{{0.927}}&  \Yes{{0.760}}&  3.28\%  & 0$_{57}$     &  48{\bf X} &  \\
     GCC\#21430        &  $3844$  & C  & $O(N^{2})$ & Linked List L.                &  &  &  &  4.64\%  &            &  95{\bf X} &    \\
-    GCC\#12322        &  $2341$  & C  & $O(N^{2})$ & Linked List L.                &  &  &  & 0.54\% &  &  &   \\
+    GCC\#12322        &  $2341$  & C  & $O(N^{2})$ & Linked List L.                &  &  \Yes{{0.973}}&  \Yes{{0.990}}& 0.54\% & 0$_{11}$  &  &   \\
     \midrule
     \midrule
     Apache\#53622     & $1.094^*$  & Java  & $O(N^{2})$ & Array L.                 &  & \Yes{{0.99}} & \Yes{{0.99}} &   0.37\% &  1$_{2}$  &  28{\bf X} &     \\
@@ -51,12 +51,12 @@
     Collections\#410      & $0.769^*$  & Java  & $O(N^{2})$ & Array L.             &  & \Yes{{0.99}} & \Yes{{1.00}} &    2.27\% &  1$_{2}$  &  78{\bf X} &   \\
     Collections\#412      & $0.284^*$  & Java & $O(N^{2})$ & Array L.              &  & \Yes{{1.00}} & \Yes{{1.00}} &    1.32\% &  1$_{2}$  &  91{\bf X} &   \\
     Collections\#413      & $0.923^*$  & Java & $O(N^{2})$ & Linked List L.        &  & \Yes{{1.00}} & \Yes{{0.99}} &   3.88\% &  1$_{3}$  &  127{\bf X} &   \\
-    Collections\#425      & $0.758^*$  & Java & $O(N^{2})$ & Array L.              &  &  &  &    2.44\% &  x$_{x}$  &  94{\bf X} &   \\
+    Collections\#425      & $0.758^*$  & Java & $O(N^{2})$ & Array L.              &  &  &  &    2.44\% &    &  94{\bf X} &   \\
     Collections\#426      & $0.783^*$  & Java & $O(N^{2})$ & Array L.              &  & \Yes{{1.00}} & \Yes{{1.00}} &   3.53\% &  1$_{6}$  &  96{\bf X} &   \\
     Collections\#427      & $0.756^*$  & Java  & $O(N^{2})$ & Array L.             &  & \Yes{{1.00}} & \Yes{{1.00}} &  2.00\% &  1$_{5}$  &  95{\bf X} &   \\
-    Collections\#429-0    & $0.668^*$  & Java & $O(N^{2})$ & L.                    &  &  &  &      2.76\% &  x$_{x}$  &  149{\bf X} &   \\
-    Collections\#429-1    & $0.536^*$  & Java & $O(N^{2})$ & L.                    &  &  &  &    2.76\% &  x$_{x}$  &  8.4{\bf X} &   \\
-    Collections\#429-2    & $0.416^*$  & Java  & $O(N^{2})$ & L.                   &  &  &  &  x &  1$_{2}$  &  56{\bf X} &   \\
+    Collections\#429-0    & $0.668^*$  & Java & $O(N^{2})$ & L.                    &  &  &  &      2.76\% &    &  149{\bf X} &   \\
+    Collections\#429-1    & $0.536^*$  & Java & $O(N^{2})$ & L.                    &  &  &  &    2.76\% &    &  8.4{\bf X} &   \\
+    Collections\#429-2    & $0.416^*$  & Java  & $O(N^{2})$ & L.                   &  &  &  &   &  1$_{2}$  &  56{\bf X} &   \\
     Collections\#434      & $0.336^*$  & Java & $O(N^{2})$ & Linked List L.        &  & \Yes{{0.99}} & \Yes{{1.00}} &  4.83\% &  1$_{2}$  &  119{\bf X} &     \\
     \midrule
     Groovy\#5739-0        & $0.745^*$  & Java  & $O(N^{2})$ & Linked List L.       &  & \Yes{{0.99}} & \Yes{{1.00}} &   2.88\%  &  1$_{5}$  &  93{\bf X} &  \\
