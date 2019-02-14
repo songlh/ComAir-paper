@@ -15,7 +15,7 @@ We then plot the recorded information with input size as x-axis and cost as y-ax
 In the end, we infer complexity for the code construct as a cost function of input size. 
 \commentty{To help reviewers better understand algorithmic profiling,
 we can rephrase the example of Figure 1 to illustrate algorithmic profiling and
-show  how the cost function looks like.}
+show how the cost function looks like.}
 
 To conduct algorithmic profiling effectively, 
 we need to define suitable metrics for input and cost. 
@@ -83,11 +83,13 @@ it invokes \texttt{xml\_parent\_tag()} for every element in \texttt{items}.
 When a code construct is executed,
 it could consume many different types of resources, 
 such as CPU cycles, network bandwidth, storage, and so on.
-In this paper, focus on CPU cycles (or computation cost), 
-since computation cost is most correlated with user-perceived slowdown~\cite{add cites}.
+In this paper, we focus on CPU cycles (or computation cost), 
+since computation cost is often correlated 
+with user-perceived software slowdown~\cite{SongOOPSLA2014}.
 \commentty{any references?}
 We leave the measurement for other types of 
 consumed resources for future work.
+
 
 Computation cost can be measured 
 as the number of executed basic blocks (BBs)~\cite{Aprof1,Aprof2}.
@@ -139,10 +141,11 @@ which function is the root cause from profiling results of existing techniques.
 Second, existing techniques incur significant runtime overheads. 
 They simply record all direct information to calculate the metrics, 
 failing to consider programs' structures and missing opportunities to optimize performance.
-In our evaluation, we implement RMS and DSS to collect input size information. 
-For most benchmarks, RMS incurs 50$X$ runtime overhead. 
-DSS collects less information, and for most benchmarks, it incurs 20$X$ runtime overhead. 
+For example, we implement an existing technique, Aprof~\cite{Aprof1,Aprof2}, 
+using LLVM in our experiment. 
+For most evaluated benchmark, Aprof incurs 50$X$ runtime overhead.
 \commentty{Do you mean Aprof? Aren't RMS and DSS general input metrics?}
+\commentlh{addressed}
 %\commentty{Why do they incur large overheads? What are the underlying limitations?}
 %\emph{Due to the extremely large overhead, 
 %we cannot deploy these two techniques in production-run scenario. }
@@ -152,20 +155,30 @@ Third, one option to mitigate runtime overhead is using
 sampling, which is a widely-used technique to lower runtime overhead 
 and deploy existing techniques to production 
 environments~\cite{SongOOPSLA2014,liblit03,liblit05,CCI}. 
-%
 However, \emph{existing algorithmic profiling techniques are not cooperative well with
 sampling approach.} 
 Take MySQL\#27287 in Figure~\ref{fig:mysql27287} as an example,
 the $n^2$ complexity can only be observed on the side of the outer loop. 
-Each execution of the outer loop contributes almost all of 
+One execution of the outer loop contributes almost all of 
 the execution time during performance failure runs. 
-If we sample the outer loop, 
+When we try to sample the outer loop, 
 we may not get any sample and thus miss the opportunity to 
 identify the $n^2$ complexity, or we get a sample but have to 
 record all 
-information for the sampled executions of the outer loop, 
+information for the sampled execution of the outer loop, 
 which can still  have a non-tolerable overhead. 
+
+
+To address the above limitations, 
+we design a novel ranking mechanism to identify 
+functions that contain complexity problems causing the recorded slowdown. 
+We infer complexity from the side of inner loops for cases like MySQL\#27287, 
+and successfully apply sampling to algorithmic profiling 
+and lower runtime overhead.
+We will discuss more detailed information later in Section~\ref{sec:online}. 
 
 
 \commentty{It would be better to add 1-2 sentence to describe
 how our approach addresses each of the three limitations.}
+
+\commentlh{addressed}

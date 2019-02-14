@@ -51,9 +51,10 @@ Distinct code constructs are instrumented by the production-run
 version of \Tool to create different program versions distributed
 to end users.
 
-As for input metrics, our study found that most two commonly involved 
+As for input metrics, our study found that the most two commonly involved 
 data structures in complexity problems 
-are array and linked list. Therefore, if a loop is chosen as a profiling target 
+are array and linked list (Implication 3). 
+Therefore, if a loop is chosen as a profiling target 
 and it is to process an array 
 or a linked list, we use data structure size (DSS) as its input metric. 
 Otherwise, we use Read Memory Size (RMS), 
@@ -62,9 +63,10 @@ The difference between DSS and RMS is that
 we only need to instrument \texttt{read} instructions accessing elements 
 in an array or a linked list with DSS,
 while RMS needs to monitor both \texttt{read} and \texttt{write}
-instructions to figure out where a memory cell is 
+instructions to figure out whether a memory cell is 
 firstly accessed by \texttt{read}.
 Therefore, DSS requires recording less dynamic information. 
+
 
 %\commentlh{
 %and we have two approximating metrics 
