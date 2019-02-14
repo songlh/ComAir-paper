@@ -37,19 +37,20 @@ for Algorithmic Profling}
 To obtain execution profiles, we need to select suitable 
 \emph{profiling targets} (i.e.,
 code constructs), \emph{input metrics}, and \emph{cost metrics}. 
-\Tool supports code constructs in any granularity. 
+
+\Tool supports code constructs in any granularity as profiling targets. 
 However, one finding (Implication 2) in our empirical study is 
 that all complexity problems are 
 caused either by a loop or a recursive function. 
 \commentty{Is ``ALL  complexity problems..." true? This is inconsistent
 with the data from implication 2.} 
-\commentlh{All are caused by loops or recursive functions. 7 are caused by one-level loop, 
-so that implication 2 does not count them as repeated execution of a loop. }
-Therefore, we consider code constructs  related 
+\commentlh{I changed the description of implication 2. }
+Therefore, we consider code constructs related 
 to loops and recursive functions as profiling targets. 
 Distinct code constructs are instrumented by the production-run
 version of \Tool to create different program versions distributed
 to end users.
+
 As for input metrics, our study found that most two commonly involved 
 data structures in complexity problems 
 are array and linked list. Therefore, if a loop is chosen as a profiling target 
@@ -59,10 +60,12 @@ Otherwise, we use Read Memory Size (RMS),
 since RMS is more generic as we discussed in Section~\ref{sec:back}. 
 The difference between DSS and RMS is that 
 we only need to instrument \texttt{read} instructions accessing elements 
-in an array or a linked list with DSS,  without instrument \texttt{write} instructions.
+in an array or a linked list with DSS,
+while RMS needs to monitor both \texttt{read} and \texttt{write}
+instructions to figure out where a memory cell is 
+firstly accessed by \texttt{read}.
 Therefore, DSS requires recording less dynamic information. 
-The cost metric used in \Tool is executed basic 
-blocks (BBs) as discussed in Section~\ref{subsec:pre}. 
+
 %\commentlh{
 %and we have two approximating metrics 
 %for loops and recursive functions respectively.  

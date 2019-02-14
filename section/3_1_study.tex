@@ -144,17 +144,20 @@ on users' descriptions
 and provided inputs when they report complexity problems.  
 
 \noindent{\underline{\textit{Implication 2.}}}
-Our study shows that approximately three-fourths of the studied complexity problems (23/30)
-are caused by repeated executions of a loop or a recursive function. 
+Our study shows that all complexity problems are caused 
+either by a loop or a recursive function.
 This finding suggests that algorithmic profiling should \emph{focus 
 on code constructs involving loops and recursive functions}.
-%These bugs are categorized as polynomial complexity and exponential complexity in Section~\ref{sec:tax}.
+Our study also shows that 
+approximately three-fourths of complexity problems (23/30)
+are caused by repeated executions of a loop or a recursive function. 
 Previous work~\cite{SongOOPSLA2014,ldoctor} 
-shows that sampling code constructs 
+demostrates that sampling code constructs 
 that execute many times in one program run can lower the runtime overhead 
 while preserving the same diagnosis or detection capability. 
-It is promising to  \emph{apply sampling 
-to design production-run algorithmic profiling techniques}. 
+It is promising to \emph{apply sampling 
+to design production-run algorithmic profiling techniques}.
+
  
 \noindent{\underline{\textit{Implication 3.}}}
 We also examine what types of data structures holding inputs processed 
@@ -164,8 +167,8 @@ are array (11/30) and linked list (9/30).
 Other types of data structures are either application-specific or 
 can only cover one or two bugs.
 This fact inspires us to \emph{design effective algorithms 
-for loops (or recursive functions) 
-that process an array or a linked list during algorithmic profiling}. 
+for loops that process an array or 
+a linked list during algorithmic profiling}. 
 
 
 
