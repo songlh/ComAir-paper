@@ -228,6 +228,7 @@ leaving the event number as zero for other edges.
 After that, applying the algorithm~\cite{event-counting}
 can inform \Tool  where to update 
 the counter and how to update the counter.
+\commentlh{
 For example, 
 there are in total six basic blocks inside 
 the loop in Figure~\ref{fig:mysql27287},
@@ -235,11 +236,11 @@ but \Tool only instruments five basic blocks, instead of six.
 As another example, there are 141 basic blocks 
 inside function \texttt{mult\_alg()} in Figure~\ref{fig:gcc27733}, 
 while \Tool only instruments 78 of them. 
+}
 
+\subsubsection{Approximation of Input Metric}
 
-\subsubsection{Approximation of Input and Cost Metrics}
-
-Accurately recording dynamic information for input and cost metrics
+Accurately recording dynamic input information
 for each code construct
 may still incur a large runtime overhead.
 Therefore, we propose two approximation mechanisms. 
