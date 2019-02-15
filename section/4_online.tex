@@ -21,14 +21,15 @@ The design of \Tool used in production environment
 follows two steps. First, given a program under profiling,
 \Tool instruments the program and
 distribute it to end users to collect runtime profiles
-under different user inputs (e.g., workload). 
+under different user inputs (e.g., workloads). 
 To minimize runtime overhead, we design and implement
 several advanced instrumentation methods in \Tool. 
 In the second step, \Tool computes cost functions for
 different code constructs based on the execution profiles
 and then reports a ranked list of code constructs in
 terms of their likelihood of containing performance bugs due to
-complexity problems.  We next describe details of the two steps. 
+complexity problems.  
+We next describe details of the two steps. 
 
 
 \subsection{Using Light-Weighted Instrumentation 
@@ -56,7 +57,7 @@ data structures in complexity problems
 are array and linked list (Implication 3). 
 Therefore, if a loop is chosen as a profiling target 
 and it is to process an array 
-or a linked list, we use data structure size (DSS) as its input metric. 
+or a linked list, we use Data Structure Size (DSS) as its input metric. 
 Otherwise, we use Read Memory Size (RMS), 
 since RMS is more generic as we discussed in Section~\ref{sec:back}. 
 The difference between DSS and RMS is that 
@@ -68,10 +69,13 @@ firstly accessed by \texttt{read}.
 Therefore, DSS requires recording less dynamic information. 
 
 
-%\commentlh{
-%and we have two approximating metrics 
-%for loops and recursive functions respectively.  
-%}
+We use the executed BBs as cost metric. 
+As discussed in Section~\ref{sec:back}, 
+the number of executed BBs is a generic metric 
+and it is more lightweight than executed instructions. 
+We design a novel algorithm to reduce the number of instrumentation sites,
+while still computing the precise number of executed BBs. 
+
 
 
 As discussed in Section~\ref{subsec:existing}, 
@@ -83,7 +87,7 @@ constitute the key novelty of \Tool over existing algorithmic profiling tools}.
 These methods include 1) 
 minimizing instrumented code at each user's end; 
 2) optimizing instrumentation sites;
-3) approximation of input and cost metrics;
+3) approximation of input metrics;
 and 4) sampling profiling targets. 
 We next discuss these methods in detail.
 
@@ -117,6 +121,12 @@ Given a instrumented profiling target,
 its direct and indirect callees are also instrumented. 
 Therefore, we will not put code constructs with caller-callee 
 relationship in the same set. 
+If there are limited program versions we can distribute at the same time,
+we prioritize ``simple'' code constructs, such as 
+functions without callees and inner loops of nested loops,
+and we gradually select more ``complex'' code constructs along call chains, 
+if we cannot find complex problems inside simple code constructs. 
+
 } 
 \commentty{The question is how to select profiling
 targets for different versions? I assume you do not 
@@ -151,7 +161,8 @@ We then analyze tracing log offline to calculate RMS.
 
 In order to reduce the number of \texttt{read} 
 and \texttt{write} instructions
-to be instrumented, our approach works as follows. 
+to be instrumented, we propose two optimizations. 
+The first one works as follows. 
 If a write on a memory cell happens earlier, 
 following read on the same memory cell will not increase RMS,
 since RMS only count memory cells whose first access is read.
@@ -167,6 +178,17 @@ We focus on stack memory cells that hold scalar variables
 and only have read and write as uses 
 (i.e., not having ``address of'' as uses), 
 so that alias analysis is avoided. 
+\commentlh{
+For example, there are four reads on variable \texttt{p} inside 
+the loop in Figure~\ref{fig:mysql27287}, two are at 
+line 7 (``\texttt{p>=items}'' and ``\texttt{p--}''), 
+and the other two are at line 8. 
+There is one write on \texttt{p} (``\texttt{p--}'').
+Variable \texttt{p} satisfies the requirement of our optimization. 
+Since ``\texttt{p>=items}'' is conducted in the loop header 
+and it dominates all other accesses,
+we only need to instrument the read access inside ``\texttt{p>=items}''.
+}
 
 
 \noindent{\underline{\textit{Cost metric.}}
