@@ -196,7 +196,7 @@ instead of recording the accessed address in every iteration.
 For example, the address of variable \texttt{p} is not changed 
 inside the loop in Figure~\ref{fig:mysql27287}.
 Therefore, we can record the value of \texttt{p} in the loop's 
-preheader for \texttt{p>=items}.
+preheader for ``\texttt{p>=items}''.
 }
 
 \noindent{\underline{\textit{Cost metric.}}
@@ -208,18 +208,33 @@ we design an algorithm to selectively
 instrument part of basic blocks.
 
 Our algorithm leverages the previous
-work on counting edge events through selectively 
-instrumenting counter update sites  on control flow graphs (CFGs)~\cite{event-counting},
+work on counting 
+edge~\footnote{An edge on CFG represents a jump from 
+one basic block to another basic block.} 
+events through selectively 
+instrumenting counter update sites on control flow graphs (CFGs)~\cite{event-counting},
 which has been proved to conduct path 
 profiling efficiently~\cite{path-profiling,peter-ase}.  
 However, the original algorithm cannot be
-directly adapted in our case because it is designed
-to count edge events.  Instead, \Tool splits 
-each BB into two and label the event number to be one for 
+directly adopted in our case because it is designed
+to count edge events, not BB events.  
+Instead, \Tool firstly splits 
+each monitored BB into two, 
+and monitored BBs include BBs inside profiling targets 
+and BBs inside functions called from profiling targets.
+Then, \Tool labels the event number to be one for 
 edges connecting a pair of split BBs, 
 leaving the event number as zero for other edges. 
 After that, applying the algorithm~\cite{event-counting}
-can inform \Tool  where to update the counter and how to update the counter.
+can inform \Tool  where to update 
+the counter and how to update the counter.
+For example, 
+there are in total six basic blocks inside 
+the loop in Figure~\ref{fig:mysql27287},
+but \Tool only instruments five basic blocks, instead of six. 
+As another example, there are 141 basic blocks 
+inside function \texttt{mult\_alg()} in Figure~\ref{fig:gcc27733}, 
+while \Tool only instruments 78 of them. 
 
 
 \subsubsection{Approximation of Input and Cost Metrics}
