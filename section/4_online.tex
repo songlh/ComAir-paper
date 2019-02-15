@@ -125,9 +125,7 @@ If there are limited program versions we can distribute at the same time,
 we prioritize ``simple'' code constructs, such as 
 functions without callees and inner loops of nested loops,
 and we gradually select more ``complex'' code constructs along call chains, 
-if we cannot find complex problems inside simple code constructs. 
-
-} 
+if we cannot find complexity problems inside simple code constructs.}
 \commentty{The question is how to select profiling
 targets for different versions? I assume you do not 
 instrument ALL loops or recursive functions
@@ -190,6 +188,16 @@ and it dominates all other accesses,
 we only need to instrument the read access inside ``\texttt{p>=items}''.
 }
 
+\commentlh{
+For the second optimization, if a read or a write is conducted inside a loop and 
+the accessed address is not changed across different loop iterations,
+we promote the instrumentation to the loop preheader, 
+instead of recording the accessed address in every iteration. 
+For example, the address of variable \texttt{p} is not changed 
+inside the loop in Figure~\ref{fig:mysql27287}.
+Therefore, we can record the value of \texttt{p} in the loop's 
+preheader for \texttt{p>=items}.
+}
 
 \noindent{\underline{\textit{Cost metric.}}
 When counting the executed basic blocks (BBs) to compute cost metric,
