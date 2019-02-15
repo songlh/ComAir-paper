@@ -172,10 +172,13 @@ which can still  have a non-tolerable overhead.
 To address the above limitations, 
 we design a novel ranking mechanism to identify 
 functions that contain complexity problems causing the recorded slowdown. 
-We infer complexity from the side of inner loops for cases like MySQL\#27287, 
-and successfully apply sampling to algorithmic profiling 
-and lower runtime overhead.
-We will discuss more detailed information later in Section~\ref{sec:online}. 
+We infer complexity from the side of inner loops 
+for cases like MySQL\#27287, 
+and successfully apply sampling to algorithmic 
+profiling to lower runtime overhead.
+We will discuss more detailed design 
+later in Section~\ref{sec:online}. 
+
 
 
 \commentty{It would be better to add 1-2 sentence to describe
