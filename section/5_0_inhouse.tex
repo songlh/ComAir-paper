@@ -3,38 +3,54 @@
 
 During in-house testing, \Tool profiles the whole program, 
 since runtime overhead is less of a concern. 
-Existing tests can be used to launch \Tool, 
-and test input generation techniques~\cite{KLEE,dart,s2e} 
-can be utilized to create more inputs.
-Execution information for the same code constructs 
+Existing testing inputs can be used to launch \Tool, 
+and testing input generation techniques~\cite{KLEE,dart,s2e} 
+can also be utilized to create more inputs.
+Input and cost information for the same code constructs 
+collected from multiple runs
 is automatically merged to infer code functions. 
-
-
 \commentty{need to discuss the usage scenario 
 of in-house profiling, e.g., what kinds of inputs are used.}
-
 \commentlh{addressed}
 
-In in-house profiling, we choose RMS as input metric 
-and BB as cost  metric. \commentty{Why is DSS discarded
-for in-house?} 
- %
- %In this section, we present the design and implementation 
-%of \Tool under the in-house setting. 
-%We choose RMS as input metric and BB as cost 
-%metric for the in-house version of \Tool, 
-%since RMS is more general than DSS and BB is a balance 
-%between monitoring accuracy and monitoring efficiency, 
-The in-house version of \Tool is configured by enabling
-only the second instrumentation optimization method (i.e.,
+The in-house version of \Tool uses RMS as input metric and BB
+as cost metric.
+It is configured by enabling
+only the two instrumentation optimization methods (i.e.,
 optimizing instrumentation sites) presented 
-in the production-run version. This is because we wish 
-to obtain more accurate results while overhead is less of 
-a concern.  
+in the production-run version, without enabling any approximation. 
+This is because we wish 
+to obtain more accurate results.
+Similar to Aprof~\cite{Aprof1,Aprof2}, 
+the in-house version of \Tool leverages several global data structures
+to preprocess memory access information and lower memory and disk overhead,
+instead of directly tracing read and write information into log, 
+as what we did for the production-run version. 
+To keep the implementation simple, 
+we choose function as profiling granularity.
+Otherwise, we need to implement more complex 
+mechanisms to judge whether a given code construct 
+has finished its execution.  
+
+Different from the production-run version, the in-house version of \Tool 
+considers each individual dynamic instance of a function 
+as a distinct point during inferring cost function, 
+while not merging all dynamic instances of the function 
+from the same program run.
+This is because if we want to merge all dynamic instances for a given function, 
+we need to track accessed memory cells by previous dynamic instances, 
+which will incur a large memory overhead. 
+As what we discussed in Section~\ref{sec:back}, 
+given a complexity problem with polynomial complexity 
+(e.g. Figure~\ref{fig:mysql27287}),  
+the polynomial complexity can be inferred when profiling 
+the function containing the outer loop by the in-house version.
+
+
 
 The main advantage of the in-house version of \Tool 
 over existing profilers (e.g., Aprof~\cite{Aprof1,Aprof2}) is that 
-\Tool provides a ranked list of code constructs to
+\Tool provides a ranked list of functions to
 help localizing complexity problems while 
 existing tools simply attribute complexity to each executed function, 
 without providing any postmortem analysis. 
