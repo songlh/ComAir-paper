@@ -243,15 +243,13 @@ while \Tool only instruments 78 of them.
 Accurately recording dynamic input information
 for each code construct
 may still incur a large runtime overhead.
-Therefore, we propose two approximation mechanisms. 
-First, if a profiled code construct is a loop and 
+Therefore, we propose an approximation mechanism. 
+If a profiled code construct is a loop and 
 it is to process an array or a linked list,
 we use the DSS as input metric.
-Second, if a profiled code construct is a loop or a recursive function,
-we use loop iterations (LIs) and recursive invocations (RIs) 
-as cost metrics respectively. 
 
-To apply the first approximation, we are facing two challenges. 
+
+To apply the approximation, we are facing two challenges. 
 The first one is to \emph{identify array-processing loops}.
 To address this, given a loop, we analyze all pointer usage inside the loop. 
 If a pointer is deferenced in every iteration of a loop, 
@@ -277,12 +275,13 @@ relationship with the number of accessed elements and DSS.
 
 
 
+
 %\commentty{Why do we need to handle linked-list-processing loops?
 %In the first paragraph, only array-processing loop is mentioned.}
 %\commentlh{I have changed the first paragraph in this subsection.}
 The second challenge is to \emph{identify linked-list-processing loops}.
 %\noindent{\underline{How to identify a linked-list-processing loop?}}
-To address this, we also analyze all pointer usage inside a loop under profile, 
+To address this, we also analyze all pointer usage inside a loop under profiling, 
 by checking whether a pointer satisfies the following three conditions.
 First, its base type is a \texttt{struct}.
 Second, it is deferenced in every iteration of the loop.
@@ -320,7 +319,7 @@ we clone the code construct.
 We instrument the cloned version to record information for input size and cost.
 We also dump extra delimiters to log before each 
 execution of the cloned version
-to differentiate information collected from different instances. 
+to differentiate information collected from different dynamic instances. 
 
 
 Before each execution of a code construct under profiling, 
@@ -337,12 +336,12 @@ a random number,
 whose expectation is 
 equal to the inverse of the sampling rate.  
 
-We design two sampling policies. 
-For the first one, we sample dynamic instances of a code construct 
-independently from each other.
-For the second one, we sample a pair of consecutive dynamic instances, 
-with the intuition that two consecutive 
-instances may share more information.
+%We design two sampling policies. 
+%For the first one, we sample dynamic instances of a code construct 
+%independently from each other.
+%For the second one, we sample a pair of consecutive dynamic instances, 
+%with the intuition that two consecutive 
+%instances may share more information.
 
 
 After sampling, \Tool next \emph{infers input and cost information
@@ -388,38 +387,64 @@ As we discussed in Section~\ref{subsec:existing},
 existing techniques~\cite{Aprof1,Aprof2,AlgoProf} 
 simply attribute complexity to each function, 
 without providing any future analysis. 
-Therefore, they fail to identify root-cause functions for 
+Therefore, they fail to identify root causes for 
 performance failures caused by complexity problems. 
 \commentty{Does \Tool rank functions or code constructs?
 We have been measuring costs for code constructs...}
+\commentlh{addressed.}
 
 To address this problem, we design a ranking algorithm 
-with the goal to identify root-cause functions\footnote{We consider a loop 
-as a function called by its parent function containing the loop}. 
+with the goal to identify root-cause code constructs.
 Our algorithm follows three intuitions. 
-First, root-cause functions must have the same (or higher) 
-complexity as \texttt{main} function.
-Second, root-cause functions must consume large computation cost.
-Third, since all direct and indirect callers of root-cause functions 
+First, root-cause code constructs must have highest complexity.
+Second, root-cause code constructs must consume large computation cost.
+Third, since all direct and indirect callers of root-cause code constructs 
 consume more cost and have the same complexity, 
 we should rank callee higher than its caller, 
 to reduce false positives. 
 
+
 Our algorithm works as follows. 
-We first filter out functions with complexity lower than \texttt{main} function.
-We then compute caller-callee relationship using static analysis and tracing logs. 
+According to their complexity, 
+we first divide profiling targets into three groups, 
+exponential-complexity group, 
+polynomial-complexity group and linear-complexity group.
+We always rank profiling targets with exponential complexity highest,
+profiling targets with polynomial complexity in the middle,
+and profiling targets with linear complexity lowest. 
+For profiling targets within the same group, 
+we then compute caller-callee relationship using static analysis and tracing logs.
+Since we record instructions' ids, tracing logs can help us solve function pointers. 
 \commentty{How are tracing logs utilized?}
+\commentlh{addressed.}
 If there is direct or indirect caller-callee relationship 
-between function \texttt{A}
-and function \texttt{B}, we will rank \texttt{B} higher than \texttt{A}.
-If there is not caller-callee relationship,
-we rank the one with larger cost higher.
+between profiling target \texttt{A}
+and profiling target \texttt{B}, we rank \texttt{B} higher than \texttt{A}.
+If there is no caller-callee relationship,
+we rank the one with larger observed cost higher.
+
+
 \commentty{How to rank two functions with different complexities? What
 about linear complexity?}
+\commentlh{addressed}
+
+To illustrate our ranking algorithm, suppose we have four profiling targets, 
+whose ids, complexity and ever observed largest costs are listed as follows:
+(0, $O(n)$, 2000), (1, $O(n^2)$, 800), (2, $O(n^2)$, 1200), and (3, $O(n^2)$, 300).
+We also assume target 2 is an indirect caller of target 1 and target 3,
+and there is no caller-callee relationship between target 1 and target 3.
+According to our algorithm, 
+we rank the four profiling targets as 1, 3, 2, and 0. 
+Targets 1, 2 and 3 have higher complexity than target 1, 
+so that these three are ranked higher.
+Target 2 is has caller-callee relationship with targets 1 and 3,
+and thus it is ranked lower. 
+Target 1 has larger cost than target 3, so that it is ranked as No. 1. 
+
+
 
 \commentty{If we have time, section 4.2 can be expanded, since
 we claim it as one of our contributions. The current version is a bit short. 
 Use a concrete example might help, e.g., ``suppose there four code constructs
 with different cost functions...".  }
-
-
+\commentlh{addressed}
