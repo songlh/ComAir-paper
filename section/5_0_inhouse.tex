@@ -6,12 +6,16 @@ since runtime overhead is less of a concern.
 Existing testing inputs can be used to launch \Tool, 
 and testing input generation techniques~\cite{KLEE,dart,s2e} 
 can also be utilized to create more inputs.
-Input and cost information for the same code constructs 
-collected from multiple runs
-is automatically merged to infer code functions. 
+For testing inputs with repetitive patterns, 
+developer can change these inputs by themselves 
+and create inputs with the same functionality but different sizes. 
+\Tool automatically merges input and cost information 
+for the same code constructs
+collected from multiple runs with different inputs and infer cost functions. 
 \commentty{need to discuss the usage scenario 
 of in-house profiling, e.g., what kinds of inputs are used.}
 \commentlh{addressed}
+
 
 The in-house version of \Tool uses RMS as input metric and BB
 as cost metric.
@@ -23,7 +27,7 @@ This is because we wish
 to obtain more accurate results.
 Similar to Aprof~\cite{Aprof1,Aprof2}, 
 the in-house version of \Tool leverages several global data structures
-to preprocess memory access information and lower memory and disk overhead,
+to preprocess memory access information to lower memory and disk overhead,
 instead of directly tracing read and write information into log, 
 as what we did for the production-run version. 
 To keep the implementation simple, 
@@ -40,7 +44,7 @@ from the same program run.
 This is because if we want to merge all dynamic instances for a given function, 
 we need to track accessed memory cells by previous dynamic instances, 
 which will incur a large memory overhead. 
-As what we discussed in Section~\ref{sec:back}, 
+As we discussed in Section~\ref{sec:back}, 
 given a complexity problem with polynomial complexity 
 (e.g. Figure~\ref{fig:mysql27287}),  
 the polynomial complexity can be inferred when profiling 
