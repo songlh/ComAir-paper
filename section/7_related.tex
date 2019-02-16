@@ -3,79 +3,91 @@
 \section{Related Works}
 \label{sec:related}
 
-\noindent\textbf{Empirical Studies on Performance Problems}
+\noindent\textbf{Empirical Studies on Performance Problems.}
 Many characteristics studies are conducted on real-world performance
-problems\cite{PerfBug,SongOOPSLA2014,ldoctor,Zaman2012MSR,Nistor2013MSR,HuangRegression,SmartphoneStudy,junwen-1, junwen-2}.
-\cite{PerfBug} collect 110 real-world performance bugs from 5 representative applications.
+problems~\cite{PerfBug,SongOOPSLA2014,ldoctor,Zaman2012MSR,Nistor2013MSR,HuangRegression,SmartphoneStudy,junwen-1, junwen-2}.
+\citet{PerfBug} collect 110 real-world performance bugs from 
+5 representative applications.
 Their study tries to understand root causes of performance problems,
-how performance problems are introduced, how to expose them, and how to fix them.
+how performance problems are introduced, 
+how to expose them, and how to fix them.
 In their following works, they focus their studies on
-user-perceived performance problems\cite{SongOOPSLA2014}
-and real-world inefficient loops\cite{ldoctor}.
-\cite{Zaman2012MSR} conduct qualitative comparison between performance bugs
+user-perceived performance problems~\cite{SongOOPSLA2014}
+and inefficient loops~\cite{ldoctor}.
+\citet{Zaman2012MSR} conduct quantitative comparison between performance bugs
 and non-performance bugs collected from FireFox and Chrome.
-\cite{Nistor2013MSR} compare performance bugs with non-performance bugs
+\citet{Nistor2013MSR} compare performance bugs with non-performance bugs
 from aspects of discovering, reporting and fixing.
-\cite{HuangRegression} try to figure out what code changes are more likely to introduce performance regressions through
+\citet{HuangRegression} try to figure out what code changes are 
+more likely to introduce performance regressions by
 studying 100 performance regressions.
-\cite{SmartphoneStudy} find common inefficiency patterns after
+\citet{SmartphoneStudy} find common inefficiency patterns after
 inspecting 70 performance problems from smartphone applications.
-There are also research work focusing on studying inefficiency in web applications\cite{junwen-1, junwen-2}.
+There are also research work focusing on studying inefficiency 
+in web applications~\cite{junwen-1, junwen-2}.
 Similar to our work in Section~\ref{sec:study},
 these studies have important findings and can guide technical design to combat
 real-world performance problems.
-However, our work is the first empirical study on real-world complexity problems,
+However, our work is the first empirical study focusing on complexity problems,
 and it provides important supplement to existing studies.
 
-\noindent\textbf{Profilers}
+
+\noindent\textbf{Profilers.}
 Traditional profilers are the most widely used tools
 during performance optimization and performance debugging.
 After collecting runtime information,
-profilers will associate performance metrics to executed instructions,
-functions, or calling context\cite{oprofile,gprof, CCT}.
+profilers associate performance metrics to executed instructions,
+functions, or calling context~\cite{oprofile,gprof, CCT}.
 Many research works are proposed to improve
-accuracy of profilers\cite{4Profilers, LagHunter, AppInsight} or
-to reduce runtime overhead\cite{AdaptiveBurst}
-or memory overhead of profilers\cite{HotCallingContext}.
-As we discussed earlier, profilers can only analyze one single execution,
-but fail to connect analysis results from different executions
-or to predict analysis results for inputs not seen before.
+accuracy of profilers~\cite{4Profilers, LagHunter, AppInsight}, or
+to reduce runtime overhead~\cite{AdaptiveBurst}
+and memory overhead of profilers~\cite{HotCallingContext}.
+However, traditional profilers can only analyze one single program run,
+while failing to connect results from multiple runs and failing to
+predict results for inputs not seen before.
 
-Aprof\cite{Aprof1, Aprof2} and AlgoProf\cite{AlgoProf} are existing
+
+Aprof~\cite{Aprof1, Aprof2} and AlgoProf~\cite{AlgoProf} are existing
 algorithmic profiling techniques.
-They infer cost functions for different code granularities
-using different input and cost metrics.
-We evaluate different input and cost metrics
-using real-world complexity problems in Section~\ref{sec:inhouse}.
-We significantly lower runtime overhead after applying sampling in Section~\ref{sec:online}.
-Different from existing techniques, \Tool can be deployed in production runs.
+As discussed in Section~\ref{sec:back},
+these two techniques suffer from three limitations. 
+\Tool enhances existing techniques through significantly 
+reducing runtime overhead and providing an effective ranking algorithm. 
+\Tool can accurately point out root causes 
+and can be deployed in production runs. 
 
-\noindent\textbf{Performance Bug Detection}
+
+
+\noindent\textbf{Performance Bug Detection.}
 There are many performance bug detectors.
 They leverage static or dynamic techniques to
 identify performance problems matching specific inefficiency
-patterns\cite{yufei-perf,CLARITY,xiao13:context,PerfBug,Alabama,CARAMEL,XuDataStructure,XuBloatPLDI2009,XuBloatPLDI2010,Cachetor,LoopInvariant,falsesharing}.
+patterns~\cite{yufei-perf,CLARITY,xiao13:context,PerfBug,Alabama,CARAMEL,XuDataStructure,XuBloatPLDI2009,XuBloatPLDI2010,Cachetor,LoopInvariant,falsesharing}.
 For some of them, their detected bugs overlap with complexity problems.
-For example, as we discussed in Section~\ref{sec:inhouse_exp},
+For example, as we discussed in Section~\ref{sec:eva},
 all detected performance bugs by Toddler are in $O(N^2)$ complexity.
 However, static detectors fail to provide any information
 about detected bugs' performance impact.
 Dynamic detectors usually incur more than $10\times$ runtime overhead,
 and can only be applied for in-house testing using testing inputs.
-Under production-run setting,
-\Tool will incur very small overhead and can be deployed in the users' side.
-Profiling results from \Tool can help developers better
-understand real-world workloads and diagnose performance failures caused by complexity problems.
+\Tool only incurs very small overhead and can be deployed in the users' side.
+Profiling results generated by \Tool can help developers better
+understand real-world workloads, 
+detect previously unknown complexity problems exposed under real-world workloads, 
+and diagnose performance failures caused by complexity problems.
 
 
-\noindent\textbf{Input Generation for Performance Testing}
-There are many test input generation techniques to expose performance problems\cite{WISE,EventBreak,slowfuzz}.
-%WISE\cite{WISE} generates inputs with small sizes firstly,
-%then uses these inputs to profile the program in order to learn how to restrict conditional branches,
-%and finally generates large inputs to expose worst-case complexity by using learned policies.
-%EventBreak\cite{EventBreak} generates inputs to identify
-%event handlers whose reaction time increases as the application is running.
-%SlowFuzz\cite{slowfuzz} generates inputs to expose worst-case complexity by using
-%resource-usage-guided evolutionary search.
+
+\noindent\textbf{Input Generation for Performance Testing.}
+There are many test input generation techniques to expose performance 
+problems~\cite{WISE,EventBreak,slowfuzz}.
+WISE~\cite{WISE} generates inputs with small sizes firstly,
+then uses these inputs to learn how to restrict conditional branches,
+and finally generates large inputs to expose worst-case complexity using learned policies.
+EventBreak~\cite{EventBreak} generates inputs to identify
+event handlers whose reaction time increases as the application is running.
+SlowFuzz~\cite{slowfuzz} generates inputs to expose worst-case complexity using
+resource-usage-guided evolutionary search.
 These input generation techniques are orthogonal to our work,
 and their generated inputs can be used to conduct algorithmic profiling.
+

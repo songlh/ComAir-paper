@@ -1,8 +1,19 @@
 \subsection{In-house Algorithmic Profiling}
 \label{sec:in-house}
 
+During in-house testing, \Tool profiles the whole program, 
+since runtime overhead is less of a concern. 
+Existing tests can be used to launch \Tool, 
+and test input generation techniques~\cite{KLEE,dart,s2e} 
+can be utilized to create more inputs.
+Execution information for the same code constructs 
+is automatically merged to infer code functions. 
+
+
 \commentty{need to discuss the usage scenario 
 of in-house profiling, e.g., what kinds of inputs are used.}
+
+\commentlh{addressed}
 
 In in-house profiling, we choose RMS as input metric 
 and BB as cost  metric. \commentty{Why is DSS discarded
