@@ -107,8 +107,8 @@ are more than 1 million lines of code.
 Our evaluated re-implemented bugs are in small to middle sizes, 
 ranging from 91 to 1094 lines of code. 
 The majority of bugs used in our experiments are in $O(N^2)$ complexity. 
-We also two benchmarks in $O(2^N)$ complexity, 
-and {\color{red}{XXX}} benchmarks in O(N) complexity.
+We also have two benchmarks in $O(2^N)$ complexity, 
+and two benchmarks in O(N) complexity.
 
 \subsubsection{Production-run and In-house Inputs}
 
@@ -116,30 +116,41 @@ and {\color{red}{XXX}} benchmarks in O(N) complexity.
 were used and how they were generated. SE people 
 are very picky about this kind of thing.}
 
-For production-run version of \Tool, the inputs
-are from real users. To obtain the inputs, 
 \commentty{how to obtain the inputs?}
-%For all benchmarks used in our experiment, 
-%their bug reports contain at least one bug-triggering input. 
-For 14 bugs, 
-the users explicitly explained how to change input sizes 
-to reproduce the described scaling problems 
-when they reported these bugs. 
-We follow the users' descriptions to generate new inputs. 
-For the other benchmarks, it is not difficult to figure out 
-how to generate new inputs based on the bad inputs in the bug reports,
-since the bad inputs contain repetitive patterns. 
-For example, when reporting GCC\#46401,
- the user provided a C file, 
-containing an expression with thousands of strings as operands. 
-We change the number of strings to generate new inputs. 
-For each benchmark, we choose the input sizes of the 10 inputs 
-to be an arithmetic sequence with the largest input 
-as the input from the bug report and the 
-smallest input size that is $1/10$ 
-of the largest input.
 
 \commentty{How were inputs generated for the in-house version?}
+
+\commentlh{addressed, but not good enough}
+
+
+For the production-run version of \Tool, the inputs
+are from real users. 
+To obtain suitable inputs for our evaluation, 
+we mainly leverage bug reports, 
+which contain detailed information about how real-world 
+users perceive the complexity problems. 
+For 14 bugs, 
+the users explicitly explained how to change input sizes 
+to reproduce the described scaling problems in the bug reports. 
+We follow the users' descriptions to create new inputs. 
+For the other bugs, their bug-triggering inputs provided 
+in the bug reports contain repetitive patterns, 
+so that it is not difficult for us to create new inputs.
+For example, when reporting GCC\#46401,
+the user provided a C file, 
+containing an expression with thousands of strings as operands. 
+We change the number of strings to create new inputs. 
+We use ten distinct inputs for each bug, 
+and we set their sizes 
+to be an arithmetic sequence with the largest input size
+equal to the input in the bug report and the 
+smallest input size equal to $1/10$ 
+of the largest input.
+We use the same inputs to evaluate the in-house version of \Tool. 
+
+
+
+
 
 \subsubsection{Experimental Settings}
 
