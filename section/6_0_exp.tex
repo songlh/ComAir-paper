@@ -19,7 +19,8 @@ in both production and in-house environments?
 {\bf RQ2:}
 How does the production-run version of \Tool 
 compare with the in-house version in terms of
-cost-effectiveness?
+%cost-effectiveness?
+\commentlh{accuracy}?
 
 \vspace*{3pt}
 \noindent
@@ -154,33 +155,61 @@ We use the same inputs to evaluate the in-house version of \Tool.
 
 \subsubsection{Experimental Settings}
 
-For each benchmark, we conduct algorithmic profiling on 10 program 
-runs with inputs on both production-run and in-house versions
-of \Tool, following the practice 
-in previous work~\cite{joy.asplos13,SongOOPSLA2014}.
-%
-After collecting a set of (input, cost) pairs for a code construct, 
-we first use the maximum cost to aggregate pairs with the same input size into one,
-because we want to infer the worst-case complexity.
-{\color{red} Todo: how do we infer cost function?}
+For each benchmark, we conduct algorithmic profiling on ten 
+program runs with ten distinct inputs, following the practice in 
+previous work~\cite{joy.asplos13,SongOOPSLA2014}.
+After collecting a set of (input, cost) pairs for a code construct,
+we keep the pair with largest cost for pairs with the same input size,
+because we want to infer worst-case complexity. 
 
-
-
-
-\commentty{
-Besides reporting the position of the rank, we should
-report the percentage to show how ``easy" the problem
-can be found: 
 
 To answer RQ1 (i.e., the effectiveness of  \Tool in identifying
 complexity problems), we measure the rank number (position) of code
 constructs contain complexity problems. We also use the rank number
 to compute the percentage of code constructs
 that need to be examined to find a performance bug in the program.
-This ranking strategy has been widely  adopted by existing fault localization 
+This ranking strategy has been widely adopted by existing fault localization 
 techniques~\cite{Jones05,Cleve05}.
+\commentlh{
+To evaluate the production-run version of \Tool,
+we instrument the top five loops with largest loop 
+iteration numbers under bug-triggering input to create five distinct program versions, 
+since instrumenting all loops is too time-consuming. 
+For benchmarks with less than five executed 
+loops during buggy runs, 
+we instrument all executed loops.  
+For the in-house version, since the whole program is profiled, 
+we rank all executed functions during buggy runs. 
 }
 
+\commentlh{
+To answer RQ2 (i.e., the accuracy of the production-run version of \Tool, 
+comparing with the in-house version),
+we calculate the $R^2$ value for the two groups of input sizes (and cost) reported by 
+the production-run version
+and the in-house version respectively.
+If the $R^2$ value is close to one, the two groups of input (or cost) 
+are in linear relationship and they will not change 
+the order of inferred cost function. 
+Given an evaluated benchmark, we conduct this experiment 
+on the minimum
+code construct containing the complexity problem.
+To understand whether sampling cause the production-run version of \Tool 
+to lose some accuracy, we also calculate the $R^2$ value for two groups 
+of input (and cost) reported by the production-run versions 
+under sampling rate 100 and sampling rate 1. 
+}
+
+\commentlh{
+To answer RQ3 (i.e., whether the production-run version of \Tool 
+can be really deployed in production runs), 
+we measure the runtime overhead for the program version 
+with the loop containing complexity problems instrumented. 
+As a contrast, we also measure the overhead for the in-house version of \Tool, 
+and the minimum of instrumented programs in order 
+to identify the complexity problem. 
+
+}
 
 
 
