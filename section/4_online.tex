@@ -433,7 +433,7 @@ we rank the one with larger observed cost higher.
 %\commentlh{addressed}
 
 To illustrate our ranking algorithm, suppose we have four profiling targets, 
-whose ids, complexity and ever observed largest costs are listed as follows:
+whose target ids (0 to 3), complexity and ever observed largest costs are listed as follows:
 (0, $O(n)$, 2000), (1, $O(n^2)$, 800), (2, $O(n^2)$, 1200), and (3, $O(n^2)$, 300).
 We also assume target 2 is an indirect caller of target 1 and target 3,
 and there is no caller-callee relationship between target 1 and target 3.
