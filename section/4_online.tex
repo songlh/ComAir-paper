@@ -43,9 +43,9 @@ code constructs), \emph{input metrics}, and \emph{cost metrics}.
 However, one finding (Implication 2) in our empirical study is 
 that all complexity problems are 
 caused either by a loop or a recursive function. 
-\commentty{Is ``ALL  complexity problems..." true? This is inconsistent
-with the data from implication 2.} 
-\commentlh{I changed the description of implication 2. }
+%\commentty{Is ``ALL  complexity problems..." true? This is inconsistent
+%with the data from implication 2.} 
+%\commentlh{I changed the description of implication 2. }
 Therefore, we consider code constructs related 
 to loops and recursive functions as profiling targets. 
 Distinct code constructs are instrumented by the production-run
@@ -115,8 +115,10 @@ or indirectly as profiling targets.
 We ignore loops whose iteration numbers are constant,
 since the execution of these loops does not scale with input 
 and cannot cause complexity problems.
-\commentlh{
-For each program version, we only instrument a small set of profiling targets.
+%\commentlh{
+
+For each program version, we only instrument a small set of profiling targets
+to reduce runtime overhead.
 Given a instrumented profiling target,
 its direct and indirect callees are also instrumented. 
 Therefore, we will not put code constructs with caller-callee 
@@ -125,11 +127,12 @@ If there are limited program versions we can distribute at the same time,
 we prioritize ``simple'' code constructs, such as 
 functions without callees and inner loops of nested loops,
 and we gradually select more ``complex'' code constructs along call chains, 
-if we cannot find complexity problems inside simple code constructs.}
-\commentty{The question is how to select profiling
-targets for different versions? I assume you do not 
-instrument ALL loops or recursive functions
-for every version.}
+if we cannot find complexity problems inside simple code constructs.
+%}
+%\commentty{The question is how to select profiling
+%targets for different versions? I assume you do not 
+%instrument ALL loops or recursive functions
+%for every version.}
 
 
 
@@ -159,11 +162,11 @@ We then analyze tracing log offline to calculate RMS.
 
 In order to reduce the number of \texttt{read} 
 and \texttt{write} instructions
-to be instrumented, we propose two optimizations. 
-The first one works as follows. 
+to be instrumented, we propose two optimization algorithms. 
+The first algorithm works as follows. 
 If a write on a memory cell happens earlier, 
 following read on the same memory cell will not increase RMS,
-since RMS only count memory cells whose first access is read.
+since RMS only counts memory cells whose first access is read.
 Similarly, if a read on a memory cell happens earlier,
 following read on the same memory cell will not increase RMS either,
 since RMS only considers distinct memory cells. 
@@ -176,28 +179,29 @@ We focus on stack memory cells that hold scalar variables
 and only have read and write as uses 
 (i.e., not having ``address of'' as uses), 
 so that alias analysis is avoided. 
-\commentlh{
-For example, there are four reads on variable \texttt{p} inside 
-the loop in Figure~\ref{fig:mysql27287}, two are at 
+In the example of Figure~\ref{fig:mysql27287},
+suppose there are four reads on variable \texttt{p} inside 
+the loop --- two are at 
 line 7 (``\texttt{p>=items}'' and ``\texttt{p--}''), 
-and the other two are at line 8. 
-There is one write on \texttt{p} (``\texttt{p--}'').
-Variable \texttt{p} satisfies the requirement of our optimization. 
-Since ``\texttt{p>=items}'' is conducted in the loop header 
-and it dominates all other accesses,
+and the other two are at line 8 and 
+there is one write on \texttt{p} (``\texttt{p--}'').
+In this case, variable \texttt{p} meets the requirement of the optimization,
+because ``\texttt{p>=items}'' is conducted in the loop header 
+and it dominates all other accesses. Therefore, 
 we only need to instrument the read access inside ``\texttt{p>=items}''.
-}
 
-\commentlh{
-For the second optimization, if a read or a write is conducted inside a loop and 
+
+%\commentlh{
+For the second optimization algorithm, if a read or a write is conducted inside a loop and 
 the accessed address is not changed across different loop iterations,
-we promote the instrumentation to the loop preheader, 
+we promote the instrumentation to the loop pre-header, 
 instead of recording the accessed address in every iteration. 
-For example, the address of variable \texttt{p} is not changed 
-inside the loop in Figure~\ref{fig:mysql27287}.
+For example, in Figure~\ref{fig:mysql27287}, 
+the address of variable \texttt{p} is not changed 
+inside the loop.
 Therefore, we can record the value of \texttt{p} in the loop's 
 preheader for ``\texttt{p>=items}''.
-}
+%}
 
 \noindent{\underline{\textit{Cost metric.}}
 When counting the executed basic blocks (BBs) to compute cost metric,
@@ -218,25 +222,26 @@ profiling efficiently~\cite{path-profiling,peter-ase}.
 However, the original algorithm cannot be
 directly adopted in our case because it is designed
 to count edge events, not BB events.  
-Instead, \Tool firstly splits 
+To address this problem, \Tool firstly splits 
 each monitored BB into two, 
-and monitored BBs include BBs inside profiling targets 
+and the monitored BBs include BBs inside profiling targets 
 and BBs inside functions called from profiling targets.
-Then, \Tool labels the event number to be one for 
+Then, \Tool labels the event number as ``1" for 
 edges connecting a pair of split BBs, 
-leaving the event number as zero for other edges. 
+leaving the event number as ``0" for other edges. 
 After that, applying the algorithm~\cite{event-counting}
 can inform \Tool  where to update 
 the counter and how to update the counter.
-\commentlh{
-For example, 
+%\commentlh{
+For example, in Figure~\ref{fig:mysql27287}
 there are in total six basic blocks inside 
-the loop in Figure~\ref{fig:mysql27287},
+the loop,
 but \Tool only instruments five basic blocks, instead of six. 
+\commentty{need a bit explanation why five is needed not six.}
 As another example, there are 141 basic blocks 
 inside function \texttt{mult\_alg()} in Figure~\ref{fig:gcc27733}, 
 while \Tool only instruments 78 of them. 
-}
+%}
 
 \subsubsection{Approximation of Input Metric}
 
@@ -389,9 +394,9 @@ simply attribute complexity to each function,
 without providing any future analysis. 
 Therefore, they fail to identify root causes for 
 performance failures caused by complexity problems. 
-\commentty{Does \Tool rank functions or code constructs?
-We have been measuring costs for code constructs...}
-\commentlh{addressed.}
+%\commentty{Does \Tool rank functions or code constructs?
+%We have been measuring costs for code constructs...}
+%\commentlh{addressed.}
 
 To address this problem, we design a ranking algorithm 
 with the goal to identify root-cause code constructs.
@@ -415,18 +420,17 @@ and profiling targets with linear complexity lowest.
 For profiling targets within the same group, 
 we then compute caller-callee relationship using static analysis and tracing logs.
 Since we record instructions' ids, tracing logs can help us solve function pointers. 
-\commentty{How are tracing logs utilized?}
-\commentlh{addressed.}
 If there is direct or indirect caller-callee relationship 
 between profiling target \texttt{A}
 and profiling target \texttt{B}, we rank \texttt{B} higher than \texttt{A}.
+\commentty{need a bit explanation on why the caller-callee relationship matters.}
 If there is no caller-callee relationship,
 we rank the one with larger observed cost higher.
 
 
-\commentty{How to rank two functions with different complexities? What
-about linear complexity?}
-\commentlh{addressed}
+%\commentty{How to rank two functions with different complexities? What
+%about linear complexity?}
+%\commentlh{addressed}
 
 To illustrate our ranking algorithm, suppose we have four profiling targets, 
 whose ids, complexity and ever observed largest costs are listed as follows:
@@ -435,7 +439,7 @@ We also assume target 2 is an indirect caller of target 1 and target 3,
 and there is no caller-callee relationship between target 1 and target 3.
 According to our algorithm, 
 we rank the four profiling targets as 1, 3, 2, and 0. 
-Targets 1, 2 and 3 have higher complexity than target 1, 
+Targets 1, 2 and 3 have higher complexity than target 0, 
 so that these three are ranked higher.
 Target 2 is has caller-callee relationship with targets 1 and 3,
 and thus it is ranked lower. 
@@ -443,8 +447,8 @@ Target 1 has larger cost than target 3, so that it is ranked as No. 1.
 
 
 
-\commentty{If we have time, section 4.2 can be expanded, since
-we claim it as one of our contributions. The current version is a bit short. 
-Use a concrete example might help, e.g., ``suppose there four code constructs
-with different cost functions...".  }
-\commentlh{addressed}
+%\commentty{If we have time, section 4.2 can be expanded, since
+%we claim it as one of our contributions. The current version is a bit short. 
+%Use a concrete example might help, e.g., ``suppose there four code constructs
+%with different cost functions...".  }
+%\commentlh{addressed}
