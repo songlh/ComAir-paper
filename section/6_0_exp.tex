@@ -108,8 +108,9 @@ are more than 1 million lines of code.
 Our evaluated re-implemented bugs are in small to middle sizes, 
 ranging from 91 to 1094 lines of code. 
 The majority of bugs used in our experiments are in $O(N^2)$ complexity. 
-We also have two benchmarks in $O(2^N)$ complexity, 
-and two benchmarks in O(N) complexity.
+We also have two bugs in $O(2^N)$ complexity, 
+and two bugs in O(N) complexity.
+
 
 \subsubsection{Production-run and In-house Inputs}
 
@@ -141,7 +142,7 @@ For example, when reporting GCC\#46401,
 the user provided a C file, 
 containing an expression with thousands of strings as operands. 
 We change the number of strings to create new inputs. 
-We use ten distinct inputs for each bug, 
+We create ten distinct inputs for each bug, 
 and we set their sizes 
 to be an arithmetic sequence with the largest input size
 equal to the input in the bug report and the 
@@ -153,14 +154,17 @@ We use the same inputs to evaluate the in-house version of \Tool.
 
 
 
+
 \subsubsection{Experimental Settings}
 
 For each benchmark, we conduct algorithmic profiling on ten 
-program runs with ten distinct inputs, following the practice in 
+program runs with the ten distinct inputs for both production-run 
+and in-house versions of \Tool, following the practice in 
 previous work~\cite{joy.asplos13,SongOOPSLA2014}.
 After collecting a set of (input, cost) pairs for a code construct,
-we keep the pair with largest cost for pairs with the same input size,
-because we want to infer worst-case complexity. 
+we only keep the pair with largest cost for pairs with the same input size,
+since we want to infer the worst-case complexity.
+We use $1/100$ as default sampling rate for the production-run version of \Tool.
 
 
 To answer RQ1 (i.e., the effectiveness of  \Tool in identifying
@@ -173,41 +177,50 @@ techniques~\cite{Jones05,Cleve05}.
 \commentlh{
 To evaluate the production-run version of \Tool,
 we instrument the top five loops with largest loop 
-iteration numbers under bug-triggering input to create five distinct program versions, 
+iteration numbers under the bug-triggering input 
+to create five distinct program versions, 
 since instrumenting all loops is too time-consuming. 
 For benchmarks with less than five executed 
 loops during buggy runs, 
 we instrument all executed loops.  
 For the in-house version, since the whole program is profiled, 
-we rank all executed functions during buggy runs. 
-}
+we rank all executed functions during buggy runs.}
+
 
 \commentlh{
-To answer RQ2 (i.e., the accuracy of the production-run version of \Tool, 
-comparing with the in-house version),
-we calculate the $R^2$ value for the two groups of input sizes (and cost) reported by 
+To answer RQ2 (i.e., the accuracy of the production-run version of \Tool),
+besides reporting inferred cost functions,
+we also compute $R^2$ value~\cite{rsquare} for 
+the two groups of input sizes (and cost values) reported by 
 the production-run version
-and the in-house version respectively.
-If the $R^2$ value is close to one, the two groups of input (or cost) 
-are in linear relationship and they will not change 
-the order of inferred cost function. 
-Given an evaluated benchmark, we conduct this experiment 
-on the minimum
-code construct containing the complexity problem.
-To understand whether sampling cause the production-run version of \Tool 
-to lose some accuracy, we also calculate the $R^2$ value for two groups 
-of input (and cost) reported by the production-run versions 
-under sampling rate 100 and sampling rate 1. 
+and the in-house version.
+If $R^2$ value is close to one~\cite{rsquare-value}, 
+the two groups of input sizes (or cost values) 
+are in strong linear relationship and 
+replacing one with the other will not change 
+the order of an inferred cost function. 
+For each evaluated benchmark, 
+we choose the two groups of input sizes (and cost) reported
+when profiling the minimum code constructs that 
+the production-run version 
+and the in-house version can report the corresponding complexity problem. 
+To better understand how sampling influences the accuracy,
+we also compute $R^2$ value for two groups 
+of input sizes (and cost values) reported by the production-run version 
+of \Tool configured 
+with sampling rate as $1/100$ and $1$. 
 }
 
 \commentlh{
-To answer RQ3 (i.e., whether the production-run version of \Tool 
-can be really deployed in production runs), 
-we measure the runtime overhead for the program version 
-with the loop containing complexity problems instrumented. 
-As a contrast, we also measure the overhead for the in-house version of \Tool, 
-and the minimum of instrumented programs in order 
-to identify the complexity problem. 
+To answer RQ3 (i.e., whether the runtime overhead of \Tool), 
+we measure the runtime overhead when the loop containing the complexity problem 
+is instrumented. 
+As a contrast, we also measure the overhead for the in-house version of \Tool.
+Since the in-house version of \Tool profiles the whole program, 
+to compare the overhead more fairly, we also measure 
+the runtime overhead for the in-house version of \Tool with 
+the minimum code to be instrumented in order to identify 
+the corresponding complexity problem. 
 
 }
 
