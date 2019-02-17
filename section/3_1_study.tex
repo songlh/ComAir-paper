@@ -7,7 +7,7 @@ We categorize complexity problems based on their complexity types.
 We then study complexity problems in each type from the following three aspects:
 1) what are their root causes\footnote{We refer root causes as code constructs 
 conducting the inefficient computation, 
-following previous works in this area\cite{SongOOPSLA2014,ldoctor}.};
+following previous works in this area~\cite{SongOOPSLA2014,ldoctor}.};
 2) how they generate user-perceived slowdown;
 3) how they are fixed by developers. 
 Table~\ref{tab:study} shows the results. 
@@ -16,7 +16,7 @@ Table~\ref{tab:study} shows the results.
 As shown in Table~\ref{tab:study}, 
 7 out of \ComBugs studied complexity problems are in linear complexity. 
 All of them are caused by a buggy loop, 
-whose iteration number scales in terms of input size $N$.
+whose iteration number scales with input size $N$.
 
 Five of them are characterized by buggy loops that contain serialized I/O operations.
 Users could perceive these bugs, 
@@ -44,8 +44,8 @@ including both used ones and free ones.
 The buggy loop iterates the linked list and looks for a free entry.
 During performance failure runs, 
 many table entries are used and the buggy loop must iterate excessively to find a free entry.
-To fix this bug, MySQL developers simply separate used entries and free entries,
-and keep them in two separated linked lists. 
+To fix this bug, MySQL developers simply separate used entries and free entries 
+into two separated linked lists. 
 
 
 \noindent{\underline{\textit{$O(N^k)$: polynomial complexity (k>1).}}}
@@ -53,7 +53,7 @@ As shown in Table~\ref{tab:study},
 more than half of the studied complexity bugs are in polynomial complexity. 
 Similar to the bugs in linear complexity,
 the polynomial complexity is also caused by a buggy loop.
-However, {\bf both} of the loop execution number 
+However, {\bf both} the loop execution number 
 and the average loop iteration number
 scale as input size $N$.
 
@@ -71,7 +71,7 @@ and completely remove the buggy loop shown in Figure~\ref{fig:mysql27287}.
 How the execution time changes after patching for MySQL\#27287 is 
 shown in Figure~\ref{fig:mysql27287-time}. 
 
-To fix the other bugs (5/19) in this category,
+To fix the other bugs (5/19),
 developers reduce workloads processed by the loops scaling polynomially, 
 instead of changing the loops directly.
 The buggy code fragment of Apache\#34464 is shown in Figure~\ref{fig:apache34464}.
@@ -86,7 +86,7 @@ scale polynomially in terms of the number of characters returned from \texttt{ge
 After fixing this bug, the inner loop will only check the most recent \texttt{tgtLen} characters.
 The developers do not change the inner loop, 
 while reducing the workload it processes.   
-How execution time scales before and after patching for 
+How execution time scales after patching for 
 this bug is shown in Figure~\ref{fig:apache34464-time}.
 
 
@@ -116,9 +116,11 @@ However, there is a type declaration error inside the hash table entry,
 and this error causes \texttt{t} larger than the maximum unsigned integer to never hit cache.
 For large \texttt{t}, \texttt{mult\_alg} is still in exponential complexity. 
 After fixing the type declaration error, 
-memoization is enabled for large \texttt{t}. 
-How the complexity changes after patching for 
-GCC\#27733 is shown in Figure~\ref{fig:gcc27733-time}.
+After fixing the type declaration error, 
+memoization is enabled for large \texttt{t}, 
+as shown in Figure~\ref{fig:gcc27733-time}.
+%How the complexity changes after patching for 
+%GCC\#27733 is shown in Figure~\ref{fig:gcc27733-time}.
 
 GCC\#32540 is in exponential complexity and it is caused by an inefficient loop. 
 The loop applies an iterative algorithm to implement a compiler optimization. 
