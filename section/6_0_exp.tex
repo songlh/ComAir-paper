@@ -63,14 +63,14 @@ We implement \Tool using LLVM-5.0.0~\cite{llvm}.
 All our experiments are conducted on a Linux machine, 
 with Intel Xeon(R) 4110 CPU and 3.10.0 kernel.
 
-We will release all our source code, experimental scripts 
-and used benchmarks in the future. 
+%We will release all our source code, experimental scripts 
+%and used benchmarks in the future. 
 
 
-\commentty{Can we mention \Tool and datasets 
-are publicly  available?}
+%\commentty{Can we mention \Tool and datasets 
+%are publicly  available?}
 
-\commentlh{addressed}
+%\commentlh{addressed}
 
 \subsubsection{Benchmarks}
 
@@ -114,21 +114,10 @@ and two bugs in O(N) complexity.
 
 \subsubsection{Production-run and In-house Inputs}
 
-\commentty{We'd better clarify what  inputs
-were used and how they were generated. SE people 
-are very picky about this kind of thing.}
-
-\commentty{how to obtain the inputs?}
-
-\commentty{How were inputs generated for the in-house version?}
-
-\commentlh{addressed, but not good enough}
-
-
-For the production-run version of \Tool, the inputs
-are from real users. 
-To obtain suitable inputs for our evaluation, 
-we mainly leverage bug reports, 
+For the production-run version of \Tool, we create 10 distinct inputs
+for each of the 38 benchmarks by simulating real user inputs. 
+\commentty{people may ask why 10?}
+To obtain such inputs, we use bug reports, 
 which contain detailed information about how real-world 
 users perceive the complexity problems. 
 For 14 bugs, 
@@ -142,14 +131,15 @@ For example, when reporting GCC\#46401,
 the user provided a C file, 
 containing an expression with thousands of strings as operands. 
 We change the number of strings to create new inputs. 
-We create ten distinct inputs for each bug, 
+Finally, we create ten distinct inputs for each bug, 
 and we set their sizes 
 to be an arithmetic sequence with the largest input size
 equal to the input in the bug report and the 
 smallest input size equal to $1/10$ 
 of the largest input.
 We use the same inputs to evaluate the in-house version of \Tool. 
-
+\commentty{Is it because by using the same inputs, we can compare
+the overheads between the two versions?}
 
 
 
@@ -169,61 +159,60 @@ We use $1/100$ as default sampling rate for the production-run version of \Tool.
 
 To answer RQ1 (i.e., the effectiveness of  \Tool in identifying
 complexity problems), we measure the rank number (position) of code
-constructs contain complexity problems. We also use the rank number
+constructs containing complexity problems. We also use the rank number
 to compute the percentage of code constructs
 that need to be examined to find a performance bug in the program.
 This ranking strategy has been widely adopted by existing fault localization 
 techniques~\cite{Jones05,Cleve05}.
-\commentlh{
+%\commentlh{
 To evaluate the production-run version of \Tool,
 we instrument the top five loops with largest loop 
-iteration numbers under the bug-triggering input 
-to create five distinct program versions, 
-since instrumenting all loops is too time-consuming. 
+iteration numbers under bug-triggering input to create five distinct program versions, 
+since instrumenting all loops is expensive. 
 For benchmarks with less than five executed 
 loops during buggy runs, 
 we instrument all executed loops.  
 For the in-house version, since the whole program is profiled, 
-we rank all executed functions during buggy runs.}
+we rank all executed functions during buggy runs. 
+%}
 
-
-\commentlh{
-To answer RQ2 (i.e., the accuracy of the production-run version of \Tool),
-besides reporting inferred cost functions,
-we also compute $R^2$ value~\cite{rsquare} for 
-the two groups of input sizes (and cost values) reported by 
+%\commentlh{
+To answer RQ2 (i.e., the accuracy of the production-run version of \Tool, 
+comparing with the in-house version),
+we calculate the $R^2$ value for the two groups of input sizes (and cost) reported by 
 the production-run version
-and the in-house version.
-If $R^2$ value is close to one~\cite{rsquare-value}, 
-the two groups of input sizes (or cost values) 
-are in strong linear relationship and 
-replacing one with the other will not change 
-the order of an inferred cost function. 
-For each evaluated benchmark, 
-we choose the two groups of input sizes (and cost) reported
-when profiling the minimum code constructs that 
-the production-run version 
-and the in-house version can report the corresponding complexity problem. 
-To better understand how sampling influences the accuracy,
-we also compute $R^2$ value for two groups 
-of input sizes (and cost values) reported by the production-run version 
-of \Tool configured 
-with sampling rate as $1/100$ and $1$. 
-}
+and the in-house version respectively.
+\commentty{Need to explain what $R^2$ is and how it is computed.}
+If the $R^2$ value is close to one, the two groups of inputs (or costs) 
+are in linear relationship and they will not change 
+the order of the inferred cost function. 
+\commentty{It is not clear here why $R^2$ can reflect the comparison
+of the accuracy between the two versions.}
+Given an evaluated benchmark, we conduct this experiment 
+on the minimum
+code construct containing the complexity problem.
+\commentty{what do you mean by ``minimum code construct"?}
+To understand whether the optimization methods
+(Section ???) cause the production-run version of \Tool 
+to lose some accuracy, we also calculate the $R^2$ value for two groups 
+of inputs (and costs) reported by the production-run versions 
+under sampling rate 100 and sampling rate 1. 
+\commentty{people may ask why 100 and 1 are chosen.}
+%}
 
-\commentlh{
-To answer RQ3 (i.e., whether the runtime overhead of \Tool), 
-we measure the runtime overhead when the loop containing the complexity problem 
-is instrumented. 
-As a contrast, we also measure the overhead for the in-house version of \Tool.
-Since the in-house version of \Tool profiles the whole program, 
-to compare the overhead more fairly, we also measure 
-the runtime overhead for the in-house version of \Tool with 
-the minimum code to be instrumented in order to identify 
-the corresponding complexity problem. 
-
-}
-
+%\commentlh{
+To answer RQ3 (i.e., whether the production-run version of \Tool 
+can be really deployed in production runs), 
+we measure the runtime overhead for the program version 
+with the loop containing complexity problems instrumented. 
+\commentty{not sure why this can be used to measure if the production-version
+can be deployed...I thought we should measure the overhead of the instrumented version
+vs the non-instrumented version?}
+As a contrast, we also measure the overhead for the in-house version of \Tool, 
+and the minimum of instrumented programs in order 
+to identify the complexity problem.  \commentty{what do we need to
+care about the in-house version for this RQ?}
+%}
 
 
 \subsection{Limitations and Threats to Validity}
