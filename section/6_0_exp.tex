@@ -108,8 +108,9 @@ are more than 1 million lines of code.
 Our evaluated re-implemented bugs are in small to middle sizes, 
 ranging from 91 to 1094 lines of code. 
 The majority of bugs used in our experiments are in $O(N^2)$ complexity. 
-We also have two benchmarks in $O(2^N)$ complexity, 
-and two benchmarks in O(N) complexity.
+We also have two bugs in $O(2^N)$ complexity, 
+and two bugs in O(N) complexity.
+
 
 \subsubsection{Production-run and In-house Inputs}
 
@@ -130,7 +131,7 @@ For example, when reporting GCC\#46401,
 the user provided a C file, 
 containing an expression with thousands of strings as operands. 
 We change the number of strings to create new inputs. 
-Finally, we use ten distinct inputs for each bug, 
+Finally, we create ten distinct inputs for each bug, 
 and we set their sizes 
 to be an arithmetic sequence with the largest input size
 equal to the input in the bug report and the 
@@ -143,14 +144,17 @@ the overheads between the two versions?}
 
 
 
+
 \subsubsection{Experimental Settings}
 
 For each benchmark, we conduct algorithmic profiling on ten 
-program runs with ten distinct inputs, following the practice in 
+program runs with the ten distinct inputs for both production-run 
+and in-house versions of \Tool, following the practice in 
 previous work~\cite{joy.asplos13,SongOOPSLA2014}.
 After collecting a set of (input, cost) pairs for a code construct,
-we keep the pair with largest cost for pairs with the same input size,
-because we want to infer worst-case complexity. 
+we only keep the pair with largest cost for pairs with the same input size,
+since we want to infer the worst-case complexity.
+We use $1/100$ as default sampling rate for the production-run version of \Tool.
 
 
 To answer RQ1 (i.e., the effectiveness of  \Tool in identifying
@@ -209,7 +213,6 @@ and the minimum of instrumented programs in order
 to identify the complexity problem.  \commentty{what do we need to
 care about the in-house version for this RQ?}
 %}
-
 
 
 \subsection{Limitations and Threats to Validity}
