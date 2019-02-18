@@ -86,7 +86,7 @@ Among the 17 reproduced bugs, six are from
 original Java or JS programs, 
 and we re-implement them using C/C++.
 The reason is that our current implementation of \Tool 
-only supports on C/C++ programs.
+only supports C/C++ programs.
 Our re-implementation is based on our thorough 
 understanding of these complexity problems.
 In our re-implementation, we maintain 
@@ -108,14 +108,17 @@ are more than 1 million lines of code.
 Our evaluated re-implemented bugs are in small to middle sizes, 
 ranging from 91 to 1094 lines of code. 
 The majority of bugs used in our experiments are in $O(N^2)$ complexity. 
-We also have two bugs in $O(2^N)$ complexity, 
-and two bugs in O(N) complexity.
+We also have two bugs in $O(2^N)$ complexity 
+and two in O(N) complexity.
 
 
 \subsubsection{Production-run and In-house Inputs}
 
-For the production-run version of \Tool, we create 10 distinct inputs
-for each of the 38 benchmarks by simulating real user inputs. 
+\commentlh{
+For the production-run version of \Tool, we create inputs used in our evaluation
+by simulating real user inputs.
+For each of the 38 benchmarks, we create ten distinct inputs, 
+following previous practice in evaluating statistical debugging~\cite{joy.asplos13,SongOOPSLA2014}.} 
 \commentty{people may ask why 10?}
 To obtain such inputs, we use bug reports, 
 which contain detailed information about how real-world 
@@ -137,9 +140,13 @@ to be an arithmetic sequence with the largest input size
 equal to the input in the bug report and the 
 smallest input size equal to $1/10$ 
 of the largest input.
-We use the same inputs to evaluate the in-house version of \Tool. 
+We use the same inputs to evaluate the in-house version of \Tool
+\commentlh{to fairly compare accuracy and runtime 
+overhead between the two versions of \Tool.}
 \commentty{Is it because by using the same inputs, we can compare
 the overheads between the two versions?}
+
+
 
 
 
