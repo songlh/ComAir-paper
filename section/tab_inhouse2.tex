@@ -1,0 +1,41 @@
+\begin{table*}[h!]
+  \centering
+  \scriptsize
+  {
+  \newcommand{\Yes}[1]{\checkmark{}$_#1$}
+  \newcommand{\No}[0]{-}
+  %\resizebox{\textwidth}{70mm}
+  {
+  \begin{tabular}{lccc|ccccccc|cc}
+    \toprule
+        & \multicolumn{3}{c}{Benchmark Information} & \multicolumn{7}{c}{Production-run Version} & \multicolumn{2}{c}{In-house Version}   \\
+
+    \cmidrule(lr){2-4}
+    \cmidrule(lr){5-11}
+    \cmidrule(lr){12-13}
+    {BugID} & {KLOC} & {P. L.} & {Comp.} & {Ranking} & $R^2$-Input  & $R^2$-Cost & $R^2$-Input    & $R^2$-Input       & Cost     & {Overhead} & {Ranking} & {Overhead}  \\
+                &            &             &             &               & \tiny{P-vs.-I} & \tiny{P-vs.-I} & \tiny{100-vs.-1} & \tiny{100-vs.-1}   & Function &            &  & \\
+    \midrule
+
+    \bottomrule
+   \end{tabular}
+   }
+   }
+  %\nocaptionrule
+  \vspace{0.1in}
+   \mycaption{tab:benchmark_info}{Benchmark Information and evaluation results for \Tool.}
+   {In the ``Benchmark Information'' columns,
+   $x^*$: $x$ thousands of lines of code for re-implemented benchmarks;
+   Buggy C. C.: buggy code construct;
+   L.: Loop; 
+   F.: Lunction.
+   In the ``In-house Experiments''columns,
+   $x_{y}$: the root-cause function is ranked as $x$th in $y$ 
+   functions with the same or higher order of complexity as \texttt{main} function;
+   Max Overhead: runtime overhead when the whole program is instrumented;
+   Min Overhead: runtime overhead when only the root-cause function and all its callees are instrumented.
+   In the ``Production-run Experiments'' columns, 
+   }
+  %\label{tab:benchmark_info}
+\vspace{-0.15in}
+\end{table*}
