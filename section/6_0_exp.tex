@@ -155,13 +155,17 @@ the overheads between the two versions?}
 \subsubsection{Experimental Settings}
 
 For each benchmark, we conduct algorithmic profiling on ten 
-program runs with the ten distinct inputs for both production-run 
-and in-house versions of \Tool, following the practice in 
-previous work~\cite{joy.asplos13,SongOOPSLA2014}.
+program runs with the ten distinct inputs for the two
+versions of \Tool, following the practice in 
+previous works~\cite{joy.asplos13,SongOOPSLA2014}.
 After collecting a set of (input, cost) pairs for a code construct,
 we only keep the pair with largest cost for pairs with the same input size,
 since we want to infer the worst-case complexity.
-We use $1/100$ as default sampling rate for the production-run version of \Tool.
+We use $1/100$ as default sampling rate for 
+the production-run version of \Tool, 
+which is also the default sampling rate 
+in previous works on statistical debugging~\cite{liblit03,CCI,ldoctor}.
+
 
 
 To answer RQ1 (i.e., the effectiveness of  \Tool in identifying
@@ -173,8 +177,9 @@ This ranking strategy has been widely adopted by existing fault localization
 techniques~\cite{Jones05,Cleve05}.
 %\commentlh{
 To evaluate the production-run version of \Tool,
-we instrument the top five loops with largest loop 
-iteration numbers under bug-triggering input to create five distinct program versions, 
+we instrument the top five loops with the largest loop 
+iteration numbers under bug-triggering inputs to 
+create five distinct program versions, 
 since instrumenting all loops is expensive. 
 For benchmarks with less than five executed 
 loops during buggy runs, 
@@ -183,42 +188,58 @@ For the in-house version, since the whole program is profiled,
 we rank all executed functions during buggy runs. 
 %}
 
-%\commentlh{
-To answer RQ2 (i.e., the accuracy of the production-run version of \Tool, 
-comparing with the in-house version),
-we calculate the $R^2$ value for the two groups of input sizes (and cost) reported by 
-the production-run version
-and the in-house version respectively.
+To answer RQ2 (i.e., the accuracy of the production-run version of \Tool),
+we calculate the $R^2$ value~\cite{rsquare} 
+for the two groups of input sizes (and costs) reported by 
+the two versions of \Tool.
+\commentlh{
+$R^2$ represents how well one variable can be predicted by another variable,
+and a $R^2$ value close to one means the two variables are 
+in strong linear relationship~\cite{rsquare-value}.
+Therefore, if the computed $R^2$ values for input sizes and costs
+are both close to one,
+the inferred two cost functions by the two versions must be in the same order, 
+which means the production-run version is as accurate as the in-house version, 
+and both sampling and other designed approximation (Section~\ref{sec:opt}) do not hurt accuracy. 
+}
 \commentty{Need to explain what $R^2$ is and how it is computed.}
-If the $R^2$ value is close to one, the two groups of inputs (or costs) 
-are in linear relationship and they will not change 
-the order of the inferred cost function. 
 \commentty{It is not clear here why $R^2$ can reflect the comparison
 of the accuracy between the two versions.}
-Given an evaluated benchmark, we conduct this experiment 
-on the minimum
-code construct containing the complexity problem.
+
+Due to the difference in profiling granularities and algorithms 
+(e.g. whether different dynamic instances in one program run are merged), 
+given a bug in $O(N)$ complexity, 
+we apply the production-run version on the buggy loop, 
+and apply the in-house version on the function containing the buggy loop. 
+Given a bug in $O(N^2)$ complexity, we apply the production-run version on the inner loop, 
+while applying the in-house version on the function containing the outer loop. 
+The two bugs in $O(N^2)$ complexity are both caused by recursive functions.
+We apply the two versions on the recursive function for each bug. 
 \commentty{what do you mean by ``minimum code construct"?}
-To understand whether the optimization methods
-(Section ???) cause the production-run version of \Tool 
+\commentlh{removed}
+To understand whether sampling
+causes the production-run version of \Tool 
 to lose some accuracy, we also calculate the $R^2$ value for two groups 
 of inputs (and costs) reported by the production-run versions 
-under sampling rate 100 and sampling rate 1. 
+under sampling rate $1/100$ and sampling rate $1$,
+since $1/100$ is our default sampling rate and $1$ means disable sampling. 
 \commentty{people may ask why 100 and 1 are chosen.}
-%}
+\commentlh{addressed}
+
 
 %\commentlh{
 To answer RQ3 (i.e., whether the production-run version of \Tool 
 can be really deployed in production runs), 
 we measure the runtime overhead for the program version 
-with the loop containing complexity problems instrumented. 
+with the buggy loop instrumented, compared with non-instrumented version. 
+We run each version ten times and compute the overhead based by average execution time. 
 \commentty{not sure why this can be used to measure if the production-version
 can be deployed...I thought we should measure the overhead of the instrumented version
 vs the non-instrumented version?}
-As a contrast, we also measure the overhead for the in-house version of \Tool, 
-and the minimum of instrumented programs in order 
-to identify the complexity problem.  \commentty{what do we need to
+\commentlh{not sure whether I answered your question.}
+\commentty{what do we need to
 care about the in-house version for this RQ?}
+\commentlh{removed}
 %}
 
 
