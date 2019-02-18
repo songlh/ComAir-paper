@@ -199,7 +199,7 @@ instead of recording the accessed address in every iteration.
 For example, in Figure~\ref{fig:mysql27287}, 
 the address of variable \texttt{p} is not changed 
 inside the loop.
-Therefore, we can record the value of \texttt{p} in the loop's 
+Therefore, we can record the address of \texttt{p} in the loop's 
 preheader for ``\texttt{p>=items}''.
 %}
 
@@ -213,7 +213,7 @@ instrument part of basic blocks.
 
 Our algorithm leverages the previous
 work on counting 
-edge~\footnote{An edge on CFG represents a jump from 
+edge\footnote{An edge on CFG represents a jump from 
 one basic block to another basic block.} 
 events through selectively 
 instrumenting counter update sites on control flow graphs (CFGs)~\cite{event-counting},
@@ -234,11 +234,15 @@ can inform \Tool  where to update
 the counter and how to update the counter.
 %\commentlh{
 For example, in Figure~\ref{fig:mysql27287}
-there are in total six basic blocks inside 
+there are in total six BBs inside 
 the loop,
-but \Tool only instruments five basic blocks, instead of six. 
+\commentlh{
+but \Tool only instruments five of them and 
+updates the counter by two for one BB and by one for the other four BBs,
+instead of updating the counter by one for all the six BBs.
+}
 \commentty{need a bit explanation why five is needed not six.}
-As another example, there are 141 basic blocks 
+As another example, there are 141 BBs 
 inside function \texttt{mult\_alg()} in Figure~\ref{fig:gcc27733}, 
 while \Tool only instruments 78 of them. 
 %}
@@ -257,7 +261,7 @@ we use the DSS as input metric.
 To apply the approximation, we are facing two challenges. 
 The first one is to \emph{identify array-processing loops}.
 To address this, given a loop, we analyze all pointer usage inside the loop. 
-If a pointer is deferenced in every iteration of a loop, 
+If a pointer is deferenced in every iteration of the loop, 
 and its value is also increased or decreased by 
 an integer number in every iteration,
 we consider the pointer points to array elements and 
@@ -302,7 +306,7 @@ We also consider the loop is a linked-list-processing loop.
 
 %\commentty{Again, sampling what?}
 
-Previous work~\cite{liblit03,liblit05,CCI,SongOOPSLA2014,ldoctor}
+Previous works~\cite{liblit03,liblit05,CCI,SongOOPSLA2014,ldoctor}
 demonstrate that sampling can greatly 
 reduce overhead for dynamic techniques,
 while still preserving their desired 
@@ -319,15 +323,14 @@ and infer the whole input size and cost for all instances in the same run.
 
 How we do sampling is similar to what is described in previous works 
 on statistical debugging~\cite{liblit03,liblit05,CCI,SongOOPSLA2014,ldoctor}.
-Given a code construct to be profiled, 
-we clone the code construct.
-We instrument the cloned version to record information for input size and cost.
+Given a profiling target, 
+we clone it
+and we instrument the cloned version to record information for input size and cost.
 We also dump extra delimiters to log before each 
 execution of the cloned version
 to differentiate information collected from different dynamic instances. 
 
-
-Before each execution of a code construct under profiling, 
+Before each execution of a profiling target, 
 we choose between the cloned version and the original version. 
 How many times the cloned version is executed 
 depends on a tunable sampling rate. 
@@ -341,6 +344,7 @@ a random number,
 whose expectation is 
 equal to the inverse of the sampling rate.  
 
+
 %We design two sampling policies. 
 %For the first one, we sample dynamic instances of a code construct 
 %independently from each other.
@@ -350,7 +354,7 @@ equal to the inverse of the sampling rate.
 
 
 After sampling, \Tool next \emph{infers input and cost information
-for all instances of the same code construct.} 
+for all instances of the same profiling target.} 
 Cost can be simply inferred by multiplying recorded cost values with sampling rate.
 To infer the whole input size for all instances, 
 we leverage the mark-and-recapture method~\cite{mark-recapture}. 
@@ -367,15 +371,16 @@ we first process our log to calculate a set of memory cells,
 which contribute RMS
 or DSS for each sampled dynamic instance. 
 We then estimate the whole RMS or DSS for all instances using the following formula.
-We assume we collect a sequence of $m$ samples for a profiled code construct 
+We assume we collect a sequence of $m$ samples for a profiling target 
 in one program run.
 Given the $i$th sample, we use $M_i$ to represent the 
 total number of distinct memory cells in the previous $i-1$ samples, 
 $C_i$ represents the number of distinct memory cells in the $i$th sample,
 and $R_i$ represents the number of distinct memory cells in 
 the $i$th sample that also appeared in one of the previous $i-1$ samples.
-The estimated RMS or DSS of the profiled code construct is:
+The estimated RMS or DSS of the profiling target is:
 
+%\vspace{-0.in}
 \begin{equation} \label{eq:mark}
 N = \sum\limits_{i=1}^m M_i*C_i\Big/\sum\limits_{i=1}^m R_i
 \end{equation}
@@ -404,7 +409,7 @@ Our algorithm follows three intuitions.
 First, root-cause code constructs must have highest complexity.
 Second, root-cause code constructs must consume large computation cost.
 Third, since all direct and indirect callers of root-cause code constructs 
-consume more cost and have the same complexity, 
+consume more cost and may have the same complexity, 
 we should rank callee higher than its caller, 
 to reduce false positives. 
 
@@ -423,6 +428,9 @@ Since we record instructions' ids, tracing logs can help us solve function point
 If there is direct or indirect caller-callee relationship 
 between profiling target \texttt{A}
 and profiling target \texttt{B}, we rank \texttt{B} higher than \texttt{A}.
+\commentlh{Since a root-cause profiling target may 
+cause all its callers to be in the same complexity, 
+prioritizing callees over callers can help reduce false positives.}
 \commentty{need a bit explanation on why the caller-callee relationship matters.}
 If there is no caller-callee relationship,
 we rank the one with larger observed cost higher.
