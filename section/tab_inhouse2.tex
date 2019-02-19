@@ -6,18 +6,61 @@
   \newcommand{\No}[0]{-}
   %\resizebox{\textwidth}{70mm}
   {
-  \begin{tabular}{lccc|ccccccc|cc}
+  \begin{tabular}{lccc|cccccccc|ccc}
     \toprule
-        & \multicolumn{3}{c}{Benchmark Information} & \multicolumn{7}{c}{Production-run Version} & \multicolumn{2}{c}{In-house Version}   \\
+        & \multicolumn{3}{c}{Benchmark Information} & \multicolumn{8}{c}{Production-run Version} & \multicolumn{3}{c}{In-house Version}   \\
 
     \cmidrule(lr){2-4}
-    \cmidrule(lr){5-11}
-    \cmidrule(lr){12-13}
-    {BugID} & {KLOC} & {P. L.} & {Comp.} & {Ranking} & $R^2$-Input  & $R^2$-Cost & $R^2$-Input    & $R^2$-Input       & Cost     & {Overhead} & {Ranking} & {Overhead}  \\
-                &            &             &             &               & \tiny{P-vs.-I} & \tiny{P-vs.-I} & \tiny{100-vs.-1} & \tiny{100-vs.-1}   & Function &            &  & \\
+    \cmidrule(lr){5-12}
+    \cmidrule(lr){13-15}
+    {BugID} & {KLOC} & {P. L.} & {Comp.} & {Ranking} & Top-\%  & Cost  & $R^2$-Input  & $R^2$-Cost & $R^2$-Input    & $R^2$-Input       & {Overhead} & {Ranking} & Top-\% & {Overhead}  \\
+          &    &    &        &   &   &   Function    & \tiny{P-vs.-I} & \tiny{P-vs.-I} & \tiny{100-vs.-1} & \tiny{100-vs.-1}           &  & \\
     \midrule
-   % Mozilla\#347306
-
+    Mozilla\#347306 &$88$&C&$O(N^{2})$&1$_{{5}}$&$20\%$&$y=0.09x^2$&\Yes{{0.99}}&\Yes{{0.99}}&\Yes{{1.00}}&\Yes{{0.99}}&2.34\% &1$_{465}$ & $0.21\%$& 79X \\
+    Mozilla\#416628 &$105$&C&$O(N^{2})$&1$_{{5}}$&$20\%$&$y=0.007x^2$&\Yes{{0.99}}&\Yes{{0.99}}&\Yes{{0.99}}&\Yes{{0.99}}&3.77\%&1$_{394}$ &$0.25\%$& 1252X \\
+    Mozilla\#490742& $0.157^*$&JS & $O(N)$ &1$_{{4}}$&$25\%$&$y=5.00x$&\Yes{{1.00}}&\Yes{{1.00}}&\Yes{{1.00}}&\Yes{{1.00}}&0.22\%&1$_{8}$&12.50\%& 54.46\%\\  
+    Mozilla\#35294&$0.195^*$&C++&$O(N^{2})$&1$_{{5}}$&$20\%$&$y=0.0106x^2$& \Yes{{0.99}}&\Yes{{0.99}}&\Yes{{1.00}} &\Yes{{0.99}}&0.12\%&1$_{{12}}$& 8.33\%&98X  \\ 
+    Mozilla\#477564&$0.116^*$&JS&$O(N^{2})$&1$_{{5}}$&$20\%$&$y=0.0644x^2$&\Yes{{0.99}}&\Yes{{0.99}}&\Yes{{0.99}}&\Yes{{0.99}}&2.96\%&1$_{{5}}$&$20\%$ &129X\\
+    \midrule
+    MySQL\#27287&$995$&C++&$O(N^{2})$&\\
+    MySQL\#15811&$1127$&C++&$O(N^{2})$&\\
+    \midrule
+    Apache\#37184&$0.092^*$&Java&$O(N)$&1$_{{3}}$&$33\%$&$y=7.00x$&\Yes{{1.00}}&\Yes{{1.00}}&\Yes{{1.00}}&\Yes{{1.00}}&3.30\%&1$_{{7}}$&$14\%$&$2.85\%$\\
+    Apache\#29743&$0.257^*$&Java&$O(N^{2})$&1$_{{5}}$&$20\%$&$y=1.56*10^{-4}x^2$&\Yes{{0.99}}&\Yes{{0.98}}&\Yes{{1.00}}&\Yes{{0.99}}&$1.56\%$&1$_{{110}}$&0.90\%&54.11\%\\
+    Apache\#34464&$0.16^*$&Java&$O(N^{2})$&1$_{{4}}$&25\%&$y=5.64*10^{-2}x^2$&\Yes{{0.99}}&\Yes{{0.99}}&\Yes{{0.99}}&\Yes{{0.99}}&$0.18\%$&1$_{{9}}$&$11\%$&38X\\
+    Apache\#47223&$0.162^*$&Java&$O(N^{2})$&1$_{{4}}$&25\%&$y=1.56*10^{-4}x^2$&\Yes{{0.99}}&\Yes{{0.99}}&\Yes{{0.99}}&\Yes{{0.99}}&$4.14\%$&1$_{{12}}$&8.33\%&81X\\
+    \midrule
+    GCC\#46401&$5521$&C&$O(N^{2})$&1$_{{5}}$&$20\%$&$y=3.12*10^{-3}x^2$&\Yes{{0.99}}&\Yes{{0.99}}&\Yes{{0.98}}&\Yes{{0.99}}&0.37\%&1$_{{4249}}$&$0.02\%$&32X\\
+    GCC\#1687&$2099$&C&$O(2^{N})$&1$_{{5}}$&$20\%$&$y=2.13*10^{2}e^{0.005x}$&\Yes{{0.94}}&\Yes{{0.96}}&\Yes{{0.94}}&\Yes{{0.93}}&$4.57\%$&1$_{{1481}}$&$0.06\%$&96X\\
+    GCC\#27733&$3217$&C&$O(2^{N})$&1$_{{5}}$&$20\%$&$y=2.33e^{0.003x}$&\Yes{{0.93}}&\Yes{{0.97}}&\Yes{{0.95}}&\Yes{{0.98}}&$4.34\%$&1$_{{3537}}$&$0.02\%$ &48X\\
+    GCC\#8805&$2538$&C&$O(N^{2})$&1$_{{5}}$&$20\%$&$y=2.08*10^{-5}x^2$&\Yes{{0.99}}&\Yes{{0.99}}&\Yes{{0.99}}&\Yes{{0.99}}&3.28\%&1$_{{1373}}$ &$0.07\%$ & 48X \\
+    GCC\#21430&$3844$&C&$O(N^{2})$&1$_{{5}}$&$20\%$&$y=1.02*10^{-3}x^2$&\Yes{{0.99}}&\Yes{{0.98}}&\Yes{{0.99}}&\Yes{{0.99}}&4.63\%& 1$_{{3370}}$ & $0.02\%$& 23X\\
+    GCC\#12322&$2341$&C&$O(N^{2})$&1$_{{5}}$&$20\%$\\
+    \midrule
+    \midrule
+    Apache\#53622&$1.094^*$&Java&$O(N^{2})$&1$_{{5}}$&$20\%$&$y=6.64*10^{-2}x^2$&\Yes{{1.00}}&\Yes{{1.00}}&\Yes{{1.00}}&\Yes{{0.98}}&$0.36\%$&1$_{{41}}$&$2.43\%$&27X\\
+    Apache\#53637&$0.937^*$&Java&$O(N^{2})$&1$_{{5}}$&$20\%$&$y=1.03*10^{-2}x^2$&\Yes{{0.99}}&\Yes{{0.99}}&\Yes{{1.00}}&\Yes{{0.99}}&$0.49\%$&1$_{{27}}$&$3.70\%$&68X\\
+    Apache\#53803&$0.421^*$&Java&$O(N^{2})$&1$_{{4}}$&$25\%$&$y=4.37*10^{-2}x^2$&\Yes{{1.00}}&\Yes{{0.99}}&\Yes{{1.00}}&\Yes{{0.99}}&$1.27\%$&1$_{{17}}$&$5.88\%$&51X\\
+    Apache\#53821&$0.417^*$&Java&$O(N^{2})$&1$_{{4}}$&$25\%$&$y=4.36*10^{-2}x^2$&\Yes{{1.00}}&\Yes{{0.99}}&\Yes{{1.00}}&\Yes{{0.99}}&$0.08\%$&1$_{{16}}$&$6.25\%$&97X\\
+    Apache\#53822&$0.417^*$&Java&$O(N^{2})$&1$_{{4}}$&$25\%$&$y=5.66*10^{-2}x^2$&\Yes{{0.98}}&\Yes{{1.00}}&\Yes{{1.00}}&\Yes{{0.99}}&$2.18\%$&1$_{{16}}$&$6.25\%$&91X\\
+    \midrule
+    Collections\#406&$0.253^*$&Java&$O(N^{2})$&1$_{{5}}$&$20\%$&$y=1.17*10^{-2}x^2$&\Yes{{1.00}}&\Yes{{0.99}}&\Yes{{1.00}}&\Yes{{1.00}}&$2.29\%$&1$_{{8}}$&$12.5\%$&92X\\
+    Collections\#407&$0.766^*$&Java&$O(N^{2})$&1$_{{5}}$&$20\%$&$y=4.36*10^{-2}x^2$&\Yes{{1.00}}&\Yes{{1.00}}&\Yes{{1.00}}&\Yes{{0.99}}&$0.97\%$&1$_{{21}}$&$4.76\%$&93X\\
+    Collections\#408&$0.742^*$&Java&$O(N^{2})$&1$_{{5}}$&$20\%$&$y=8.07*10^{-2}x^2$&\Yes{{1.00}}&\Yes{{1.00}}&\Yes{{1.00}}&\Yes{{0.99}}&$0.08\%$&1$_{{28}}$&$3.57\%$&95X\\
+    Collections\#409&$0.781^*$&Java&$O(N^{2})$&1$_{{5}}$&$20\%$&$y=1.03*10^{-2}x^2$&\Yes{{0.99}}&\Yes{{1.00}}&\Yes{{1.00}}&\Yes{{0.99}}&$2.52\%$&1$_{{27}}$&$3.70\%$&86X\\
+    Collections\#410&$0.769^*$&Java&$O(N^{2})$&1$_{{5}}$&$20\%$&$y=1.03*10^{-2}x^2$&\Yes{{0.99}}&\Yes{{1.00}}&\Yes{{1.00}}&\Yes{{0.99}}&$2.26\%$&1$_{{31}}$&$3.22\%$&78X\\
+    Collections\#412&$0.284^*$&Java&$O(N^{2})$&1$_{{5}}$&$20\%$&$y=4.31*10^{-2}x^2$&\Yes{{1.00}}&\Yes{{1.00}}&\Yes{{1.00}}&\Yes{{0.99}}&$1.31\%$&1$_{{10}}$&$10\%$&90X\\
+    Collections\#413&$0.923^*$&Java&$O(N^{2})$&1$_{{5}}$&$20\%$&$y=2.69*10^{-3}x^2$&\Yes{{1.00}}&\Yes{{0.99}}&\Yes{{1.00}}&\Yes{{0.99}}&$3.88\%$&1$_{{23}}$&$4.34\%$&117X\\
+    Collections\#425&$0.758^*$&Java&$O(N^{2})$&1$_{{5}}$&$20\%$&$y=4.31*10^{-2}x^2$&\Yes{{1.00}}&\Yes{{1.00}}&\Yes{{1.00}}&\Yes{{0.99}}&$2.43\%$&1$_{{21}}$&$4.76\%$&94X\\
+    Collections\#426&$0.783^*$&Java&$O(N^{2})$&1$_{{5}}$&$20\%$&$y=4.36*10^{-2}x^2$&\Yes{{1.00}}&\Yes{{1.00}}&\Yes{{1.00}}&\Yes{{0.99}}&$3.53\%$&1$_{{23}}$&$4.34\%$&95X\\
+    Collections\#427&$0.756^*$&Java&$O(N^{2})$&1$_{{5}}$&$20\%$&$y=8.05*10^{-2}x^2$&\Yes{{1.00}}&\Yes{{1.00}}&\Yes{{1.00}}&\Yes{{0.99}}&$1.99\%$&1$_{{26}}$&$3.84\%$&94X\\
+    Collections\#429-0&$0.668^*$&Java&$O(N^{2})$&1$_{{5}}$&$20\%$&$ $&\Yes{{0.97}}&\Yes{{0.92}}&\Yes{{1.00}}&\Yes{{0.99}}&$2.75\%$&1$_{{19}}$&$5.26\%$&148X\\
+    Collections\#429-1&$0.536^*$&Java&$O(N^{2})$&1$_{{5}}$&$20\%$&$ $&\Yes{{0.94}}&\Yes{{0.96}}&\Yes{{0.99}}&\Yes{{0.99}}&$3.39\%$&1$_{{18}}$&$5.55\%$&8X\\
+    Collections\#429-2&$0.416^*$&Java&$O(N^{2})$&1$_{{5}}$&$20\%$&$y=2.17*10^{-3}x^2$&\Yes{{0.99}}&\Yes{{0.99}}&\Yes{{1.00}}&\Yes{{0.99}}&$4.63\%$&1$_{{21}}$&$4.76\%$&55X\\
+    Collections\#434&$0.336^*$&Java&$O(N^{2})$&1$_{{5}}$&$20\%$&$y=3.64*10^{-3}x^2$&\Yes{{0.99}}&\Yes{{1.00}}&\Yes{{0.99}}&\Yes{{0.99}}&$4.82\%$&1$_{{17}}$&$5.88\%$&118X\\
+    \midrule
+    Groovy\#5739-0&$0.745^*$&Java&$O(N^{2})$&1$_{{5}}$&$20\%$&$y=2.54*10^{-2}x^2$&\Yes{{0.99}}&\Yes{{1.00}}&\Yes{{0.99}}&\Yes{{0.98}}&$2.88\%$&1$_{{18}}$&$5.55\%$&93X\\
+    Groovy\#5739-1&$0.756^*$&Java&$O(N^{2})$&1$_{{5}}$&$20\%$&$y=2.71*10^{-2}x^2$&\Yes{{0.99}}&\Yes{{1.00}}&\Yes{{0.99}}&\Yes{{0.98}}&$1.32\%$&1$_{{17}}$&$5.88\%$&90X\\
     \bottomrule
    \end{tabular}
    }
@@ -26,16 +69,19 @@
   \vspace{0.1in}
    \mycaption{tab:benchmark_info}{Benchmark Information and evaluation results for \Tool.}
    {In the ``Benchmark Information'' columns,
-   $x^*$: $x$ thousands of lines of code for re-implemented benchmarks;
-   Buggy C. C.: buggy code construct;
-   L.: Loop; 
-   F.: Lunction.
-   In the ``In-house Experiments''columns,
-   $x_{y}$: the root-cause function is ranked as $x$th in $y$ 
-   functions with the same or higher order of complexity as \texttt{main} function;
+   $x^*$: $x$ thousands of lines of code for re-implemented benchmarks.
+   In the ``Production-run Version''columns,
+   $x_{y}$: the root-cause loop is ranked as $x$th in $y$ evaluated loops;
+   Top-\%: the percentage of loops need to be examined until identifying the root-cause loop.
+   \Yes{{x}}: the computed $R^2$ value x is larger than 0.9;
+   P-vs.-I: the production-run version vs. the in-house version;
+   100-vs.-1: sampliing rate is configured as $1/100$ vs. sampling rate is $1$.
+   Cost Function: we only report the part with highest order due to limited space. 
    Max Overhead: runtime overhead when the whole program is instrumented;
    Min Overhead: runtime overhead when only the root-cause function and all its callees are instrumented.
    In the ``Production-run Experiments'' columns, 
+   $x_{y}$: the root-cause function is ranked as $x$th in $y$ executed functions;
+   Top-\%: the percentage of functions need to be examined until identifying the root-cause function.
    }
   %\label{tab:benchmark_info}
 \vspace{-0.15in}
