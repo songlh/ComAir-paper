@@ -33,7 +33,7 @@ This bug is caused by a nested loop,
 whose inner loop's total iterations are in polynomial complexity ($O(N^2)$).
 To fix this bug, GCC developers significantly reduce 
 the workload processed by the inner loop. 
-Among the five evaluated loops, xx of them are in superlinear complexity, and 
+Among the five evaluated loops, {\color{red} XX} of them are in superlinear complexity, and 
 the production-run version successfully rank the inner loop as No. 1.
 There are in total 1373 executed function during buggy runs,
 and 87 of them are in superlinear complexity. 
