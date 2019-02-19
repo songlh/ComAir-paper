@@ -1,3 +1,46 @@
 \subsection{Experimental Results}
+\label{sec:results}
 
-%\input{section/tab_inhouse2}
+All experimental results are shown in Table~\ref{tab:benchmark_info}.
+We discuss how these results can answer the previous three research questions as follows.
+
+
+\subsubsection{Effectiveness Results}
+As shown by the ranking numbers in Table~\ref{tab:benchmark_info},
+\Tool can effectively identify buggy loops and buggy functions 
+among all evaluated loops and executed functions. 
+\Tool rank the buggy loop or the buggy function as No. 1 
+for \textbf{all} benchmarks under both the production-run and in-house settings. 
+We also calculate the percentage of loops or functions 
+to be examined before the root-cause one is identified, 
+after referring our ranking list. 
+Since the root-cause one is always ranked as No. 1,
+the percentage is controlled by the number of evaluated loops 
+or the number of executed functions. 
+For the production version, the percentage is $20\%$ for most benchmarks, 
+since we at most evaluate five loops. 
+The percentage for Apache\#37184 is the largest one, 
+because there are only three executed loops. 
+For the in-house version, the minimum percentage is for GCC\#46401, 
+and there are in total 4249 executed functions for this bug.
+The largest one is for Mozilla\#477564. 
+Overall, the percentage is less than 10\% for 33 out of 39 bugs. 
+
+Our ranking mechanism can indeed save developers' efforts 
+and help identify root causes. 
+Take GCC\#8805 as an example.
+This bug is caused by a nested loop, 
+whose inner loop's total iterations are in polynomial complexity ($O(N^2)$).
+To fix this bug, GCC developers significantly reduce 
+the workload processed by the inner loop. 
+Among the five evaluated loops, xx of them are in superlinear complexity, and 
+the production-run version successfully rank the inner loop as No. 1.
+There are in total 1373 executed function during buggy runs,
+and 87 of them are in superlinear complexity. 
+The buggy function containing the outer loop is ranked as No. 1 
+by the in-house version. 
+By referring the results of \Tool, 
+developers can avoid manually inspecting the large number of  
+loops or functions in superlinear complexity. 
+
+
