@@ -23,14 +23,12 @@ It is configured by enabling
 only the two instrumentation optimization methods (i.e.,
 optimizing instrumentation sites) presented 
 in the production-run version, without enabling any approximation. 
-\commentlh{The reason is that the designed optimization can speed up \Tool, 
+The reason is that the optimization methods intend to speed up \Tool, 
 while still providing the same results, 
-but enabling the designed approximation will sacrifice accuracy. }
+but enabling the approximation method will sacrifice accuracy. 
+\commentty{In the above sentence, better add pointers to specific sections.}
 %This is because we wish 
 %to obtain more accurate results.
-\commentty{Only the optimization in 4.1.2 is enabled?
-why will it not affect the accuracy of the results and why do the other
-methods affect the accuracy? Need a bit explanation here.}
 Similar to Aprof~\cite{Aprof1,Aprof2}, 
 the in-house version of \Tool leverages several global data structures
 to preprocess memory access information to lower memory and disk overhead,

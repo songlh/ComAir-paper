@@ -77,9 +77,6 @@ by the production-run version under the default sampling rate and disabling samp
 The minimum $R^2$ value is $0.93$. 
 These results demonstrate that sampling and approximation in the production-run 
 version does not hurt profiling accuracy. 
-\commentty{The optimization does not affect accuracy, but does it reduce
-the overhead and to what extent? I think reviewers would ask how much cost
-can be saved by the optimization.}
 
 
 \subsubsection{Overhead}
@@ -94,8 +91,7 @@ The overhead can be as large as 1252X for Mozilla\#416628.
 For 31 out of 38 bugs, the overhead is larger than 10X. 
 These results show that the instrumentation mechanisms 
 discussed in Section~\ref{sec:opt} can effectively reduce runtime overhead. 
-\commentty{This is related to my previous comment, would the optimization
-help to reduce the overhead?}
+
 
 
 \subsection{Discussion and Limitations}
