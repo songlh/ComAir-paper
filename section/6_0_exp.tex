@@ -161,22 +161,28 @@ in previous works on statistical debugging~\cite{liblit03,CCI,ldoctor}.
 
 To answer RQ1 (i.e., the effectiveness of  \Tool in identifying
 complexity problems), we measure the ranking number (position) of code
-constructs containing complexity problems. We also use the ranking number
-to compute the percentage of code constructs
-that need to be examined before finding a performance bug in the program.
-This ranking strategy has been widely adopted by existing fault localization 
-techniques~\cite{Jones05,Cleve05}.
-To evaluate the production-run version of \Tool,
-we instrument the top five loops with the largest loop 
-iteration numbers under bug-triggering inputs to 
-create five distinct program versions, 
-since instrumenting all loops is expensive. 
-For benchmarks with less than five executed 
-loops during buggy runs, 
-we instrument all executed loops.  
-For the in-house version, since the whole program is profiled, 
-we rank all executed functions during buggy runs. 
-
+constructs containing complexity problems. 
+%We also use the ranking number
+%to compute the percentage of code constructs
+%that need to be examined before finding a performance bug in the program.
+%This ranking strategy has been widely adopted by existing fault localization 
+%techniques~\cite{Jones05,Cleve05}.
+%To evaluate the production-run version of \Tool,
+%we instrument the top five loops with the largest loop 
+%iteration numbers under bug-triggering inputs to 
+%create five distinct program versions, 
+%since instrumenting all loops is expensive. 
+%For benchmarks with less than five executed 
+%loops during buggy runs, 
+%we instrument all executed loops.  
+%For the in-house version, since the whole program is profiled, 
+%we rank all executed functions during buggy runs. 
+To determine whether a code construct matches
+the known complexity problem (i.e., ground truth), 
+we manually examined the solution discussed in the corresponding issue 
+report and the patch used for fixing the issue. 
+\commentty{I added a sentence describing how we found the ground truth, please
+check.}
 
 To answer RQ2 (i.e., the accuracy of the production-run version of \Tool),
 we calculate the $R^2$ value~\cite{rsquare} 
@@ -192,9 +198,9 @@ are both close to one,
 the inferred two cost functions with and without optimizations must be in the same order, 
 which means that both sampling and other designed optimizations 
 do not hurt the accuracy. 
-\commentty{This paragraph seems too much. Are we just comparing 
-the accuracy between the non-optimized and the optimized production version of \Tool}
-\commentlh{addressed.}
+%\commentty{This paragraph seems too much. Are we just comparing 
+%the accuracy between the non-optimized and the optimized production version of \Tool}
+%\commentlh{addressed.}
 
 %\commentlh{
 To answer RQ3 (i.e., whether the production-run version of \Tool 
@@ -202,9 +208,9 @@ can be really deployed in production runs),
 we measure the runtime overhead for the program version 
 with the buggy loop instrumented, compared with non-instrumented version. 
 We run each version ten times and compute the overhead based by average execution time. 
-\commentlh{
-We also measure the overhead while disabling all optimizations 
-to understand the effect of all our designed optimizations. }
+%\commentlh{
+%We also measure the overhead while disabling all optimizations 
+%to understand the effect of all our designed optimizations. }
 
 
 

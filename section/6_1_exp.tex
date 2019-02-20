@@ -5,19 +5,22 @@ All experimental results are shown in Table~\ref{tab:benchmark_info}.
 We discuss how these results can answer the previous three research questions as follows.
 
 
-\subsubsection{Effectiveness}
+\subsubsection{RQ1: Effectiveness}
 As shown by the ranking numbers in Table~\ref{tab:benchmark_info},
 \Tool can effectively identify buggy loops and buggy functions 
 among all evaluated loops and executed functions. 
 \Tool ranked the buggy loop or the buggy function as No. 1 
-for \textbf{all} benchmarks under both the production-run and in-house settings. 
-Since root-cause loops or functions are always ranked as No. 1, 
-the percentage of loops or functions to be examined before a performance bug is found is 0
-for all bugs. 
-\commentty{If you rank the ground-truth as No. 1, shouldn't the 
-number of loops or functions to be examined before the root 
-cause is 0, so the percentage is 0? }
-\commentlh{addressed}
+%for \textbf{all} benchmarks under both the production-run and in-house settings. 
+%Since root-cause loops or functions are always ranked as No. 1, 
+%the percentage of loops or functions to be examined before a performance bug is found is 0
+%for all bugs. 
+%\commentty{If you rank the ground-truth as No. 1, shouldn't the 
+%number of loops or functions to be examined before the root 
+%cause is 0, so the percentage is 0? }
+%\commentlh{addressed}
+\commentty{Since all are ranked at 1, I think we may not need 
+to report the percentage, but can we add a column reporting the total number
+of code constructs?}
 
 Our ranking mechanism can indeed save developers' efforts 
 and help identify root causes. 
@@ -36,7 +39,7 @@ By referring the results of \Tool,
 developers can avoid manually inspecting the large number of  
 suspicious loops or functions in superlinear complexity. 
 
-\subsubsection{Accuracy}
+\subsubsection{RQ2: Accuracy}
 As shown in Table~\ref{tab:benchmark_info} (the ``Cost Function'' column),
 the production-run version of \Tool successfully 
 report the correct complexity for the buggy loop of 
@@ -49,9 +52,8 @@ Previous work consider $R^2$ value larger than 0.92
 as a good fitting~\cite{rsquare-value}.
 Our results show that inferred cost functions can well represent 
 observed (input size, cost) pairs. 
-
-
-\commentty{should say something like the production-version
+%
+\commentty{should make a conclusion here, sayting something like the production-version
 is almost as accurate as the in-house version.}
 
 To understand whether sampling and approximation leveraged 
@@ -71,7 +73,7 @@ These results demonstrate that sampling and approximation in the production-run
 version does not hurt profiling accuracy. 
 
 
-\subsubsection{Overhead}
+\subsubsection{RQ3: Overhead}
 The runtime overhead for the production-run version of \Tool is 
 shown in Table~\ref{tab:benchmark_info}. 
 In general, the performance is good. The runtime overhead is constantly 
