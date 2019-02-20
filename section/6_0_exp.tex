@@ -161,13 +161,12 @@ in previous works on statistical debugging~\cite{liblit03,CCI,ldoctor}.
 
 
 To answer RQ1 (i.e., the effectiveness of  \Tool in identifying
-complexity problems), we measure the rank number (position) of code
-constructs containing complexity problems. We also use the rank number
+complexity problems), we measure the ranking number (position) of code
+constructs containing complexity problems. We also use the ranking number
 to compute the percentage of code constructs
-that need to be examined to find a performance bug in the program.
+that need to be examined before finding a performance bug in the program.
 This ranking strategy has been widely adopted by existing fault localization 
 techniques~\cite{Jones05,Cleve05}.
-%\commentlh{
 To evaluate the production-run version of \Tool,
 we instrument the top five loops with the largest loop 
 iteration numbers under bug-triggering inputs to 
@@ -178,40 +177,25 @@ loops during buggy runs,
 we instrument all executed loops.  
 For the in-house version, since the whole program is profiled, 
 we rank all executed functions during buggy runs. 
-%}
+
 
 To answer RQ2 (i.e., the accuracy of the production-run version of \Tool),
 we calculate the $R^2$ value~\cite{rsquare} 
 for the two groups of input sizes (and costs) reported by 
-the two versions of \Tool.
+\commentlh{
+the production-run version of \Tool with and without optimizations in Section~\ref{sec:opt}.
+}
 $R^2$ represents how well one variable can be predicted by another variable,
 and a $R^2$ value close to one means the two variables are 
 in strong linear relationship~\cite{rsquare-value}.
 Therefore, if the computed $R^2$ values for input sizes and costs
 are both close to one,
-the inferred two cost functions by the two versions must be in the same order, 
-which means the production-run version is as accurate as the in-house version, 
-and both sampling and other designed approximation (Section~\ref{sec:opt}) do not hurt accuracy. 
-
-
-Due to the difference in profiling granularities and algorithms 
-(e.g. whether different dynamic instances in one program run are merged), 
-given a bug in $O(N)$ complexity, 
-we apply the production-run version on the buggy loop, 
-and apply the in-house version on the function containing the buggy loop. 
-Given a bug in $O(N^2)$ complexity, we apply the production-run version on the inner loop, 
-while applying the in-house version on the function containing the outer loop. 
-The two bugs in $O(N^2)$ complexity are both caused by recursive functions.
-We apply the two versions on the recursive function for each bug. 
-To understand whether sampling
-causes the production-run version of \Tool 
-to lose some accuracy, we also calculate the $R^2$ value for two groups 
-of inputs (and costs) reported by the production-run versions 
-under sampling rate $1/100$ and sampling rate $1$,
-since $1/100$ is our default sampling rate and $1$ means disable sampling. 
+the inferred two cost functions with and without optimizations must be in the same order, 
+which means that both sampling and other designed optimizations 
+do not hurt the accuracy. 
 \commentty{This paragraph seems too much. Are we just comparing 
 the accuracy between the non-optimized and the optimized production version of \Tool}
-
+\commentlh{addressed.}
 
 %\commentlh{
 To answer RQ3 (i.e., whether the production-run version of \Tool 
@@ -219,6 +203,9 @@ can be really deployed in production runs),
 we measure the runtime overhead for the program version 
 with the buggy loop instrumented, compared with non-instrumented version. 
 We run each version ten times and compute the overhead based by average execution time. 
+\commentlh{
+We also measure the overhead while disabling all optimizations 
+to understand the effect of all our designed optimizations. }
 
 
 

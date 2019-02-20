@@ -11,23 +11,13 @@ As shown by the ranking numbers in Table~\ref{tab:benchmark_info},
 among all evaluated loops and executed functions. 
 \Tool ranked the buggy loop or the buggy function as No. 1 
 for \textbf{all} benchmarks under both the production-run and in-house settings. 
-We also calculate the percentage of loops or functions 
-to be examined before the root-cause one is identified, 
-after referring our ranking list. 
-Since the root-cause one is always ranked as No. 1,
-the percentage is controlled by the number of evaluated loops 
-or the number of executed functions. 
-For the production version, the percentage is $20\%$ for most benchmarks, 
-since we at most evaluate five loops. 
-The percentage for Apache\#37184 is the largest one, 
-because there are only three executed loops. 
-For the in-house version, the minimum percentage is for GCC\#46401, 
-and there are in total 4249 executed functions for this bug.
-The largest one is for Mozilla\#477564. 
-Overall, the percentage is less than 10\% for 33 out of 39 bugs. 
+Since root-cause loops or functions are always ranked as No. 1, 
+the percentage of loops or functions to be examined before a performance bug is found is 0
+for all bugs. 
 \commentty{If you rank the ground-truth as No. 1, shouldn't the 
 number of loops or functions to be examined before the root 
 cause is 0, so the percentage is 0? }
+\commentlh{addressed}
 
 Our ranking mechanism can indeed save developers' efforts 
 and help identify root causes. 
@@ -59,6 +49,8 @@ Previous work consider $R^2$ value larger than 0.92
 as a good fitting~\cite{rsquare-value}.
 Our results show that inferred cost functions can well represent 
 observed (input size, cost) pairs. 
+
+
 \commentty{should say something like the production-version
 is almost as accurate as the in-house version.}
 
