@@ -4,7 +4,7 @@
 %\subsection{Motivation}
 %\label{sec:motiv}
 
-As a type of software bug, performance problems~\footnote{We will use performance problems,
+As a type of software bug, performance problems\footnote{We will use performance problems,
 performance issues,  and performance bugs exchangeably,
 following previous works in this area~\cite{SongOOPSLA2014,ldoctor}.}
 are one major source of software's slowness and inefficiency~\cite{PerfBug,perf.fse10,SongOOPSLA2014,ldoctor,Alabama}. 
@@ -56,7 +56,8 @@ which is used as an array index.
 All \texttt{XML\_NODE}s are maintained in the array \texttt{items}.
 The loop iterates through the array \texttt{items}
 backwardly and searches for the first \texttt{XML\_NODE} 
-\commentlh{with \texttt{level} one less than the \texttt{XML\_NODE} indexed by \texttt{nitems}?} (Lines 7--11).
+with \texttt{level} one less than the \texttt{XML\_NODE} 
+indexed by \texttt{nitems} (lines 7--11).
 This piece of code looks innocent.
 However, there is an outer loop not shown in the figure.
 The outer loop will keep calling \texttt{xml\_parent\_tag} using
@@ -69,7 +70,8 @@ an \texttt{XML\_NODE} contains tens of thousands of children,
 and this leads significant showdown perceived by the end users.
 \commentty{To make the example more readable, can we add ``+", ``-" to indicate
 where the bug was and how it was fixed? }
-\commentlh{I will address this later.}
+\commentlh{The patch is to completely remove this loop and add something when initializing all XML\_Nodes. 
+It is too large and hard to understand.}
 
 To fix this bug, the developers added an extra field to each \texttt{XML\_NODE} to save its parent,
 and this field is initialized when an \texttt{XML\_NODE} is created.
@@ -137,44 +139,47 @@ To the best of our knowledge, our work is the first study focusing on complexity
 
 Second, guided by the findings from the empirical
 study, we develop \Tool, the first automated tool to effectively and efficiently 
-conduct algorithmic profiling  under production-run setting.
+conduct algorithmic profiling under production-run setting.
 Given a program under profiling, \Tool first instruments the program
 using a light-weighted instrumentation method. 
 The key idea is to use software-based sampling to conduct algorithmic profiling.
-Given a code construct with multiple dynamic instances in a program run,
-we sample some of the dynamic instances and leverage the mark-and-recapture
-method \citep{mark-recapture} to infer information for all instances.
+Given a code construct, like a loop or a function,  
+with multiple dynamic instances in a program run,
+we sample some of the dynamic instances to record their input and cost information
+and leverage the mark-and-recapture
+method \citep{mark-recapture} to infer input and cost information for all instances.
 \commentty{Infer what information?}
-\Tool then collects runtime profiles as the program is running
-in production environment with different inputs.
+\commentlh{addressed}
+\Tool selectively instruments different code constructs and 
+creates multiple program versions distributed to end users.
+\Tool then collects runtime profiles as different program versions are running
+on different user sites under different workloads.
 \commentty{Better define what inputs are...}
 Next, \Tool synthesizes the profiles and generates a cost function of input size
 for each code construct to describe its complexity. 
 \commentty{Any novel ideas in this step?}
+\commentlh{No}
 Finally, \Tool  reports a ranked list of code constructs in terms of their likelihood
 of containing performance bugs due to complexity problems. \commentty{We may need to define code
 constructs.} 
-\commentlh{We don't have ranking list for production-run setting, and we only have it under in-house setting.}
+\commentlh{addressed}
+
 
 
 %{\color{red} TODO: discuss the ranking list}
 
+
 \Tool provides several benefits over existing performance profilers:
 1) \Tool supports production-run algorithmic profiling by taking into account
-real-world workload and can thus discover most of the real complexity problems;
-%2) \Tool considers multiple runtime profiles and automatically synthesizes them
-%into a cost function for each code construct; 
-%\commentlh{we may need to remove this one, 
-%since existing techniques can also provide this functionality.}
+real-world workloads and can thus discover most of the real complexity problems;
 2) \Tool incurs negligible runtime overhead while achieving accurate profiling results;
 3) \Tool  simplifies the task of detecting performance bugs related to complexity
-problems by providing a ranked lists of code constructs in terms of their
-cost functions; 
-4) \commentty{what else?} \commentlh{provide information about real-world workloads 
-and improve developers' understanding?}
-
-
-
+problems by providing a ranked list of code constructs in terms of their
+likelihood to contain complexity problems;
+and 4) \commentlh{\Tool provides information about real-world workloads 
+processed by each code construct and guides developers to make better priority 
+decisions during performance bug fixing and performance optimization.} 
+\commentty{what else?} 
 
 We envision that \Tool can be used in at least two scenarios. 
 First, \Tool can be deployed on user end to conduct production-run performance
@@ -183,24 +188,23 @@ are returned to developers, which can help to localize performance
 bugs and understand 
 which code constructs have the most performance impact on the system.
 Second, \Tool can be configured as an in-house testing tools used by 
-developers and testers. \commentty{how to make it as a testing tool.}
-\commentlh{something like generating performance testing oracle?}
-Third, ... \commentty{more usage scenarios?}
+developers and testers. After launched with existing testing inputs, 
+\Tool can automatically analyzes executed functions and 
+reports their complexity information,
+which can help developers predict how each function scales. 
+\commentty{how to make it as a testing tool.}
 
 
-To evaluate \Tool, we apply the approach to ? popular benchmarks and real-world 
-C/C++ programs with both known and previously unknown complexity 
-problems.  Our results show that  \Tool effectively identifies complexity
-problems.  Within \Tool, we show that 
-sampling allows us to significantly lower the runtime overhead.
-Specifically, \Tool  lowered the runtime overhead to less than
-$5\%$ for $34$ out of $38$ benchmarks,
-without sacrificing the profiling capability and the profiling latency.
-The evaluation also shows that sampling does not hurt the profiling capability
-and does not require to profile more program runs,
-not increasing profiling latency, since
-the majority of complexity problems are caused by
-repeated executions of a loop or a recursive function, as shown by our empirical study.
+\commentlh{
+To evaluate \Tool, we use 38 real-world complexity problems from two sources.
+These complexity problems cover different types of 
+complexity and different types root-cause code constructs. 
+Experimental results show that \Tool can successfully identify the 
+root cause for each evaluated bug without reporting 
+any false positive under both in-house and production-run settings, 
+and incur less than 5\% runtime overhead under the production-run setting, 
+while can still generate accurate profiling results.  
+} 
 Compared to ... \commentty{Need to update the this paragraph based 
 on the results.}
 
@@ -230,8 +234,10 @@ problems to specific code constructs with negligible
 overhead.  
 \Tool can also be configured as an in-house testing tool. 
 
-\item We implement \Tool and conduct an empirical study to demonstrate 
-its effectiveness and efficiency in detecting complexity problems. 
+\item \commentlh{We conduct thorough experiments and demonstrate the effectiveness, accuracy and performance of \Tool. }
+
+%We implement \Tool and conduct an empirical study to demonstrate 
+%its effectiveness and efficiency in detecting complexity problems. 
 
 
 
