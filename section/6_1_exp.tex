@@ -2,16 +2,16 @@
 \label{sec:results}
 
 All experimental results are shown in Table~\ref{tab:benchmark_info}.
-We discuss how these results can answer the previous three research questions as follows.
-
+We discuss how these results can answer 
+the previous three research questions as follows.
 
 \subsubsection{RQ1: Effectiveness}
 As shown by the ranking numbers in Table~\ref{tab:benchmark_info},
 \Tool can effectively identify buggy loops and buggy functions 
-among all evaluated loops and executed functions. 
-\Tool ranked the buggy loop or the buggy function as No. 1 
-or \textbf{all} benchmarks under both the production-run and in-house settings. 
-The evaluated or executed code constructs are shown as subscripts of 
+among all evaluated loops and executed functions.
+The buggy loop and the buggy function are ranked as No. 1 for \textbf{all}
+benchmarks by the production-run version and the in-house version respectively. 
+ The evaluated or executed code constructs are shown as subscripts of 
 the two ``ranking'' columns. 
 \commentlh{
 For the production-run versions, the evaluated loops range from 3 to 5.
@@ -26,7 +26,6 @@ to report the percentage, but can we add a column reporting the total number
 of code constructs?}
 \commentlh{addressed}
 
-
 Our ranking mechanism can indeed save developers' efforts 
 and help identify root causes. 
 Take GCC\#8805 as an example.
@@ -40,7 +39,7 @@ There are in total 1373 executed function during buggy runs,
 and 87 of them are in superlinear complexity. 
 The buggy function containing the outer loop is ranked as No. 1 
 by the in-house version. 
-By referring the results of \Tool, 
+After referring the results of \Tool, 
 developers can avoid manually inspecting the large number of  
 suspicious loops or functions in superlinear complexity. 
 \commentlh{Discuss another case where the root-cause loop does not 
@@ -49,7 +48,7 @@ have the largest loop iteration number. }
 \subsubsection{RQ2: Accuracy}
 As shown in Table~\ref{tab:benchmark_info} (the ``Cost Function'' column),
 the production-run version of \Tool successfully 
-reports the correct complexity for buggy loops of 
+reports the correct complexity for the buggy loops of 
 all evaluated benchmark. 
 We compute the $R^2$ value between observed cost values and 
 cost values predicted by the inferred cost function for each bug 
@@ -61,49 +60,82 @@ as a good fitting~\cite{rsquare-value}.
 Our results show that inferred cost functions can well represent 
 observed (input size, cost) pairs. 
 We also compute $R^2$ to compare the reported input sizes 
-and cost values by the production-run version and the in-house version. 
+and cost values by the two versions of \Tool. 
 For 31 out of 38 benchmarks, 
 the $R^2$ values are larger than $0.99$ for both input sizes and cost values. 
 For the left seven benchmarks, the $R^2$ values are all larger than $0.92$. 
-This result shows that the production-run version is 
+These results show that the production-run version is 
 as accurate as the in-house version. 
-\commentty{should make a conclusion here, sayting something like the production-version
+\commentty{should make a conclusion here, saying something like the production-version
 is almost as accurate as the in-house version.}
 \commentlh{addressed}
-
 
 \commentlh{
 The $R^2$ values computed by comparing input sizes and cost values 
 reported by the production-run version with and without optimizations are shown in 
 Table~\ref{tab:benchmark_info} 
 (the ``$R^2$-Input'' and ``$R^2$-Cost'' columns).
-The $R^2$ values are larger than $0.99$ for 
-both input sizes and costs for 35 out of 38 benchmarks. 
+For 35 out of 38 benchmarks, $R^2$ are larger than $0.99$ for 
+both input sizes and cost values. 
 For the other three bugs, the computed $R^2$ values are not low, 
-and all of them are larger than $0.92$, which is observed as a good fitting. 
+and all of them are larger than $0.92$, which is considered as a good fitting. 
 The minimum $R^2$ value is $0.93$ for GCC\#1687.
-This result demonstrates that sampling and approximation 
+These results demonstrate that sampling and approximation 
 applied in the production-run version of \Tool do not hurt accuracy. 
 }
 
 \subsubsection{RQ3: Overhead}
 The runtime overhead for the production-run version of \Tool is 
-shown in Table~\ref{tab:benchmark_info}. 
-In general, the performance is good. The runtime overhead is constantly 
+shown in Table~\ref{tab:benchmark_info} (the ``Overhead w/ opt.'' column). 
+In general, the performance is good. 
+The runtime overhead is constantly 
 under 5\% for all evaluated bugs. 
-For nine bugs, the overhead is less than 1\%. 
+There are night bugs, whose overhead is less than 1\%, 
+and 16 bugs, whose overhead is in the range from 1\% to 3\%.  
 The largest overhead is 4.82\% for Collections\#434. 
-We also measure the overhead for the in-house version as a comparison. 
-The overhead can be as large as 1252X for Mozilla\#416628.
+The production-run version of \Tool only incurs a negligible runtime overhead, 
+and it can be deployed in production environment.  
+
+We also measure the runtime overhead for the production-run 
+version without enabling optimizations, 
+including sampling, instrumentation-site optimizations
+and approximation (the ``Overhead w/o opt.'' column). 
+The overhead is significantly larger, compared with when optimizations enabled. 
+For xx bugs, the overhead is larger than 10X. 
+In summary, our designed optimizations can 
+indeed lower the runtime overhead. 
+The overhead for the in-house version 
+of \Tool is also measured 
+(the ``Overhead'' column). 
+The overhead can be as large as 1252X for 
+Mozilla\#416628.
 For 31 out of 38 bugs, the overhead is larger than 10X. 
-These results show that the instrumentation mechanisms 
-discussed in Section~\ref{sec:opt} can effectively reduce runtime overhead. 
 
 
 
 \subsection{Discussion and Limitations}
+The current design and implementation of \Tool 
+only consider complexity problems in one thread. 
+To profile multi-threaded programs, 
+\Tool needs extra synchronizations on all utilized global data structures, 
+and these synchronizations may bring more overhead. 
+\Tool also needs more advanced input metrics to precisely profile programs 
+in multi-threaded producer-consumer 
+model discussed in previous work~\cite{Aprof2}. 
+
+Although the performance of the production-version 
+is good on all evaluated benchmarks, 
+if a sampled dynamic instance conducts a lot of computation, 
+\Tool can still incur non-tolerable slowdown.
+For example, if a profiling target is a loop and 
+one sampled instance of the loop contain a lot of iterations, 
+\Tool may cause observable slowdown. 
+To handle this problem, the next version of \Tool could 
+be enhanced by recording limited number of iterations for a sampled loop instance. 
+
 
 \commentty{Consider adding a section
-on limitations and threats to validity after the results. People would want to see under what conditions
+on limitations and threats to validity after the results. 
+People would want to see under what conditions
 \Tool works and does not work.}
 
