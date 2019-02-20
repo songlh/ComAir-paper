@@ -158,8 +158,6 @@ the production-run version of \Tool,
 which is also the default sampling rate 
 in previous works on statistical debugging~\cite{liblit03,CCI,ldoctor}.
 
-
-
 To answer RQ1 (i.e., the effectiveness of  \Tool in identifying
 complexity problems), we measure the ranking number (position) of code
 constructs containing complexity problems. We also use the ranking number
@@ -178,12 +176,12 @@ we instrument all executed loops.
 For the in-house version, since the whole program is profiled, 
 we rank all executed functions during buggy runs. 
 
-
 To answer RQ2 (i.e., the accuracy of the production-run version of \Tool),
 we calculate the $R^2$ value~\cite{rsquare} 
 for the two groups of input sizes (and costs) reported by 
 \commentlh{
-the production-run version of \Tool with and without optimizations in Section~\ref{sec:opt}.
+the production-run version of \Tool with and without optimizations 
+discussed in Section~\ref{sec:opt}.
 }
 $R^2$ represents how well one variable can be predicted by another variable,
 and a $R^2$ value close to one means the two variables are 
@@ -193,19 +191,21 @@ are both close to one,
 the inferred two cost functions with and without optimizations must be in the same order, 
 which means that both sampling and other designed optimizations 
 do not hurt the accuracy. 
+We also conduct a similar experiment to understand whether the production-run version is 
+as accurate as the in-house version. 
 \commentty{This paragraph seems too much. Are we just comparing 
 the accuracy between the non-optimized and the optimized production version of \Tool}
 \commentlh{addressed.}
 
-%\commentlh{
 To answer RQ3 (i.e., whether the production-run version of \Tool 
 can be really deployed in production runs), 
 we measure the runtime overhead for the program version 
 with the buggy loop instrumented, compared with non-instrumented version. 
-We run each version ten times and compute the overhead based by average execution time. 
+We run each version \textbf{ten} times and compute the 
+overhead based by the average execution time. 
 \commentlh{
 We also measure the overhead while disabling all optimizations 
-to understand the effect of all our designed optimizations. }
+to understand the benefits of all our designed optimizations. }
 
 
 
