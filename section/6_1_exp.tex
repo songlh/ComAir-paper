@@ -5,11 +5,11 @@ All experimental results are shown in Table~\ref{tab:benchmark_info}.
 We discuss how these results can answer the previous three research questions as follows.
 
 
-\subsubsection{Effectiveness Results}
+\subsubsection{Effectiveness}
 As shown by the ranking numbers in Table~\ref{tab:benchmark_info},
 \Tool can effectively identify buggy loops and buggy functions 
 among all evaluated loops and executed functions. 
-\Tool rank the buggy loop or the buggy function as No. 1 
+\Tool ranked the buggy loop or the buggy function as No. 1 
 for \textbf{all} benchmarks under both the production-run and in-house settings. 
 We also calculate the percentage of loops or functions 
 to be examined before the root-cause one is identified, 
@@ -25,6 +25,9 @@ For the in-house version, the minimum percentage is for GCC\#46401,
 and there are in total 4249 executed functions for this bug.
 The largest one is for Mozilla\#477564. 
 Overall, the percentage is less than 10\% for 33 out of 39 bugs. 
+\commentty{If you rank the ground-truth as No. 1, shouldn't the 
+number of loops or functions to be examined before the root 
+cause is 0, so the percentage is 0? }
 
 Our ranking mechanism can indeed save developers' efforts 
 and help identify root causes. 
@@ -43,7 +46,7 @@ By referring the results of \Tool,
 developers can avoid manually inspecting the large number of  
 suspicious loops or functions in superlinear complexity. 
 
-\subsubsection{Accuracy Results}
+\subsubsection{Accuracy}
 As shown in Table~\ref{tab:benchmark_info} (the ``Cost Function'' column),
 the production-run version of \Tool successfully 
 report the correct complexity for the buggy loop of 
@@ -56,6 +59,8 @@ Previous work consider $R^2$ value larger than 0.92
 as a good fitting~\cite{rsquare-value}.
 Our results show that inferred cost functions can well represent 
 observed (input size, cost) pairs. 
+\commentty{should say something like the production-version
+is almost as accurate as the in-house version.}
 
 To understand whether sampling and approximation leveraged 
 in the production-run version of \Tool will hurt accuracy, 
@@ -72,9 +77,12 @@ by the production-run version under the default sampling rate and disabling samp
 The minimum $R^2$ value is $0.93$. 
 These results demonstrate that sampling and approximation in the production-run 
 version does not hurt profiling accuracy. 
+\commentty{The optimization does not affect accuracy, but does it reduce
+the overhead and to what extent? I think reviewers would ask how much cost
+can be saved by the optimization.}
 
 
-\subsubsection{Performance Results}
+\subsubsection{Overhead}
 The runtime overhead for the production-run version of \Tool is 
 shown in Table~\ref{tab:benchmark_info}. 
 In general, the performance is good. The runtime overhead is constantly 
@@ -86,3 +94,13 @@ The overhead can be as large as 1252X for Mozilla\#416628.
 For 31 out of 38 bugs, the overhead is larger than 10X. 
 These results show that the instrumentation mechanisms 
 discussed in Section~\ref{sec:opt} can effectively reduce runtime overhead. 
+\commentty{This is related to my previous comment, would the optimization
+help to reduce the overhead?}
+
+
+\subsection{Discussion and Limitations}
+
+\commentty{Consider adding a section
+on limitations and threats to validity after the results. People would want to see under what conditions
+\Tool works and does not work.}
+
