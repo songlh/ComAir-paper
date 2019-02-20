@@ -1,12 +1,16 @@
 \section{Conclusion}
 \label{sec:con}
 
-In this paper, we present \Tool, which can effectively conduct algorithmic profiling.
-\Tool covers the majority of real-world complexity problems, 
-generates accurate algorithmic profiling results, 
-and incurs a very low runtime overhead under the production-run setting. 
-We build \Tool through a comprehensive empirical study on real-world complexity problems, 
-thoroughly exploring different design points for algorithmic profiling, 
-and applying sampling to lower runtime overhead. 
-Future work can improve \Tool through leveraging 
-new hardware or designing novel approximate metrics. 
+In this paper, we present \Tool, which can effectively conduct algorithmic profiling
+under both in-house and production-run setting.
+\Tool enhances existing algorithmic profiling techniques by 
+(1) providing a ranking mechanism to effectively identify root 
+causes for performance failures due to complexity problems, 
+and (2) significantly lowering runtime overhead 
+and enabling algorithmic profiling in production environment. 
+Our evaluation shows that \Tool can accurately identify root causes 
+with accurate profiling results, 
+and incur negligible overhead under the production-run setting. 
+Future work can improve \Tool to profile multi-threaded programs 
+and avoid performance corner cases during sampling. 
+

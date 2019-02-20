@@ -19,14 +19,14 @@ collected from multiple runs with different inputs and infer cost functions.
 
 The in-house version of \Tool uses RMS as input metric and BB
 as cost metric.
-It is configured by enabling
-only the two instrumentation optimization methods (i.e.,
-optimizing instrumentation sites) presented 
-in the production-run version, without enabling any approximation. 
+It is configured by enabling only the two instrumentation site optimizations 
+(Section~\ref{sec:site_opt}), without enabling approximation (Section~\ref{sec:approximate})
+and sampling (Section~\ref{sec:sampling}). 
 The reason is that the optimization methods intend to speed up \Tool, 
 while still providing the same results, 
-but enabling the approximation method will sacrifice accuracy. 
+but enabling the approximation and sampling will sacrifice accuracy. 
 \commentty{In the above sentence, better add pointers to specific sections.}
+\commentlh{addressed}
 %This is because we wish 
 %to obtain more accurate results.
 Similar to Aprof~\cite{Aprof1,Aprof2}, 

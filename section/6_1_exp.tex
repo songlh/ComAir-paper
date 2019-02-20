@@ -65,7 +65,8 @@ as accurate as the in-house version.
 }
 
 The $R^2$ values computed by comparing input sizes and cost values 
-reported by the production-run version with and without optimizations are shown in 
+reported by the production-run version with and without all 
+optimizations in Section~\ref{sec:opt} are shown in 
 Table~\ref{tab:benchmark_info} 
 (the ``$R^2$-Input'' and ``$R^2$-Cost'' columns).
 For 35 out of 38 benchmarks, $R^2$ are larger than $0.99$ for 
@@ -73,11 +74,15 @@ both input sizes and cost values.
 For the other three bugs, the computed $R^2$ values are not low, 
 and all of them are larger than $0.92$, which is considered as a good fitting. 
 The minimum $R^2$ value is $0.93$ for GCC\#1687.
-These results demonstrate that \emph{sampling and approximation 
+Applied optimizations include
+sampling and approximation, which can potentially influence profiling results.
+However, our experimental results demonstrate that \emph{sampling and approximation 
 applied in the production-run version of \Tool do not hurt accuracy. 
 }
 \commentty{Are we evaluating only sampling and approximation, or all optimization methods
 described  in Section 4.1? We should make this part clear.}
+\commentlh{addressed.}
+
 
 
 \subsubsection{RQ3: Overhead}
@@ -107,8 +112,11 @@ of \Tool is also measured
 The overhead can be as large as 1252X for 
 Mozilla\#416628.
 For 31 out of 38 bugs, the overhead is larger than 10X. 
-
+The production-run version can generate results as accurate as the in-house version,
+but with a significantly lower overhead. 
 \commentty{What do the above results imply?}
+\commentlh{addressed.}
+
 
 \subsection{Discussion and Limitations}
 

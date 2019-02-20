@@ -4,26 +4,31 @@
 \label{sec:related}
 
 \noindent\textbf{Empirical studies on performance problems.}
-Many characteristics studies are conducted on different types 
+Many previous studies were conducted on different types 
 of real-world performance
-bugs~\cite{PerfBug,SongOOPSLA2014,ldoctor,Zaman2012MSR,Nistor2013MSR,HuangRegression,SmartphoneStudy,junwen-1, junwen-2}.
+bugs~\cite{PerfBug,SongOOPSLA2014,ldoctor,Zaman2012MSR,Nistor2013MSR,HuangRegression,SmartphoneStudy,junwen-1}.
 Similar to our work in Section~\ref{sec:study},
 these studies have important findings and 
 implications 
 that can guide technical design to combat
-performance bugs.
+performance bugs from different aspects, 
+such as detecting previously unknown bugs~\cite{PerfBug,SmartphoneStudy,junwen-1}, 
+diagnosing performance failures~\cite{SongOOPSLA2014,ldoctor} 
+and optimizing existing programs~\cite{junwen-2}. 
 However, our work is the first empirical study focusing 
 on complexity problems,
 and it provides important supplement to existing studies.
-
 
 \noindent\textbf{Traditional and algorithmic profilers.}
 Traditional profilers are the most widely used tools
 during performance optimization and debugging.
 After collecting runtime information,
 traditional profilers associate performance metrics to executed instructions,
-functions, or 
-calling context~\cite{oprofile,gprof,CCT,4Profilers,LagHunter,AppInsight,AdaptiveBurst,HotCallingContext}.
+functions, or calling context~\cite{oprofile,gprof,CCT}.
+Many research works are proposed to improve
+accuracy of profilers~\cite{4Profilers, LagHunter, AppInsight}, or
+to reduce runtime overhead~\cite{AdaptiveBurst}
+and memory overhead of profilers~\cite{HotCallingContext}.
 However, traditional profilers can only analyze one single program run,
 but cannot connect results from multiple runs and cannot
 predict results for inputs not seen before.
@@ -34,7 +39,8 @@ these two techniques suffer from three limitations.
 \Tool enhances existing techniques through significantly 
 reducing runtime overhead and providing an effective ranking mechanism. 
 \Tool can accurately point out root causes 
-and can be deployed in production runs. 
+and can be deployed in production environment. 
+
 
 \noindent\textbf{Performance bug detection.}
 There are many performance bug detectors, 
@@ -48,7 +54,7 @@ in $O(N^2)$ complexity and used in our evaluation in Section~\ref{sec:eva}.
 However, static detectors cannot provide any indication
 about bugs' performance impact.
 Dynamic detectors usually incur more than $10\times$ overhead,
-and cannot be applied in production environments.
+and cannot be applied in production environment.
 \Tool can detect complexity problems in production runs 
-and also provide information about workloads and bugs' impact 
-to help developers make better priority decisions during bug fixing. 
+and also provide information about workloads and bugs' performance impact 
+to help developers make better priority decisions. 
