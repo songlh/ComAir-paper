@@ -1,30 +1,30 @@
-\noindent{\color{red} Todo: 1. existing tools fail to generate a ranking list}
-
-\noindent{\color{red} Todo: 2. we have two settings of ComAir}
-
 Complexity problems are a common type of performance problems, 
 causing by algorithmic inefficiency. 
-Algorithmic profiling aims to automatically attribute execution complexity to a code construct.
-It can detect previously unknown complexity problems and diagnose performance failures 
-caused by complexity problems. 
-Existing algorithmic profiling techniques
-incur more than $30$ times runtime overhead,
-and cannot be deployed in production runs, missing opportunities 
-to detect complexity problems escaping from in-house testing 
-and to understand how programs scale under real-world workloads. 
+Algorithmic profiling aims to automatically attribute execution 
+complexity to each executed code construct.
+It can potentially detect previously unknown complexity problems 
+and diagnose performance failures caused by complexity problems. 
+However, existing algorithmic profiling techniques 
+suffer from several severe limitations, 
+missing opportunities to be deployed in production environments 
+and effectively guide developers 
+to understand and fix complexity problems. 
 
-In this paper, we present a tool, \Tool, 
-which can effectively conduct algorithmic profiling under production-run setting. 
-To design \Tool, we first conduct an empirical study on 
-real-world complexity problems.
-Under the guidance of our empirical study, we then apply 
-sampling and a series of compiler optimizations to 
-algorithmic profiling to lower its runtime overhead.
-In the end, we systematically evaluate \Tool using real-world complexity problems. 
+In this paper, we design a tool, \Tool, which can effectively conduct 
+algorithmic profiling under both production-run and in-house settings.
+Under the guidance of an empirical study on real-world complexity problems, 
+we propose several novel instrumentation methods to 
+significantly lower runtime overhead
+for the production-run version of \Tool.
+We also design an effective ranking mechanism to help developers identify 
+root causes for performance failures due to complexity problems. 
 Our experimental results show that \Tool 
-can analyze different types of complexity problems, 
-generate accurate profiling results for algorithmic complexity, 
-and incur a negligible slowdown. 
+can effectively identify root causes, 
+generate accurate profiling results, 
+and incur a negligible slowdown under the production-run setting
+to be able to deployed in production environments. 
+
+
 
 
 
