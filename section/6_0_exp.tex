@@ -114,12 +114,10 @@ and four in O(N) complexity.
 
 \subsubsection{Production-run and In-house Inputs}
 
-\commentlh{
 For the production-run version of \Tool, we create inputs used in our evaluation
 by simulating real user inputs.
 For each of the 38 benchmarks, we create ten distinct inputs, 
-following previous practice in evaluating statistical debugging~\cite{joy.asplos13,SongOOPSLA2014}.} 
-\commentty{people may ask why 10?}
+following previous practice in evaluating statistical debugging~\cite{joy.asplos13,SongOOPSLA2014}.
 To obtain such inputs, we use bug reports, 
 which contain detailed information about how real-world 
 users perceive the complexity problems. 
@@ -141,10 +139,9 @@ equal to the input in the bug report and the
 smallest input size equal to $1/10$ 
 of the largest input.
 We use the same inputs to evaluate the in-house version of \Tool
-\commentlh{to fairly compare accuracy and runtime 
-overhead between the two versions of \Tool.}
-\commentty{Is it because by using the same inputs, we can compare
-the overheads between the two versions?}
+to fairly compare accuracy and runtime 
+overhead between the two versions of \Tool.
+
 
 
 \subsubsection{Experimental Settings}
@@ -187,7 +184,6 @@ To answer RQ2 (i.e., the accuracy of the production-run version of \Tool),
 we calculate the $R^2$ value~\cite{rsquare} 
 for the two groups of input sizes (and costs) reported by 
 the two versions of \Tool.
-\commentlh{
 $R^2$ represents how well one variable can be predicted by another variable,
 and a $R^2$ value close to one means the two variables are 
 in strong linear relationship~\cite{rsquare-value}.
@@ -196,10 +192,7 @@ are both close to one,
 the inferred two cost functions by the two versions must be in the same order, 
 which means the production-run version is as accurate as the in-house version, 
 and both sampling and other designed approximation (Section~\ref{sec:opt}) do not hurt accuracy. 
-}
-\commentty{Need to explain what $R^2$ is and how it is computed.}
-\commentty{It is not clear here why $R^2$ can reflect the comparison
-of the accuracy between the two versions.}
+
 
 Due to the difference in profiling granularities and algorithms 
 (e.g. whether different dynamic instances in one program run are merged), 
@@ -210,16 +203,14 @@ Given a bug in $O(N^2)$ complexity, we apply the production-run version on the i
 while applying the in-house version on the function containing the outer loop. 
 The two bugs in $O(N^2)$ complexity are both caused by recursive functions.
 We apply the two versions on the recursive function for each bug. 
-\commentty{what do you mean by ``minimum code construct"?}
-\commentlh{removed}
 To understand whether sampling
 causes the production-run version of \Tool 
 to lose some accuracy, we also calculate the $R^2$ value for two groups 
 of inputs (and costs) reported by the production-run versions 
 under sampling rate $1/100$ and sampling rate $1$,
 since $1/100$ is our default sampling rate and $1$ means disable sampling. 
-\commentty{people may ask why 100 and 1 are chosen.}
-\commentlh{addressed}
+\commentty{This paragraph seems too much. Are we just comparing 
+the accuracy between the non-optimized and the optimized production version of \Tool}
 
 
 %\commentlh{
@@ -228,13 +219,6 @@ can be really deployed in production runs),
 we measure the runtime overhead for the program version 
 with the buggy loop instrumented, compared with non-instrumented version. 
 We run each version ten times and compute the overhead based by average execution time. 
-\commentty{not sure why this can be used to measure if the production-version
-can be deployed...I thought we should measure the overhead of the instrumented version
-vs the non-instrumented version?}
-\commentlh{not sure whether I answered your question.}
-\commentty{what do we need to
-care about the in-house version for this RQ?}
-\commentlh{removed}
-%}
+
 
 
