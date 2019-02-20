@@ -5,19 +5,27 @@ All experimental results are shown in Table~\ref{tab:benchmark_info}.
 We discuss how these results can answer the previous three research questions as follows.
 
 
-\subsubsection{Effectiveness}
+\subsubsection{RQ1: Effectiveness}
 As shown by the ranking numbers in Table~\ref{tab:benchmark_info},
 \Tool can effectively identify buggy loops and buggy functions 
 among all evaluated loops and executed functions. 
 \Tool ranked the buggy loop or the buggy function as No. 1 
-for \textbf{all} benchmarks under both production-run and in-house settings. 
-Since root-cause loops or functions are always ranked as No. 1, 
-the percentage of loops or functions to be examined before a performance bug is found is 0\%
-for all bugs. 
-\commentty{If you rank the ground-truth as No. 1, shouldn't the 
-number of loops or functions to be examined before the root 
-cause is 0, so the percentage is 0? }
+or \textbf{all} benchmarks under both the production-run and in-house settings. 
+The evaluated or executed code constructs are shown as subscripts of 
+the two ``ranking'' columns. 
+\commentlh{
+For the production-run versions, the evaluated loops range from 3 to 5.
+For the in-house versions, there are ten bugs whose executed functions are more than 
+100.  GCC\#46401 has 4249 executed functions, 
+which is the largest number.  
+Our ranking mechanism can effectively identify the 
+root cause among all these code constructs.
+}  
+\commentty{Since all are ranked at 1, I think we may not need 
+to report the percentage, but can we add a column reporting the total number
+of code constructs?}
 \commentlh{addressed}
+
 
 Our ranking mechanism can indeed save developers' efforts 
 and help identify root causes. 
@@ -35,46 +43,50 @@ by the in-house version.
 By referring the results of \Tool, 
 developers can avoid manually inspecting the large number of  
 suspicious loops or functions in superlinear complexity. 
+\commentlh{Discuss another case where the root-cause loop does not 
+have the largest loop iteration number. }
 
-\subsubsection{Accuracy}
+\subsubsection{RQ2: Accuracy}
 As shown in Table~\ref{tab:benchmark_info} (the ``Cost Function'' column),
 the production-run version of \Tool successfully 
-report the correct complexity for the buggy loop of 
-each evaluated benchmark. 
-We also compute the $R^2$ value between observe cost values and 
-cost values predicted by the inferred cost function for each bug.  
+reports the correct complexity for buggy loops of 
+all evaluated benchmark. 
+We compute the $R^2$ value between observed cost values and 
+cost values predicted by the inferred cost function for each bug 
+(the ``$R^2$-Func'' column).  
 There are only four bugs, whose computed $R^2$ value is less than $0.99$.
-The minimum $R^2$ value is 0.927 for Collections\#429-1. 
+The minimum $R^2$ value is 0.92 for Collections\#429-1. 
 Previous work consider $R^2$ value larger than 0.92 
 as a good fitting~\cite{rsquare-value}.
 Our results show that inferred cost functions can well represent 
 observed (input size, cost) pairs. 
-
-
-\commentty{should say something like the production-version
-is almost as accurate as the in-house version.}
-
-To understand whether sampling and approximation leveraged 
-in the production-run version of \Tool will hurt accuracy, 
-we compare reported input sizes and cost values by the two versions of \Tool.
-The computed $R^2$ values are shown in Table~\ref{tab:benchmark_info} 
-(the columns labeled with ``P-vs.-I''). 
+We also compute $R^2$ to compare the reported input sizes 
+and cost values by the production-run version and the in-house version. 
 For 31 out of 38 benchmarks, 
 the $R^2$ values are larger than $0.99$ for both input sizes and cost values. 
-For the left seven benchmarks, the $R^2$ values are all larger than $0.9$.
-The minimum $R^2$ value is $0.92$ for Collections\#429-0. 
-To separately inspect the effect of sampling, 
-we also calculate $R^2$ values for input sizes and cost values reported 
-by the production-run version under the default sampling rate and disabling sampling. 
-The minimum $R^2$ value is $0.93$. 
-These results demonstrate that sampling and approximation in the production-run 
-version does not hurt profiling accuracy. 
-\commentty{The optimization does not affect accuracy, but does it reduce
-the overhead and to what extent? I think reviewers would ask how much cost
-can be saved by the optimization.}
+For the left seven benchmarks, the $R^2$ values are all larger than $0.92$. 
+This result shows that the production-run version is 
+as accurate as the in-house version. 
+\commentty{should make a conclusion here, sayting something like the production-version
+is almost as accurate as the in-house version.}
+\commentlh{addressed}
 
 
-\subsubsection{Overhead}
+\commentlh{
+The $R^2$ values computed by comparing input sizes and cost values 
+reported by the production-run version with and without optimizations are shown in 
+Table~\ref{tab:benchmark_info} 
+(the ``$R^2$-Input'' and ``$R^2$-Cost'' columns).
+The $R^2$ values are larger than $0.99$ for 
+both input sizes and costs for 35 out of 38 benchmarks. 
+For the other three bugs, the computed $R^2$ values are not low, 
+and all of them are larger than $0.92$, which is observed as a good fitting. 
+The minimum $R^2$ value is $0.93$ for GCC\#1687.
+This result demonstrates that sampling and approximation 
+applied in the production-run version of \Tool do not hurt accuracy. 
+}
+
+\subsubsection{RQ3: Overhead}
 The runtime overhead for the production-run version of \Tool is 
 shown in Table~\ref{tab:benchmark_info}. 
 In general, the performance is good. The runtime overhead is constantly 
@@ -86,8 +98,7 @@ The overhead can be as large as 1252X for Mozilla\#416628.
 For 31 out of 38 bugs, the overhead is larger than 10X. 
 These results show that the instrumentation mechanisms 
 discussed in Section~\ref{sec:opt} can effectively reduce runtime overhead. 
-\commentty{This is related to my previous comment, would the optimization
-help to reduce the overhead?}
+
 
 
 \subsection{Discussion and Limitations}

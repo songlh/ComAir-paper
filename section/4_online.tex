@@ -237,12 +237,9 @@ the counter and how to update the counter.
 For example, in Figure~\ref{fig:mysql27287}
 there are in total six BBs inside 
 the loop,
-\commentlh{
 but \Tool only instruments five of them and 
 updates the counter by two for one BB and by one for the other four BBs,
 instead of updating the counter by one for all the six BBs.
-}
-\commentty{need a bit explanation why five is needed not six.}
 As another example, there are 141 BBs 
 inside function \texttt{mult\_alg()} in Figure~\ref{fig:gcc27733}, 
 while \Tool only instruments 78 of them. 
@@ -432,10 +429,10 @@ Since we record instructions' ids, tracing logs can help us solve function point
 If there is direct or indirect caller-callee relationship 
 between profiling target \texttt{A}
 and profiling target \texttt{B}, we rank \texttt{B} higher than \texttt{A}.
-\commentlh{Since a root-cause profiling target may 
+Since a root-cause profiling target may 
 cause all its callers to be in the same complexity, 
-prioritizing callees over callers can help reduce false positives.}
-\commentty{need a bit explanation on why the caller-callee relationship matters.}
+prioritizing callees over callers can help reduce false positives.
+%\commentty{need a bit explanation on why the caller-callee relationship matters.}
 If there is no caller-callee relationship,
 we rank the one with larger observed cost higher.
 

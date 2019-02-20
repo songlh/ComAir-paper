@@ -19,8 +19,7 @@ in both production and in-house environments?
 {\bf RQ2:}
 How does the production-run version of \Tool 
 compare with the in-house version in terms of
-%cost-effectiveness?
-\commentlh{accuracy}?
+accuracy?
 
 \vspace*{3pt}
 \noindent
@@ -160,11 +159,12 @@ in previous works on statistical debugging~\cite{liblit03,CCI,ldoctor}.
 
 To answer RQ1 (i.e., the effectiveness of  \Tool in identifying
 complexity problems), we measure the ranking number (position) of code
-constructs containing complexity problems. We also use the ranking number
-to compute the percentage of code constructs
-that need to be examined before finding a performance bug in the program.
-This ranking strategy has been widely adopted by existing fault localization 
-techniques~\cite{Jones05,Cleve05}.
+constructs containing complexity problems. 
+To determine whether a code construct matches
+the known complexity problem (i.e., ground truth), 
+we manually examined the solution discussed 
+in the corresponding issue 
+report and the patch used for fixing the issue. 
 To evaluate the production-run version of \Tool,
 we instrument the top five loops with the largest loop 
 iteration numbers under bug-triggering inputs to 
@@ -176,12 +176,13 @@ we instrument all executed loops.
 For the in-house version, since the whole program is profiled, 
 we rank all executed functions during buggy runs. 
 
+
 To answer RQ2 (i.e., the accuracy of the production-run version of \Tool),
 we calculate the $R^2$ value~\cite{rsquare} 
 for the two groups of input sizes (and costs) reported by 
 \commentlh{
-the production-run version of \Tool with and without optimizations 
-discussed in Section~\ref{sec:opt}.
+the production-run version of \Tool with and without 
+optimizations discussed in Section~\ref{sec:opt}.
 }
 $R^2$ represents how well one variable can be predicted by another variable,
 and a $R^2$ value close to one means the two variables are 
@@ -191,21 +192,14 @@ are both close to one,
 the inferred two cost functions with and without optimizations must be in the same order, 
 which means that both sampling and other designed optimizations 
 do not hurt the accuracy. 
-We also conduct a similar experiment to understand whether the production-run version is 
-as accurate as the in-house version. 
-\commentty{This paragraph seems too much. Are we just comparing 
-the accuracy between the non-optimized and the optimized production version of \Tool}
-\commentlh{addressed.}
+
 
 To answer RQ3 (i.e., whether the production-run version of \Tool 
 can be really deployed in production runs), 
 we measure the runtime overhead for the program version 
 with the buggy loop instrumented, compared with non-instrumented version. 
-We run each version \textbf{ten} times and compute the 
-overhead based by the average execution time. 
-\commentlh{
-We also measure the overhead while disabling all optimizations 
-to understand the benefits of all our designed optimizations. }
+We run each version \textbf{ten} times and compute the overhead based 
+by average execution time. 
 
 
 

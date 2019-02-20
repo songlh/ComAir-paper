@@ -13,9 +13,9 @@ To conduct algorithmic profiling for a given code construct,
 we first need to record input and cost information in multiple program runs. 
 We then plot the recorded information with input size as x-axis and cost as y-axis.
 In the end, we infer complexity for the code construct as a cost function of input size. 
-\commentty{To help reviewers better understand algorithmic profiling,
-we can rephrase the example of Figure 1 to illustrate algorithmic profiling and
-show how the cost function looks like.}
+%\commentty{To help reviewers better understand algorithmic profiling,
+%we can rephrase the example of Figure 1 to illustrate algorithmic profiling and
+%show how the cost function looks like.}
 
 To conduct algorithmic profiling effectively, 
 we need to define suitable metrics for input and cost. 
@@ -50,8 +50,7 @@ the code construct are considered.
 Take MySQL\#27287 (Figure~\ref{fig:mysql27287}) as an example, 
 during an execution of the buggy loop, the number of accesses
 computed by RMS is approximately 
-two times as the number of actual \commentlh{accessed elements inside array \texttt{items}}. 
-\commentty{I rephrased the above sentence, but am not sure if I messed it up.}
+two times as the number of actual accessed elements inside array \texttt{items}. 
 This is because different \texttt{XML\_NODE}s' \texttt{level} and \texttt{type} 
 fields are read in different loop iterations. 
 Although variable \texttt{p} and \texttt{level} are also read in each iteration,
@@ -86,7 +85,6 @@ such as CPU cycles, network bandwidth, storage, and so on.
 In this paper, we focus on CPU cycles (or computation cost), 
 since computation cost is often correlated 
 with user-perceived software slowdown~\cite{SongOOPSLA2014}.
-\commentty{any references?}
 We leave the measurement for other types of 
 consumed resources for future work.
 
@@ -144,8 +142,6 @@ failing to consider programs' structures and missing opportunities to optimize p
 For example, we implement an existing technique, Aprof~\cite{Aprof1,Aprof2}, 
 using LLVM in our experiment. 
 For most evaluated benchmark, Aprof incurs 50$X$ runtime overhead.
-\commentty{Do you mean Aprof? Aren't RMS and DSS general input metrics?}
-\commentlh{addressed}
 %\commentty{Why do they incur large overheads? What are the underlying limitations?}
 %\emph{Due to the extremely large overhead, 
 %we cannot deploy these two techniques in production-run scenario. }
@@ -179,9 +175,3 @@ profiling to lower runtime overhead.
 We will discuss more detailed design 
 later in Section~\ref{sec:online}. 
 
-
-
-\commentty{It would be better to add 1-2 sentence to describe
-how our approach addresses each of the three limitations.}
-
-\commentlh{addressed}
