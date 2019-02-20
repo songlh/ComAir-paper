@@ -36,7 +36,7 @@
     GCC\#27733&$3217$&C&$O(2^{N})$&1$_{{5}}$&$y=2.33e^{0.003x}$    & \Yes{{0.97}} &\Yes{{0.95}}&\Yes{{0.98}}&$4.34\%$& 4.08X &1$_{{3537}}$&48X\\
     GCC\#8805&$2538$&C&$O(N^{2})$&1$_{{5}}$&$y=2.08*10^{-5}x^2$    & \Yes{{0.99}} &\Yes{{0.99}}&\Yes{{0.99}}&3.28\% & 58.8\%&1$_{{1373}}$ & 48X \\
     GCC\#21430&$3844$&C&$O(N^{2})$&1$_{{5}}$&$y=1.02*10^{-3}x^2$   & \Yes{{0.99}} &\Yes{{0.99}}&\Yes{{0.99}}&4.63\% & 94.7\% &1$_{{3370}}$ & 23X\\
-    GCC\#12322&$2341$&C&$O(N^{2})$&1$_{{5}}$&$y=2.43*10^{-5}x^2$   & \Yes{{0.99}}      \\
+    GCC\#12322&$2341$&C&$O(N^{2})$&1$_{{5}}$&$y=2.43*10^{-5}x^2$   & \Yes{{0.99}} &\Yes{{0.98}}&\Yes{{0.99}}     \\
     \midrule
     \midrule
     Apache\#53622&$1.094^*$&Java&$O(N^{2})$&1$_{{5}}$&$y=6.64*10^{-2}x^2$&\Yes{{0.99}} &\Yes{{1.00}}&\Yes{{0.98}}&$0.36\%$& &1$_{{41}}$&27X\\
@@ -68,19 +68,17 @@
    }
   %\nocaptionrule
   \vspace{0.1in}
-   \mycaption{tab:benchmark_info}{Benchmark Information and evaluation results for \Tool.}
+  \mycaption{tab:benchmark_info}{Benchmark Information and evaluation results for \Tool.}
    {In the ``Benchmark Information'' columns,
    $x^*$: $x$ thousands of lines of code for re-implemented benchmarks.
    In the ``Production-run Version''columns,
    $x_{y}$: the root-cause loop is ranked as $x$th in $y$ evaluated loops;
-   Top-\%: the percentage of loops needs to be examined until the root-cause one identified;
    Cost Function: we only report the part with the highest order due to limited space; 
-   \Yes{{x}}: the computed $R^2$ value x is larger than 0.9;
-   P-vs.-I: the production-run version vs. the in-house version;
-   100-vs.-1: sampling rate configured as $1/100$ vs. sampling rate as $1$.
+   $R^2$-Func: $R^2$ values comparing observed cost with predicted cost by cost function;
+   $R^2$-Input: $R^2$ values comparing input sizes reported with optimizations and without optimizations;
+   \Yes{{x}}: the computed $R^2$ value x is larger than 0.92;
    In the ``In-house Version'' columns, 
-   $x_{y}$: the root-cause function is ranked as $x$th in $y$ executed functions;
-   Top-\%: the percentage of functions needs to be examined until the root-cause one identified.
-   }
+   $x_{y}$: the root-cause function is ranked as $x$th in $y$ executed functions.}
+
 \vspace{-0.15in}
 \end{table*}
