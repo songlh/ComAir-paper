@@ -170,6 +170,8 @@ we instrument the top five loops with the largest loop
 iteration numbers under bug-triggering inputs to 
 create five distinct program versions, 
 since instrumenting all loops is expensive. 
+\commentty{how did you know which five to instrument
+among all code constructs?}
 For benchmarks with less than five executed 
 loops during buggy runs, 
 we instrument all executed loops.  
@@ -180,10 +182,8 @@ we rank all executed functions during buggy runs.
 To answer RQ2 (i.e., the accuracy of the production-run version of \Tool),
 we calculate the $R^2$ value~\cite{rsquare} 
 for the two groups of input sizes (and costs) reported by 
-\commentlh{
 the production-run version of \Tool with and without 
 optimizations discussed in Section~\ref{sec:opt}.
-}
 $R^2$ represents how well one variable can be predicted by another variable,
 and a $R^2$ value close to one means the two variables are 
 in strong linear relationship~\cite{rsquare-value}.
