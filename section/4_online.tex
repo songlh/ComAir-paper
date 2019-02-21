@@ -6,7 +6,7 @@
 %including the high-level design choices
 %and several optimization policies. 
 
-Guided by the findings of empirical study in Section~\ref{sec:study},
+Guided by the findings of the empirical study in Section~\ref{sec:study},
 we design and implement \Tool, an algorithmic
 profiler to detect complexity problems. \Tool
 can be used in both production environment 
@@ -83,7 +83,7 @@ As discussed in Section~\ref{subsec:existing},
 existing algorithmic profiling techniques
 often incur significant overhead and thus cannot be used in production
 environment. To address this issue, \Tool proposes several 
-methods to \emph{enable practical online instrumentation, which 
+methods to \emph{enable practical online monitoring, which 
 constitute the key novelty of \Tool over existing algorithmic profiling tools}.
 These methods include 1) 
 minimizing instrumented code at each user's end; 
@@ -95,13 +95,14 @@ We next discuss these methods in detail.
 
 \subsubsection{Creating Multiple Instrumentation Versions}
 
-\Tool creates multiple versions of program under profiling, 
+\Tool creates multiple program versions for a program under profiling, 
 and for each version \Tool only instruments a small number of 
 profiling targets. 
 All different versions are distributed to different end users. 
 Since there is a huge amount of end users, 
 we anticipate that enough profiles can still be collected 
 for each version to conduct algorithmic profiling. 
+
 
 To select profiling targets, 
 %\commentty{How to determine
@@ -120,7 +121,7 @@ and cannot cause complexity problems.
 
 For each program version, we only instrument a small set of profiling targets
 to reduce runtime overhead.
-Given a instrumented profiling target,
+Given a profiling target,
 its direct and indirect callees are also instrumented. 
 Therefore, we will not put code constructs with caller-callee 
 relationship in the same set. 
@@ -145,13 +146,14 @@ if we cannot find complexity problems inside simple code constructs.
 %designed in previous works~\cite{Aprof1,Aprof2} 
 %before discussing our two designed optimizations. 
 
-We propose two instrumentation optimization strategies for obtaining
-input and cost metrics, respectively. 
+We propose three instrumentation optimization strategies, 
+two for obtaining input metric, and one for obtaining cost metric. 
 
-\noindent{\underline{\textit{Input metric.}}
+
+\noindent{\underline{\textit{Input Metric.}}
 To measure RMS (i.e., the input metric), we need to instrument  
  \texttt{read} and \texttt{write} instructions in a 
-code construct (or profiling target). 
+code construct (or a profiling target). 
 Different from the algorithm described 
 in previous work~\cite{Aprof1,Aprof2},
 we do not maintain any global data structure,
@@ -205,13 +207,13 @@ Therefore, we can record the address of \texttt{p} in the loop's
 preheader for ``\texttt{p>=items}''.
 %}
 
-\noindent{\underline{\textit{Cost metric.}}
+\noindent{\underline{\textit{Cost Metric.}}
 When counting the executed basic blocks (BBs) to compute cost metric,
-a naive way is to instrument every basic block to increment a counter by one.
+a naive way is to instrument every BB to increment a counter by one.
 To reduce the number of instrumentation 
 sites that update the counter,
 we design an algorithm to selectively 
-instrument part of basic blocks.
+instrument part of BBs.
 
 Our algorithm leverages the previous
 work on counting 
@@ -250,12 +252,13 @@ while \Tool only instruments 78 of them.
 \label{sec:approximate}
 
 Accurately recording dynamic input information
-for each code construct
+for a profiling target
 may still incur a large runtime overhead.
 Therefore, we propose an approximation mechanism. 
-If a profiled code construct is a loop and 
+If a profiling target is a loop and 
 it is to process an array or a linked list,
 we use the DSS as input metric.
+
 
 
 To apply the approximation, we are facing two challenges. 
@@ -279,8 +282,9 @@ of the first and the last accessed elements.
 We calculate the address difference and use it as DSS.
 The reason is that array is organized as a 
 consecutive memory, and the address difference 
-between the first and last accessed elements is roughly in linear 
+between the first and last accessed elements is approximately in linear 
 relationship with the number of accessed elements and DSS. 
+
 
 
 
@@ -314,7 +318,7 @@ detection and diagnosis capability.
 This motivates us to apply sampling to algorithmic profiling. 
 Our study in Section~\ref{sec:study} shows that 
 the majority of complexity problems are caused by repeated execution of a loop
-or a recursive function. 
+or a recursive function (Implication 2). 
 This finding inspires us to sample some dynamic instances of 
 a profiling target in one program run to 
 record their input sizes and costs,
@@ -374,14 +378,15 @@ we first process our log to calculate a set of memory cells,
 which contribute RMS
 or DSS for each sampled dynamic instance. 
 We then estimate the whole RMS or DSS for all instances using the following formula.
-We assume we collect a sequence of $m$ samples for a profiling target 
+We assume a sequence of $m$ samples is sampled for a profiling target 
 in one program run.
 Given the $i$th sample, we use $M_i$ to represent the 
 total number of distinct memory cells in the previous $i-1$ samples, 
 $C_i$ represents the number of distinct memory cells in the $i$th sample,
 and $R_i$ represents the number of distinct memory cells in 
 the $i$th sample that also appeared in one of the previous $i-1$ samples.
-The estimated RMS or DSS of the profiling target is:
+The estimated RMS or DSS for the profiling target can be calculated as:
+
 
 %\vspace{-0.in}
 \begin{equation} \label{eq:mark}
@@ -413,7 +418,7 @@ First, root-cause code constructs must have highest complexity.
 Second, root-cause code constructs must consume large computation cost.
 Third, since all direct and indirect callers of root-cause code constructs 
 consume more cost and may have the same complexity, 
-we should rank callee higher than its caller, 
+we should rank a callee higher than its caller, 
 to reduce false positives. 
 
 
@@ -432,11 +437,12 @@ If there is direct or indirect caller-callee relationship
 between profiling target \texttt{A}
 and profiling target \texttt{B}, we rank \texttt{B} higher than \texttt{A}.
 Since a root-cause profiling target may 
-cause all its callers to be in the same complexity, 
+cause all its callers to be in the same complexity and 
+caller always has a larger cost than its callee, 
 prioritizing callees over callers can help reduce false positives.
-%\commentty{need a bit explanation on why the caller-callee relationship matters.}
 If there is no caller-callee relationship,
 we rank the one with larger observed cost higher.
+
 
 
 %\commentty{How to rank two functions with different complexities? What
@@ -444,17 +450,21 @@ we rank the one with larger observed cost higher.
 %\commentlh{addressed}
 
 To illustrate our ranking algorithm, suppose we have four profiling targets, 
-whose target ids (0 to 3), complexity and ever observed largest costs are listed as follows:
-(0, $O(n)$, 2000), (1, $O(n^2)$, 800), (2, $O(n^2)$, 1200), and (3, $O(n^2)$, 300).
-We also assume target 2 is an indirect caller of target 1 and target 3,
-and there is no caller-callee relationship between target 1 and target 3.
+whose target ids (A to D), complexity and ever observed largest costs are listed as follows:
+(A, $O(n)$, 2000), (B, $O(n^2)$, 800), (C, $O(n^2)$, 1200), and (D, $O(n^2)$, 300).
+We also assume target C is an indirect caller of target B and target D,
+and there is no caller-callee relationship between target B and target D.
 According to our algorithm, 
-we rank the four profiling targets as 1, 3, 2, and 0. 
-Targets 1, 2 and 3 have higher complexity than target 0, 
+we rank the four profiling targets as B, D, C, and A. 
+Targets B, C and D have higher complexity than target A, 
 so that these three are ranked higher.
-Target 2 is has caller-callee relationship with targets 1 and 3,
+Target C is has caller-callee relationship with targets B and D,
 and thus it is ranked lower. 
-Target 1 has larger cost than target 3, so that it is ranked as No. 1. 
+Target B has larger cost than target D 
+and it has no caller-callee relationship with target D, 
+so that it is ranked as No. 1. 
+
+
 
 
 
