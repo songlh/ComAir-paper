@@ -17,9 +17,9 @@ in both production and in-house environments?
 \vspace*{3pt}
 \noindent
 {\bf RQ2:}
-How does the production-run version of \Tool 
-compare with the in-house version in terms of
-accuracy?
+How accurate is the production-run version of \Tool after 
+equipped with various instrumentation methods?
+
 
 \vspace*{3pt}
 \noindent
@@ -47,20 +47,25 @@ in production environment?
 
 The first research question allows us to evaluate whether \Tool is effective 
 at detecting real-world complexity problems. 
-The second research question investigate whether the instrumentation methods 
-used in the production-run version of \Tool incurs low cost while remaining
-accuracy in detecting complexity problems. 
+The second research question investigates whether the instrumentation methods 
+used in the production-run version of \Tool can lower runtime overhead 
+while remaining
+the accuracy in detecting complexity problems. 
 The third research question explores whether the overhead generated 
-by \Tool is negligible enough for being used in production environment.
+by the production-run version of \Tool is negligible 
+enough for being used in production environment.
+
+
 
 
 
 \subsection{Experimental Setup}
 
-%\noindent{\textbf{Implementation and Experimental Platform.}}
 We implement \Tool using LLVM-5.0.0~\cite{llvm}. 
 All our experiments are conducted on a Linux machine, 
 with Intel Xeon(R) 4110 CPU and 3.10.0 kernel.
+\Tool and all the data from the experiments are publicly 
+available at https://github.com/ComAirProject/ComAir.
 
 %We will release all our source code, experimental scripts 
 %and used benchmarks in the future. 
@@ -166,7 +171,7 @@ we manually examined the solution discussed
 in the corresponding issue 
 report and the patch used for fixing the issue. 
 To apply the production-run version of \Tool on each bug,
-we first use a PIN tool~\cite{?} \commentty{need a citation} to record executed iteration 
+we first use a PIN tool~\cite{pin} to record executed iteration 
 numbers for all loops using the bug-triggering input,
 and then we instrument the top five loops with the largest loop 
 iteration numbers to create five distinct program versions
@@ -183,19 +188,21 @@ To answer RQ2 (i.e., the accuracy of the production-run version of \Tool),
 we calculate the $R^2$ value~\cite{rsquare} 
 for the two groups of input sizes (and costs) reported by 
 the production-run version of \Tool with and without 
-optimizations discussed in Section~\ref{sec:opt}.
+instrumentation methods discussed in Section~\ref{sec:opt}.
 $R^2$ represents how well one variable can be predicted by another variable,
 and a $R^2$ value close to one means the two variables are 
 in strong linear relationship~\cite{rsquare-value}.
 Therefore, if the computed $R^2$ values for input sizes and costs
 are both close to one,
-the inferred two cost functions with and without optimizations must be in the same order, 
-which means that both sampling and other designed optimizations 
+the inferred two cost functions with and without instrumentation 
+methods must be in the same order, 
+which means that both sampling and approximation mechanisms 
 do not hurt the accuracy. 
 
 
+
 To answer RQ3 (i.e., whether the production-run version of \Tool 
-can be really deployed in production runs), 
+can be really deployed in production runs), given a benchmark
 we measure the runtime overhead for the program version 
 with the buggy loop instrumented, compared with non-instrumented version. 
 We run each version \textbf{ten} times and compute the overhead based 
