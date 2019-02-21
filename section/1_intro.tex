@@ -68,10 +68,10 @@ since an \texttt{XML\_NODE} usually does not have too many children.
 However, during performance failure runs,
 an \texttt{XML\_NODE} contains tens of thousands of children,
 and this leads significant showdown perceived by the end users.
-\commentty{To make the example more readable, can we add ``+", ``-" to indicate
-where the bug was and how it was fixed? }
-\commentlh{The patch is to completely remove this loop and add something when initializing all XML\_Nodes. 
-It is too large and hard to understand.}
+%\commentty{To make the example more readable, can we add ``+", ``-" to indicate
+%where the bug was and how it was fixed? }
+%\commentlh{The patch is to completely remove this loop and add something when initializing all XML\_Nodes. 
+%It is too large and hard to understand.}
 
 To fix this bug, the developers added an extra field to each \texttt{XML\_NODE} to save its parent,
 and this field is initialized when an \texttt{XML\_NODE} is created.
