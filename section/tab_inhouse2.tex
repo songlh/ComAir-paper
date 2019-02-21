@@ -15,7 +15,7 @@
     \cmidrule(lr){5-11}
     \cmidrule(lr){12-13}
     {BugID} & {KLOC} & {P. L.} & {Comp.} & {Ranking}   & Cost      & $R^2$-Func      & $R^2$-Input    & $R^2$-Cost & {Overhead} & {Overhead} & {Ranking} & {Overhead}  \\
-           &         &         &         &             & Function  &                 &                &     &  w/ opt.   & w/o opt.   &    &   \\
+           &         &         &         &             & Function  &                 &                &     &  w/ ins.   & w/o ins.   &    &   \\
     \midrule
     Mozilla\#347306 &$88$ &C &$O(N^{2})$&1$_{{5}}$    &$y=9.54*10^{-2}x^2$ & \Yes{{0.99}}  &\Yes{{1.00}}&\Yes{{0.99}}&2.34\%       & 8.07X &1$_{465}$ & 79X \\
     Mozilla\#416628   &$105$    &C   &$O(N^{2})$&1$_{{5}}$&$y=7.20*10^{-3}x^2$& \Yes{{0.99}} &\Yes{{0.99}}&\Yes{{0.99}}&3.77\%     & 9.17X &1$_{394}$  & 1252X \\
@@ -71,11 +71,12 @@
   \mycaption{tab:benchmark_info}{Benchmark Information and evaluation results for \Tool.}
    {In the ``Benchmark Information'' columns,
    $x^*$: $x$ thousands of lines of code for re-implemented benchmarks.
-   In the ``Production-run Version''columns,
+   In the ``Production-run Version'' columns,
    $x_{y}$: the root-cause loop is ranked as $x$th in $y$ evaluated loops;
-   Cost Function: we only report the part with the highest order due to limited space; 
+   Cost Function: we only report the part with the highest order; 
    $R^2$-Func: $R^2$ values comparing observed cost with predicted cost by cost function;
-   $R^2$-Input: $R^2$ values comparing input sizes reported with optimizations and without optimizations;
+   $R^2$-Input: $R^2$ values comparing input sizes reported with and without instrumentation methods;
+   ins. is short for instrumentation methods;
    \Yes{{x}}: the computed $R^2$ value x is larger than 0.92;
    In the ``In-house Version'' columns, 
    $x_{y}$: the root-cause function is ranked as $x$th in $y$ executed functions.}

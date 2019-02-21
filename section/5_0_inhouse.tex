@@ -7,7 +7,7 @@ Existing testing inputs can be used to launch \Tool,
 and testing input generation techniques~\cite{KLEE,dart,s2e} 
 can also be utilized to create more inputs.
 For testing inputs with repetitive patterns, 
-developer can change these inputs by themselves 
+developers can change these inputs by themselves 
 and create inputs with the same functionality but different sizes. 
 \Tool automatically merges input and cost information 
 for the same code constructs
@@ -19,10 +19,10 @@ collected from multiple runs with different inputs and infer cost functions.
 
 The in-house version of \Tool uses RMS as input metric and BB
 as cost metric.
-It is configured by enabling only the two instrumentation site optimizations 
+It is configured by enabling only the three instrumentation site optimizations 
 (Section~\ref{sec:site_opt}), without enabling approximation (Section~\ref{sec:approximate})
 and sampling (Section~\ref{sec:sampling}). 
-The reason is that the optimization methods intend to speed up \Tool, 
+The reason is that the instrumentation site optimizations intend to speed up \Tool, 
 while still providing the same results, 
 but enabling the approximation and sampling will sacrifice accuracy. 
 %\commentty{In the above sentence, better add pointers to specific sections.}
@@ -57,7 +57,7 @@ the function containing the outer loop by the in-house version.
 %The main advantage of the in-house version of \Tool 
 %over existing profilers (e.g., Aprof~\cite{Aprof1,Aprof2}) is that 
 Like the production version of \Tool, the in-house version also provides a 
-ranked list of functions to help localizing complexity problems.
+ranked list of functions to help localize complexity problems.
 However, existing profilers (e.g., Aprof~\cite{Aprof1,Aprof2})  
 %existing tools 
 simply attribute complexity to each executed function, 
