@@ -143,7 +143,7 @@ Second, guided by the findings from the empirical
 study, we develop \Tool, the first automated tool to effectively and efficiently 
 conduct algorithmic profiling under production-run setting.
 Given a program under profiling, \Tool first instruments the program
-using a light-weighted instrumentation method. 
+using light-weighted instrumentation methods. 
 The key idea is to use software-based sampling to conduct algorithmic profiling.
 Given a code construct, like a loop or a function,  
 with multiple dynamic instances in a program run,
@@ -168,7 +168,7 @@ of containing performance bugs due to complexity problems.
 \Tool provides several benefits over existing profilers:
 1) \Tool supports production-run algorithmic profiling by taking into account
 real-world workloads and can thus discover most of the real complexity problems;
-2) \Tool incurs negligible runtime overhead while achieving accurate profiling results;
+2) \Tool incurs a negligible runtime overhead while achieving accurate profiling results;
 3) \Tool  simplifies the task of detecting performance bugs related to complexity
 problems by providing a ranked list of code constructs in terms of their
 likelihood of containing complexity problems;
@@ -178,7 +178,7 @@ decisions for performance bug fixing and optimization.
 
 
 We envision that \Tool can be used in at least two scenarios. 
-First, \Tool can be deployed on user site to conduct production-run algorithmic
+First, \Tool can be deployed on user side to conduct production-run algorithmic
 profiling. The results (i.e., a ranked list of code constructs with their cost functions)
 are returned to developers, which can help to localize performance 
 bugs and understand 
@@ -224,11 +224,11 @@ caused by different types of complexity problems and attribute complexity inform
 \item We develop   \Tool, the first performance profiling tool that is intended to be used
 in production environment to effectively detect performance
 issues caused by different types of complexity problems and attribute the 
-problems to specific code constructs with negligible
+problems to specific code constructs with a negligible
 overhead.  
 \Tool can also be configured as an in-house testing tool. 
 
-\item We conducted thorough experiments and demonstrated the effectiveness, accuracy, and efficiency of \Tool. 
+\item We conduct thorough experiments and demonstrated the effectiveness, accuracy, and efficiency of \Tool. 
 
 %We implement \Tool and conduct an empirical study to demonstrate 
 %its effectiveness and efficiency in detecting complexity problems. 

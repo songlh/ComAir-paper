@@ -12,9 +12,9 @@ among all evaluated loops and executed functions.
 The buggy loop and the buggy function are ranked as No. 1 for \textbf{all}
 benchmarks by the production-run version and the in-house version respectively. 
 The numbers of evaluated or executed code constructs are shown as subscripts of 
-the two ``ranking'' columns. 
-For the production-run version, the evaluated loops range from 3 to 5.
-For the in-house version, there are 11 bugs whose executed functions are more than 
+the two ``Ranking'' columns. 
+When evaluating the production-run version, the evaluated loops range from 3 to 5 for each bug.
+When evaluating the in-house version, there are 11 bugs whose executed functions are more than 
 100.  GCC\#46401 has 4249 executed functions, 
 which is the largest number.  
 Our ranking mechanism can effectively identify
@@ -30,7 +30,7 @@ To fix this bug, GCC developers significantly reduce
 the workload processed by the inner loop. 
 Among the five evaluated loops, three of them are in superlinear complexity, 
 and the production-run version successfully ranks the inner loop as No. 1.
-There are in total 1373 executed function during buggy runs,
+There are in total 1373 executed functions during buggy runs,
 and 87 of them are in superlinear complexity. 
 The buggy function containing the outer loop is ranked as No. 1 
 by the in-house version. 
@@ -44,7 +44,7 @@ suspicious loops or functions in superlinear complexity.
 As shown in Table~\ref{tab:benchmark_info} (the ``Cost Function'' column),
 the production-run version of \Tool successfully 
 reports the correct complexity for the buggy loops of 
-all evaluated benchmark. 
+all evaluated benchmarks. 
 We compute the $R^2$ value between observed cost values and 
 cost values predicted by the inferred cost function for each bug 
 (the ``$R^2$-Func'' column).  
@@ -116,10 +116,10 @@ but with a significantly lower overhead. }
 \subsection{Discussion and Limitations}
 
 The current design and implementation of \Tool 
-only consider complexity problems in one thread. 
+only consider complexity problems in single thread. 
 To profile multi-threaded programs, 
 \Tool needs extra synchronizations on all utilized global data structures, 
-and these synchronizations may bring more overhead. 
+and these synchronizations may generate more overhead. 
 \Tool also needs more advanced input metrics to precisely profile programs 
 in the multi-threaded producer-consumer 
 model discussed in previous work~\cite{Aprof2}. 
@@ -132,8 +132,8 @@ For example, if a profiling target is a loop and
 one sampled instance of the loop contains a lot of iterations, 
 \Tool may cause observable slowdown. 
 To handle this problem, the next version of \Tool could 
-be enhanced by recording dynamic information of limited number 
-of iterations for each sampled loop instance. 
+be enhanced by recording dynamic information for limited number 
+of iterations of  each sampled loop instance. 
 
 
 
