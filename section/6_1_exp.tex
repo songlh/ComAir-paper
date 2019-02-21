@@ -77,12 +77,9 @@ The minimum $R^2$ value is $0.93$ for GCC\#1687.
 Applied optimizations include
 sampling and approximation, which can potentially influence profiling results.
 However, our experimental results demonstrate that \emph{sampling and approximation 
+optimizations
 applied in the production-run version of \Tool do not hurt accuracy. 
 }
-\commentty{Are we evaluating only sampling and approximation, or all optimization methods
-described  in Section 4.1? We should make this part clear.}
-\commentlh{addressed.}
-
 
 
 \subsubsection{RQ3: Overhead}
@@ -95,8 +92,8 @@ under 5\% for all evaluated bugs.
 There are night bugs, whose overhead is less than 1\%, 
 and 16 bugs, whose overhead is in the range from 1\% to 3\%.  
 The largest overhead is 4.82\% for Collections\#434. 
-The production-run version of \Tool only incurs a negligible runtime overhead, 
-and it can be deployed in production environment.  
+The results imply that \emph{the production-run version of \Tool only incurs a negligible runtime overhead, 
+and it can be deployed in production environment.}
 
 We also measure the runtime overhead for the production-run 
 version without enabling optimizations, 
@@ -112,10 +109,9 @@ of \Tool is also measured
 The overhead can be as large as 1252X for 
 Mozilla\#416628.
 For 31 out of 38 bugs, the overhead is larger than 10X. 
-The production-run version can generate results as accurate as the in-house version,
-but with a significantly lower overhead. 
-\commentty{What do the above results imply?}
-\commentlh{addressed.}
+These results indicate that \emph{the 
+ production-run version of \Tool can generate results as accurate as the in-house version,
+but with a significantly lower overhead. }
 
 
 \subsection{Discussion and Limitations}
