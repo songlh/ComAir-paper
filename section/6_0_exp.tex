@@ -165,16 +165,13 @@ the known complexity problem (i.e., ground truth),
 we manually examined the solution discussed 
 in the corresponding issue 
 report and the patch used for fixing the issue. 
-\commentlh{
 To apply the production-run version of \Tool on each bug,
-we first use a Pin tool to record executed iteration 
+we first use a PIN tool~\cite{?} \commentty{need a citation} to record executed iteration 
 numbers for all loops using the bug-triggering input,
 and then we instrument the top five loops with the largest loop 
-iteration numbers to create five distinct program versions, 
+iteration numbers to create five distinct program versions
+deployed in production, 
 since instrumenting all loops is expensive. 
-}
-\commentty{how did you know which five to instrument
-among all code constructs?}
 For benchmarks with less than five executed 
 loops during buggy runs, 
 we instrument all executed loops.  

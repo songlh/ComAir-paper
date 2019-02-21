@@ -29,13 +29,13 @@ Even bookmarking 50 tabs can cause a timeout dialog
 window to pop up during a performance failure run. 
 To fix this bug, Mozilla developers use one single aggregated transaction 
 to bookmark all tabs.
-As another example, Mozilla\#344059 is due to saving unchanged 
-search engine preferences to SQLite, 
-and it is fixed by saving search 
-engine preferences
-only when some of them are changed.
+%As another example, Mozilla\#344059 is due to saving unchanged 
+%search engine preferences to SQLite, 
+%and it is fixed by saving search 
+%engine preferences
+%only when some of them are changed.
 
-For the other three bugs,
+For the other three bugs, \commentty{the other two? since you have 7 bugs in total}
 their buggy loops execute many iterations during performance failure runs.
 They are fixed by adding shortcuts to completely skip the buggy loops. 
 Taking MySQL\#33948 as an example,
@@ -59,7 +59,8 @@ scale as input size $N$.
 
 \input{section/fig_time}
 
-\input{section/fig_apache34464}
+
+%\input{section/fig_apache34464}
 
 To fix the majority (14/19) of bugs in this category,
 developers directly modify the buggy loops, 
@@ -74,11 +75,13 @@ shown in Figure~\ref{fig:mysql27287-time}.
 To fix the other bugs (5/19),
 developers reduce workloads processed by the loops scaling polynomially, 
 instead of changing the loops directly.
-The buggy code fragment of Apache\#34464 is shown in Figure~\ref{fig:apache34464}.
-The \texttt{while} loop at line 5 searches a string \texttt{src}
+In Apache\#34464, the 
+%The buggy code fragment of Apache\#34464 is shown in Figure~\ref{fig:apache34464}.
+%The 
+\texttt{while} loop searches a string \texttt{src}
 for a target sub-string \texttt{tgt}.
 If the search is unsuccessful, 
-a new character returned from \texttt{getchar()} at line 8 will be appended 
+a new character returned from \texttt{getchar()} will be appended 
 to string \texttt{src}, 
 and the loop will search \texttt{src} again from the beginning. 
 There is an inner loop inside \texttt{indexOf()}, whose total iterations 
@@ -86,9 +89,9 @@ scale polynomially in terms of the number of characters returned from \texttt{ge
 After fixing this bug, the inner loop will only check the most recent \texttt{tgtLen} characters.
 The developers do not change the inner loop, 
 while reducing the workload it processes.   
-How execution time scales after patching for 
-this bug is shown in Figure~\ref{fig:apache34464-time}.
-
+Figure~\ref{fig:apache34464-time} shows 
+how the execution time scales after patching for 
+this bug.
 
 
 
@@ -116,19 +119,19 @@ However, there is a type declaration error inside the hash table entry,
 and this error causes \texttt{t} larger than the maximum unsigned integer to never hit cache.
 For large \texttt{t}, \texttt{mult\_alg} is still in exponential complexity. 
 After fixing the type declaration error, 
-After fixing the type declaration error, 
 memoization is enabled for large \texttt{t}, 
 as shown in Figure~\ref{fig:gcc27733-time}.
 %How the complexity changes after patching for 
 %GCC\#27733 is shown in Figure~\ref{fig:gcc27733-time}.
 
-GCC\#32540 is in exponential complexity and it is caused by an inefficient loop. 
-The loop applies an iterative algorithm to implement a compiler optimization. 
-The bug-triggering input contains very complex control and data dependence,  
-so that the buggy loop scales exponentially in terms of 
-\texttt{if} branches in the input code. 
-To fix this bug, developers simply disable the optimization 
-once they detect complex control and data dependence.  
+
+%GCC\#32540 is in exponential complexity and it is caused by an inefficient loop. 
+%The loop applies an iterative algorithm to implement a compiler optimization. 
+%The bug-triggering input contains very complex control and data dependence,  
+%so that the buggy loop scales exponentially in terms of 
+%\texttt{if} branches in the input code. 
+%To fix this bug, developers simply disable the optimization 
+%once they detect complex control and data dependence.  
  
 \subsection{Implications}
 \label{sec:study_impli}
