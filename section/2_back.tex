@@ -48,9 +48,9 @@ the code construct are considered.
 %and from different threads. 
 
 Take MySQL\#27287 (Figure~\ref{fig:mysql27287}) as an example, 
-during an execution of the buggy loop, the number of accesses
+during an execution of the buggy loop, the input size
 computed by RMS is approximately 
-two times as the number of actual accessed elements inside array \texttt{items}. 
+two times the number of actual accessed elements inside array \texttt{items}. 
 This is because different \texttt{XML\_NODE}s' \texttt{level} and \texttt{type} 
 fields are read in different loop iterations. 
 Although variable \texttt{p} and \texttt{level} are also read in each iteration,
@@ -58,7 +58,7 @@ RMS only considers distinct memory cells and
 only increments its value for the first read on these 
 two variables in the first iteration. 
 For the outer loop, which is not shown in Figure~\ref{fig:mysql27287}, 
-its RMS is approximately equal to the size of \texttt{items}, 
+its RMS is roughly equal to the size of \texttt{items}, 
 because the outer loop invokes \texttt{xml\_parent\_tag()} for every
 \texttt{XML\_NODE} in the \texttt{items} and RMS only 
 counts distinct memory cells. 
@@ -115,8 +115,7 @@ roughly consumes the same computation cost.
 There are at least three limitations in existing algorithmic profiling techniques. 
 %
 First, existing techniques can only 
-attribute complexity to every executed code construct
-in single executions, 
+attribute complexity to every executed code construct, 
 while cannot provide more information about 
 which code construct is the root cause 
 for a performance slowdown recorded by multiple 
@@ -138,31 +137,34 @@ which function is the root cause from profiling results of existing techniques.
 
 Second, existing techniques incur significant runtime overheads. 
 They simply record all direct information to calculate the metrics, 
-failing to consider programs' structures and missing opportunities to optimize performance.
-For example, we implement an existing technique, Aprof~\cite{Aprof1,Aprof2}, 
-using LLVM in our experiment. 
-For most evaluated benchmark, Aprof incurs 50$X$ runtime overhead.
+failing to consider programs' structures and missing opportunities 
+to optimize performance.
+For example, as an existing technique, Aprof can incur 
+30X slowdown in previous evaluation~\cite{Aprof1,Aprof2}. 
+
 %\commentty{Why do they incur large overheads? What are the underlying limitations?}
 %\emph{Due to the extremely large overhead, 
 %we cannot deploy these two techniques in production-run scenario. }
 
 
-Third, one option to mitigate runtime overhead is using
+
+Third, one option to mitigate runtime overhead is leveraging
 sampling, which is a widely-used technique to lower runtime overhead 
 and deploy existing techniques to production 
-environments~\cite{SongOOPSLA2014,liblit03,liblit05,CCI}. 
+environment~\cite{SongOOPSLA2014,liblit03,liblit05,CCI}. 
 However, \emph{existing algorithmic profiling techniques are not cooperative well with
 sampling approach.} 
 Take MySQL\#27287 in Figure~\ref{fig:mysql27287} as an example,
 the $n^2$ complexity can only be observed on the side of the outer loop. 
-One execution of the outer loop contributes almost all of 
+One single execution of the outer loop contributes almost all of 
 the execution time during performance failure runs. 
-When we try to sample the outer loop, 
+If we try to sample the outer loop, 
 we may not get any sample and thus miss the opportunity to 
 identify the $n^2$ complexity, or we get a sample but have to 
 record all 
 information for the sampled execution of the outer loop, 
-which can still  have a non-tolerable overhead. 
+which can still  lead to a non-tolerable slowdown. 
+
 
 
 To address the above limitations, 
