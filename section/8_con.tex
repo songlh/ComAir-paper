@@ -1,16 +1,17 @@
 \section{Conclusion}
 \label{sec:con}
 
-In this paper, we present \Tool, which can effectively conduct algorithmic profiling
-under both in-house and production-run setting.
+In this paper, we present \Tool, an automated tool that can effectively conduct algorithmic profiling
+under both in-house and production-run settings.
 \Tool enhances existing algorithmic profiling techniques by 
 (1) providing a ranking mechanism to effectively identify root 
 causes for performance failures due to complexity problems, 
 and (2) significantly lowering runtime overhead 
-and enabling algorithmic profiling in production environment. 
-Our evaluation shows that \Tool can accurately identify root causes 
-with accurate profiling results, 
-and incur negligible overhead under the production-run setting. 
-Future work can improve \Tool to profile multi-threaded programs 
-and avoid performance corner cases during sampling. 
+for enabling algorithmic profiling in production environment. 
+The evaluation on 17 benchmark programs shows that, with our designed optimization
+methods, \Tool can accurately identify the root causes 
+of real complexity problems
+while incurring negligible overhead under the production-run setting. 
+%Future work can improve \Tool to profile multi-threaded programs 
+%and avoid performance corner cases during sampling. 
 
