@@ -35,10 +35,10 @@ to bookmark all tabs.
 %engine preferences
 %only when some of them are changed.
 
-For the other three bugs, \commentty{the other two? since you have 7 bugs in total}
+For the other two bugs,
 their buggy loops execute many iterations during performance failure runs.
 They are fixed by adding shortcuts to completely skip the buggy loops. 
-MySQL\#33948 as an example,
+Take MySQL\#33948 as an example,
 MySQL developers followed a common practice to keep all table entries in the same linked list, 
 including both used ones and free ones. 
 The buggy loop iterates the linked list and looks for a free entry.
@@ -60,24 +60,25 @@ scale as input size $N$.
 \input{section/fig_time}
 
 
-%\input{section/fig_apache34464}
+\input{section/fig_apache34464}
 
 To fix the majority (14/19) of bugs in this category,
 developers directly modify the buggy loops, 
 whose total iteration numbers scale polynomially.
-Take MySQL\#27287 as an illustration.
-To fix this bug,
+Take MySQL\#27287 as an illustration,
+to fix this bug,
 developers add an extra field to save parent \texttt{XML\_NODE}
-and completely remove the buggy loop shown in Figure~\ref{fig:mysql27287}.
+and completely remove the buggy loop in Figure~\ref{fig:mysql27287}.
 How the execution time changes after patching for MySQL\#27287 is 
 shown in Figure~\ref{fig:mysql27287-time}. 
+
 
 To fix the other bugs (5/19),
 developers reduce workloads processed by the loops scaling polynomially, 
 instead of changing the loops directly.
-In Apache\#34464, the 
-%The buggy code fragment of Apache\#34464 is shown in Figure~\ref{fig:apache34464}.
-%The 
+%In Apache\#34464, the 
+The buggy code fragment of Apache\#34464 is shown in Figure~\ref{fig:apache34464}.
+The 
 \texttt{while} loop searches a string \texttt{src}
 for a target sub-string \texttt{tgt}.
 If the search is unsuccessful, 
@@ -116,7 +117,7 @@ To optimize this function,
 GCC developers use a hash table, \texttt{alg\_hash}, to record
 which \texttt{t} has been processed before and its corresponding result.
 However, there is a type declaration error inside the hash table entry,
-and this error causes \texttt{t} larger than the maximum unsigned integer to never hit cache.
+causing \texttt{t} larger than the maximum unsigned integer to never hit cache.
 For large \texttt{t}, \texttt{mult\_alg} is still in exponential complexity. 
 After fixing the type declaration error, 
 memoization is enabled for large \texttt{t}, 
