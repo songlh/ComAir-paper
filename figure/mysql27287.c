@@ -8,6 +8,6 @@ uint xml_parent_tag(XML_NODE * items, uint nitems) {
     if(p->level == level && p->type == XML_NODE_TAG) {
       return p - items;
     }
-  }
+  } 
   return 0;
 }
