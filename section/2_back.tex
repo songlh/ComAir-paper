@@ -16,7 +16,6 @@ In the end, we infer complexity for the code construct as a cost function of inp
 %\commentty{To help reviewers better understand algorithmic profiling,
 %we can rephrase the example of Figure 1 to illustrate algorithmic profiling and
 %show how the cost function looks like.}
-
 To conduct algorithmic profiling effectively, 
 we need to define suitable metrics for input and cost. 
 
@@ -47,9 +46,9 @@ the code construct are considered.
 %RMS is extended  to handle inputs from library calls 
 %and from different threads. 
 
-Take MySQL\#27287 (Figure~\ref{fig:mysql27287}) as an example, 
+Taking MySQL\#27287 (Figure~\ref{fig:mysql27287}) as an example, 
 during an execution of the buggy loop, the input size
-computed by RMS is approximately 
+computed by RMS is roughly 
 two times the number of actual accessed elements inside array \texttt{items}. 
 This is because different \texttt{XML\_NODE}s' \texttt{level} and \texttt{type} 
 fields are read in different loop iterations. 
@@ -86,7 +85,7 @@ In this paper, we focus on CPU cycles (or computation cost),
 since computation cost is often correlated 
 with user-perceived software slowdown~\cite{SongOOPSLA2014}.
 We leave the measurement for other types of 
-consumed resources for future work.
+resources for future work.
 
 
 Computation cost can be measured 

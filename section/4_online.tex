@@ -20,7 +20,7 @@ We then describe how to use \Tool as an in-house testing tool.
 The design of \Tool used in production environment 
 follows two steps. First, given a program under profiling,
 \Tool instruments the program and
-distribute it to end users to collect runtime profiles
+distributes it to end users to collect runtime profiles
 under different user inputs (e.g., workloads). 
 To minimize runtime overhead, we design and implement
 several advanced instrumentation methods in \Tool. 
@@ -33,7 +33,7 @@ We next describe details of the two steps.
 
 
 \subsection{Using Light-Weighted Instrumentation 
-for Algorithmic Profling}
+for Algorithmic Profiling}
 \label{sec:opt}
 
 To obtain execution profiles, we need to select suitable 
@@ -385,7 +385,7 @@ total number of distinct memory cells in the previous $i-1$ samples,
 $C_i$ represents the number of distinct memory cells in the $i$th sample,
 and $R_i$ represents the number of distinct memory cells in 
 the $i$th sample that also appeared in one of the previous $i-1$ samples.
-The estimated RMS or DSS for the profiling target can be calculated as:
+The estimated RMS or DSS for the profiling target is:
 
 
 %\vspace{-0.in}
