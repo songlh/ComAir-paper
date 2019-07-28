@@ -13,44 +13,45 @@ following previous works in this area~\cite{SongOOPSLA2014,ldoctor}.};
 Table~\ref{tab:study} shows the results. 
 
 \noindent{\underline{\textit{$O(N)$: linear complexity.}}} 
-As shown in Table~\ref{tab:study}, 
-7 out of \ComBugs studied complexity problems are in linear complexity. 
-All of them are caused by a buggy loop, 
+Table~\ref{tab:study} shows that seven complexity bugs are in linear complexity,
+and they are caused by a buggy loop, 
 whose iteration number scales with input size $N$.
-
-Five of them are characterized by buggy loops that contain serialized I/O operations.
+Five of them are characterized by buggy loops with serialized I/O operations.
 Users could perceive these bugs, 
 even though the loop iteration numbers are not large.
-Patching these 5 bugs involves aggregating I/O operations 
+Patching the five bugs involves aggregating I/O operations 
 or completely eliminating unnecessary I/O operations. 
 For example, Mozilla\#490742 is caused by bookmarking 
 tabs using individual database transactions. 
 Even bookmarking 50 tabs can cause a timeout dialog 
-window to pop up during a performance failure run. 
+window to pop up. 
 To fix this bug, Mozilla developers use one single aggregated transaction 
 to bookmark all tabs.
+The other two bugs are caused by a loop with many iterations. 
+They are fixed by adding shortcuts to completely skip the buggy loop. 
+
 %As another example, Mozilla\#344059 is due to saving unchanged 
 %search engine preferences to SQLite, 
 %and it is fixed by saving search 
 %engine preferences
 %only when some of them are changed.
 
-For the other two bugs,
-their buggy loops execute many iterations during performance failure runs.
-They are fixed by adding shortcuts to completely skip the buggy loops. 
-Take MySQL\#33948 as an example,
-MySQL developers followed a common practice to keep all table entries in the same linked list, 
-including both used ones and free ones. 
-The buggy loop iterates the linked list and looks for a free entry.
-During performance failure runs, 
-many table entries are used and the buggy loop must iterate excessively to find a free entry.
-To fix this bug, MySQL developers simply separate used entries and free entries 
-into two separated linked lists. 
+
+%Take MySQL\#33948 as an example,
+%MySQL developers followed a common practice to keep all table entries in the same linked list, 
+%including both used ones and free ones. 
+%The buggy loop iterates the linked list and looks for a free entry.
+%During performance failure runs, 
+%many table entries are used and thus the buggy loop has to 
+%iterate excessively to find a free entry.
+%To fix this bug, MySQL developers simply separate used entries and free entries 
+%into two different linked lists. 
 
 
-\noindent{\underline{\textit{$O(N^k)$: polynomial complexity (k>1).}}}
+
+\noindent{\underline{\textit{$O(N^k)$: polynomial complexity ($k<1$).}}}
 As shown in Table~\ref{tab:study}, 
-more than half of the studied complexity bugs are in polynomial complexity. 
+more than half of the complexity bugs are in polynomial complexity. 
 Similar to the bugs in linear complexity,
 the polynomial complexity is also caused by a buggy loop.
 However, {\bf both} the loop execution number 
@@ -60,68 +61,59 @@ scale as input size $N$.
 
 
 
-\input{section/fig_apache34464}
+%\input{section/fig_apache34464}
 
-To fix the majority (14/19) of bugs in this category,
+To fix the majority (14/19) of the bugs in this category,
 developers directly modify the buggy loops, 
 whose total iteration numbers scale polynomially.
 Take MySQL\#27287 as an illustration,
 to fix this bug,
 developers add an extra field to save parent \texttt{XML\_NODE}
 and completely remove the buggy loop in Figure~\ref{fig:mysql27287}.
-How the execution time changes after patching for MySQL\#27287 is 
+How the execution time changes after patching is 
 shown in Figure~\ref{fig:mysql27287-time}. 
 
 
 To fix the other bugs (5/19),
 developers reduce workloads processed by the loops scaling polynomially, 
 instead of changing the loops directly.
-%In Apache\#34464, the 
-The buggy code fragment of Apache\#34464 is shown in Figure~\ref{fig:apache34464}.
-The 
-\texttt{while} loop searches a string \texttt{src}
-for a target sub-string \texttt{tgt}.
-If the search is unsuccessful, 
-a new character returned from \texttt{getchar()} will be appended 
-to string \texttt{src}, 
-and the loop will search \texttt{src} again from the beginning. 
-There is an inner loop inside \texttt{indexOf()}, whose total iterations 
-scale polynomially in terms of the number of characters returned from \texttt{getchar()}. 
-After fixing this bug, the inner loop will only check the most recent \texttt{tgtLen} characters.
-The developers do not change the inner loop, 
-while reducing the workload it processes.   
-Figure~\ref{fig:apache34464-time} shows 
-how the execution time scales after patching for 
-this bug.
+For example, Apache\#34464 is caused by two nested loops, 
+where the inner loop searches a source string from its beginning 
+for a target string 
+and the outer loop appends one character to the source 
+string in each iteration. 
+The total iterations of the inner loop scale polynomially with 
+the final length of the source string.
+To fix this bug, the developers change the inner loop to only 
+examine the last few characters of the source string and reduce the workload 
+processed by the inner loop.  
 
 
-
-\noindent{\underline{\textit{$O(e^N)$: exponential complexity.}}}
-Four of the studied complexity problems are in exponential complexity. 
-These complexity problems are fixed 
-either by leveraging memoization to reuse previous results 
-or by skipping the computation with exponential complexity for large workloads. 
 
 \input{section/fig_gcc27733}
 
-Three of the studied performance problems are caused by recursive function calls. 
-Taking GCC\#27733 in Figure~\ref{fig:gcc27733} as an example, 
-the recursive function \texttt{mult\_alg} computes the best algorithm to multiply \texttt{t}.
-In each invocation, \texttt{mult\_alg} will try a set of bitwise 
+\noindent{\underline{\textit{$O(e^N)$: exponential complexity.}}}
+Four complexity problems are in exponential complexity. 
+They are fixed 
+either by reusing previous results 
+or by skipping the computation in exponential complexity for large workloads. 
+Three of them are caused by recursive functions. 
+Figure~\ref{fig:gcc27733} shows one such example. 
+Function \texttt{mult\_alg()} computes the best algorithm to multiply \texttt{t}.
+In each invocation, \texttt{mult\_alg()} tries a set of bitwise 
 operations to change input 
-\texttt{t} into a smaller number, \texttt{t'}, 
-and recursively call itself.
-The number of times when \texttt{mult\_alg} is invoked scales exponentially 
-in terms of the number of 1s in the binary form of input \texttt{t}.
-To optimize this function, 
-GCC developers use a hash table, \texttt{alg\_hash}, to record
-which \texttt{t} has been processed before and its corresponding result.
-However, there is a type declaration error inside the hash table entry,
-causing \texttt{t} larger than the maximum unsigned integer to never hit cache.
-For large \texttt{t}, \texttt{mult\_alg} is still in exponential complexity. 
-After fixing the type declaration error, 
-memoization is enabled for large \texttt{t}, 
+\texttt{t} to a smaller number, \texttt{t'}, and recursively calls itself.
+How many time \texttt{mult\_alg()} is called scales exponentially 
+with the number of 1s in the binary form of input \texttt{t}.
+To optimize this function, a hash table (\texttt{alg\_hash}) is used to record
+which  \texttt{t} has been processed before and its corresponding result.
+However, a type declaration error in the hash table entry causes 
+\texttt{t} larger than the maximum \texttt{unsigned int} to never hit cache.
+For large \texttt{t}, \texttt{mult\_alg()} is still in exponential complexity. 
+After fixing the type declaration error, memoization is 
+enabled for large \texttt{t}, 
 as shown in Figure~\ref{fig:gcc27733-time}.
+
 %How the complexity changes after patching for 
 %GCC\#27733 is shown in Figure~\ref{fig:gcc27733-time}.
 
@@ -158,9 +150,9 @@ Our study also shows that
 approximately three-fourths of complexity problems (23/30)
 are caused by repeated executions of a loop or a recursive function. 
 Previous work~\cite{SongOOPSLA2014,ldoctor} 
-demostrates that sampling code constructs 
-that execute many times in one program run can lower the runtime overhead 
-while preserving the same diagnosis or detection capability. 
+demonstrates that sampling code constructs 
+executing many times in one program run can lower the runtime overhead 
+while still preserving the same diagnosis or detection capability. 
 It is promising to \emph{apply sampling 
 to design production-run algorithmic profiling techniques}.
 
@@ -168,13 +160,14 @@ to design production-run algorithmic profiling techniques}.
 \noindent{\underline{\textit{Implication 3.}}}
 We also examine what types of data structures holding inputs processed 
 by buggy loops or recursive functions.
-The most two common types of data structures 
+The two most common types of data structures 
 are array (11/30) and linked list (9/30).
 Other types of data structures are either application-specific or 
 can only cover one or two bugs.
 This fact inspires us to \emph{design effective algorithms 
 for loops that process an array or 
 a linked list during algorithmic profiling}. 
+
 
 
 

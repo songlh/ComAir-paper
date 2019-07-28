@@ -6,44 +6,42 @@ In this section, we present an empirical study on real-world
 complexity problems. Our empirical study is conducted in two steps.
 First, we quantitatively compare complexity problems with non-complexity problems
 from a public performance-bug benchmark set~\cite{PerfBug,SongOOPSLA2014,ldoctor}. 
-We want to understand the popularity of complexity problems 
-and whether they are different from non-complexity 
-problems during reporting and diagnosis. 
+%We want to understand the popularity of complexity problems 
+%and whether they are different from non-complexity 
+%problems during reporting and diagnosis. 
 Second, we build a taxonomy for complexity problems. 
-For bugs in each category, 
-we study what code constructs involve complexity problems,
-how the slowdown is caused and perceived by end users, 
-and the fixing strategies. 
+%For bugs in each category, 
+%we study what code constructs involve complexity problems,
+%how the slowdown is caused and perceived by end users, 
+%and the fixing strategies. 
 
 
 
 \subsection{Quantitative Comparison}
 \label{sec:compare}
 
-The benchmark suite contains 65 user-perceived performance bugs 
-collected from  Apache, Chrome, GCC, Mozilla, and MySQL. 
-These applications cover various types of functionalities and are implemented 
-in different programming languages, including C/C++, Java, C\#, and JavaScript. 
-All the five applications are large and mature, 
-with millions of lines of code and long development histories. 
+The benchmark set contains 65 user-perceived performance bugs 
+collected from five large, mature applications with different functionalities 
+and implemented in different programming languages. 
 All bugs in the benchmark suite are perceived and reported by real-world users
 and have large performance impact. 
-
 After carefully analyzing the bug reports and the associated buggy code fragments
-for bugs inside the benchmark suite,
+for bugs in the benchmark set,
 we identify \ComBugs performance bugs 
 related to complexity problems (or complexity bugs). 
 Developers usually fix these bugs by applying optimized algorithms to lower complexity
 or to reduce workloads processed by the buggy code. 
-These results indicate that \emph{complexity problems are popular and 
+These results indicate that \emph{complexity bugs are popular and 
 indeed one of the major reasons causing software slowdown.}
 
-Performance bugs not related to complexity problems are caused by various reasons.
-For example, there are several Mozilla bugs related to GUI operations, 
+
+Performance bugs not related to algorithmic complexity are caused by various reasons.
+For example, several Mozilla bugs are due to misuse GUI operations, 
 such as drawing transparent figures or refreshing web pages too frequently. 
 There are also bugs caused by misusing synchronizations, 
-such as using busy wait or I/O operations inside critical sections. 
+like using a busy wait or conducting I/O in critical sections. 
 Table~\ref{tab:study} shows the numbers of complexity bugs and non-complexity bugs.
+
 
 
 
@@ -64,11 +62,10 @@ Table~\ref{tab:study} shows the numbers of complexity bugs and non-complexity bu
 %problems and non-complexity problems. 
 
 
-We next analyze how long it takes to resolve performance bugs. 
+We next examine how long it takes to resolve performance bugs. 
 On average, developers use 162 days to fix a 
-complexity problem and use 103 days to fix a non-complexity problem. 
-The results indicate that complexity problems are potentially more difficult 
-to fix than non-complexity problems. 
+complexity problem and use 103 days to fix a non-complexity problem, 
+indicating that it is potentially more difficult to fix a complexity problem.
 
 
 We also find that 
@@ -76,9 +73,8 @@ when reporting a performance bug, the end user often
 1) compares the application's performance 
 using inputs with different sizes~\cite{SongOOPSLA2014}, 
 or 2) provides an input with repetitive patterns. 
-%For either of these two cases, 
-%it is fairly easy to figure out how to change input sizes. 
-There are 25 complexity bugs falling into one of the two cases, 
+There are 25 complexity bugs in one of the two cases, 
 while for non-complexity problems, the number is only 8.
+
 
 \input{section/tab_study}
