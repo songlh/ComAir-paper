@@ -96,7 +96,10 @@ understanding of these complexity problems.
 In our re-implementation, we maintain 
 their original algorithms, 
 data structures and caller-callee relationships. 
-
+\commentlh{We also reproduce all the three non-complexity, 
+single-process, MySQL bugs used in~\cite{SongOOPSLA2014} 
+to inspect whether \Tool will report 
+any false positive when analyzing non-complexity bugs.}
 
 The second source is from Toddler~\cite{Alabama} and LDoctor~\cite{ldoctor}. 
 Toddler is a dynamic technique that can detect inefficient loops in Java programs.
@@ -105,27 +108,31 @@ These bugs were later re-implemented in C/C++ by LDoctor.
 Thus, we use all the 21 bugs from LDoctor in our evaluation.  
 
 
-In total, we evaluate \Tool on 38 benchmark programs. 
+In total, we evaluate \Tool on 41 benchmark programs. 
 All benchmark information is shown in Table~\ref{tab:benchmark_info}. 
-Our evaluated original bugs are all large, and seven of them 
+Our evaluated original bugs are all large, and \commentlh{xxx} of them 
 are more than 1 million lines of code.
 Our evaluated re-implemented bugs are in small to middle sizes, 
 ranging from 91 to 1094 lines of code. 
 The majority of bugs used in our experiments are in $O(N^2)$ complexity. 
-We also have two bugs in $O(2^N)$ complexity 
-and four in O(N) complexity.
+We also have two bugs in $O(2^N)$ complexity, four in O(N) complexity, 
+and three non-complexity bugs.
 
 
 \subsubsection{Production-run and In-house Inputs}
 
-For the production-run version of \Tool, we create inputs used in our evaluation
-by simulating real user inputs.
-For each of the 38 benchmarks, we create ten distinct inputs, 
+\commentlh{
+We create three sets of evaluation inputs to simulate three different scenarios.
+Each set contains ten distinct inputs for every benchmark, 
 following previous practice in evaluating statistical debugging~\cite{joy.asplos13,SongOOPSLA2014}.
+The first scenario is the idea case. The sizes of the ten inputs 
+constitute an arithmetic sequence with the largest input size equal 
+to the input in the bug report
+and the smallest input size equal to $1/10$ of the largest input. 
 To obtain such inputs, we use bug reports, 
 which contain detailed information about how real-world 
 users perceive the complexity problems. 
-For 14 bugs, 
+For {xxx} bugs, 
 the users explicitly explained how to change input sizes 
 to reproduce the described scaling problems in the bug reports. 
 We follow the users' descriptions to create new inputs. 
@@ -135,16 +142,16 @@ so that it is not difficult for us to create new inputs.
 For example, when reporting GCC\#46401,
 the user provided a C file, 
 containing an expression with thousands of strings as operands. 
-We change the number of strings to create new inputs. 
-Finally, we create ten distinct inputs for each bug, 
-and we set their sizes 
-to be an arithmetic sequence with the largest input size
-equal to the input in the bug report and the 
-smallest input size equal to $1/10$ 
-of the largest input.
-We use the same inputs to evaluate the in-house version of \Tool
-to fairly compare accuracy and runtime 
-overhead between the two versions of \Tool.
+We change the number of strings to create new inputs.
+The second scenario is in-house testing, where
+developers can control the input size, 
+but they do not use inputs with too large size 
+to save testing time.  
+The ten input sizes also constitute an arithmetic sequence, 
+but the largest input size is only $1/100$ of the input size in the bug report. 
+The last scenario is production environment, 
+and we use input with random sizes. 
+}
 
 
 
@@ -179,9 +186,15 @@ deployed in production,
 since instrumenting all loops is expensive. 
 For benchmarks with less than five executed 
 loops during buggy runs, 
-we instrument all executed loops.  
+we instrument all executed loops. Selecting five loops follows the 
+experimental setting in a previous work~\cite{ldoctor}.
 For the in-house version, since the whole program is profiled, 
 we rank all executed functions during buggy runs. 
+\commentlh{
+Since traditional profilers are also commonly used to diagnose performance problems,
+we also evaluate oprofile using the largest input 
+in each set to compare it with \Tool. 
+}
 
 
 To answer RQ2 (i.e., the accuracy of the production-run version of \Tool),
