@@ -96,10 +96,10 @@ understanding of these complexity problems.
 In our re-implementation, we maintain 
 their original algorithms, 
 data structures and caller-callee relationships. 
-\commentlh{We also reproduce all the three non-complexity, 
+We also reproduced all three non-complexity, 
 single-process, MySQL bugs used in~\cite{SongOOPSLA2014} 
 to inspect whether \Tool will report 
-any false positive when analyzing non-complexity bugs.}
+any false positive when analyzing non-complexity bugs.
 
 The second source is from Toddler~\cite{Alabama} and LDoctor~\cite{ldoctor}. 
 Toddler is a dynamic technique that can detect inefficient loops in Java programs.
@@ -121,7 +121,7 @@ and three non-complexity bugs.
 
 \subsubsection{Production-run and In-house Inputs}
 
-\commentlh{
+%\commentlh{
 We create three sets of evaluation inputs to simulate three different scenarios.
 Each set contains ten distinct inputs for every benchmark, 
 following previous practice in evaluating statistical debugging~\cite{joy.asplos13,SongOOPSLA2014}.
@@ -130,6 +130,7 @@ constitute an arithmetic sequence with the largest input size equal
 to the input in the bug report
 and the smallest input size equal to $1/10$ of the largest input. 
 To obtain such inputs, we use bug reports, 
+\commentty{better elaborate the sources of the bug reports}
 which contain detailed information about how real-world 
 users perceive the complexity problems. 
 For {xxx} bugs, 
@@ -143,16 +144,29 @@ For example, when reporting GCC\#46401,
 the user provided a C file, 
 containing an expression with thousands of strings as operands. 
 We change the number of strings to create new inputs.
+
 The second scenario is in-house testing, where
 developers can control the input size, 
 but they do not use inputs with too large size 
 to save testing time.  
 The ten input sizes also constitute an arithmetic sequence, 
 but the largest input size is only $1/100$ of the input size in the bug report. 
+
 The last scenario is production environment, 
 and we use input with random sizes. 
-}
+%}
 
+\commentty{Are the three scenarios used in both in-house and production, or only the last scenario is
+used in production? It'd be better to explain why certain inputs are suitable for in-house/production... it seems that
+the first scenario can also be used in production because the inputs are from users.}
+
+\subsubsection{Baseline Approaches}
+
+...
+
+\commentty{Can we put the baselines (e.g., statistical debugging, oprofile) here, and 
+explain why we use them as baselines? The current baselines are hidden in the description,
+which may make  careless reviewers feel that we do not have them at all. }
 
 
 \subsubsection{Experimental Settings}
@@ -168,6 +182,9 @@ We use $1/100$ as default sampling rate for
 the production-run version of \Tool, 
 which is also the default sampling rate 
 in previous works on statistical debugging~\cite{liblit03,CCI,ldoctor}.
+
+\commentty{We never mention what sets of inputs are used
+to answer the RQs.}
 
 To answer RQ1 (i.e., the effectiveness of  \Tool in identifying
 complexity problems), we measure the ranking number (position) of code
